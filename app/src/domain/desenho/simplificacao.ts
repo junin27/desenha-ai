@@ -3,6 +3,7 @@ import { distanciaAoSegmento } from "./geometria";
 import { normalizar } from "./normalizacao";
 
 export const EPSILON_PADRAO = 2;
+const TOLERANCIA_DE_EMPATE = 1e-9; // distâncias tão próximas assim contam como iguais
 
 /**
  * Normaliza e simplifica (RDP, ε = 2) um desenho capturado no jogo, para ele ficar parecido com os do
@@ -36,12 +37,13 @@ export function simplificarTraco(traco: Traco, epsilon: number): Ponto[] {
 function pontoMaisDistante(traco: Traco, inicio: number, fim: number): [number, number] {
   const a = pontoEm(traco, inicio);
   const b = pontoEm(traco, fim);
-  let melhor: [number, number] = [inicio, 0];
-  for (let i = inicio + 1; i < fim; i++) {
-    const distancia = distanciaAoSegmento(pontoEm(traco, i), a, b);
-    if (distancia > melhor[1]) melhor = [i, distancia]; // estrito: primeiro máximo, como o argmax do numpy
-  }
-  return melhor;
+  const distancias: number[] = [];
+  for (let i = inicio + 1; i < fim; i++) distancias.push(distanciaAoSegmento(pontoEm(traco, i), a, b));
+  if (distancias.length === 0) return [inicio, 0];
+  // Empate (até TOLERANCIA_DE_EMPATE do máximo) fica com o menor índice, como no Python (D8 do design).
+  const limite = Math.max(...distancias) - TOLERANCIA_DE_EMPATE;
+  const posicao = distancias.findIndex((d) => d >= limite);
+  return [inicio + 1 + posicao, distancias[posicao] ?? 0];
 }
 
 function pontoEm(traco: Traco, indice: number): Ponto {

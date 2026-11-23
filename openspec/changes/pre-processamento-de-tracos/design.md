@@ -52,6 +52,12 @@ O Python é a referência (o treino usa ele). O comando `python -m desenha_ml.co
 
 A versão otimizada é conferida **pixel a pixel** contra uma implementação de referência direta (todo subponto contra todo segmento) nos 90 desenhos (`test_rasterizacao_otimizada_igual_a_referencia_em_desenhos_reais`). A sequência stroke-3 leva 0,05 ms. Estimativa no Colab (2 núcleos, ~480 mil rasterizações entre completas e parciais): cerca de 6 a 9 minutos.
 
+### D8 — Empate no RDP e ordem das contas (achado do teste de contrato, 23/11/2026)
+O primeiro teste de contrato falhou no caso `denso_capturado` (círculo de 301 pontos): Python e TypeScript mantinham pontos diferentes. Num traço simétrico, dois pontos ficam à mesma distância do segmento; o Python calculava o produto escalar com `@` (outra ordem de soma) e o JavaScript termo a termo, e a última casa decimal decidia o `argmax` de cada lado. Correção nas duas linguagens:
+1. A distância ao segmento é calculada termo a termo, na mesma ordem (`geometria.py` / `geometria.ts`).
+2. Distâncias a até 1e-9 do máximo contam como empate, e vence o **menor índice** (testes de regressão nos dois lados).
+- **Alternativa descartada:** aumentar a tolerância do contrato para pontos (esconderia a divergência em vez de corrigir; no jogo, o desenho do visitante seria simplificado diferente do treino).
+
 ## Risks / Trade-offs
 
 - [Rasterização em Python lenta para 540 mil imagens] → vetorizar por segmento e usar `multiprocessing` no Colab; medir no notebook e, se passar de 15 min, guardar os arrays no Drive para reaproveitar.

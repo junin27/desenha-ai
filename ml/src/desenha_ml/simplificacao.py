@@ -18,6 +18,7 @@ from desenha_ml.geometria import distancias_ao_segmento
 from desenha_ml.normalizacao import normalizar
 
 EPSILON_PADRAO = 2.0
+TOLERANCIA_DE_EMPATE = 1e-9  # distâncias tão próximas assim contam como iguais
 
 
 def preparar_desenho_capturado(desenho: Desenho, epsilon: float = EPSILON_PADRAO) -> Desenho:
@@ -46,5 +47,6 @@ def _ponto_mais_distante(traco: Traco, inicio: int, fim: int) -> tuple[int, floa
     if fim - inicio < 2:
         return inicio, 0.0
     distancias = distancias_ao_segmento(traco[inicio + 1 : fim], traco[inicio], traco[fim])
-    posicao = int(np.argmax(distancias))
+    # Empate (até TOLERANCIA_DE_EMPATE do máximo) fica com o menor índice, nas duas linguagens (D8).
+    posicao = int(np.argmax(distancias >= float(np.max(distancias)) - TOLERANCIA_DE_EMPATE))
     return inicio + 1 + posicao, float(distancias[posicao])

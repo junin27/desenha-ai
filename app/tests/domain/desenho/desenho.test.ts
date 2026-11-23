@@ -111,6 +111,20 @@ describe("Requisito: Simplificação de traços capturados", () => {
   });
 });
 
+describe("Desempate do RDP (D8 do design)", () => {
+  it("distâncias empatadas até 1e-9 escolhem o menor índice", () => {
+    const traco = [
+      [0, 0],
+      [50, 30],
+      [150, 30 + 1e-12],
+      [200, 0],
+    ] as const;
+    // O ponto 2 é 1e-12 mais distante, mas o empate fica com o ponto 1 (a escolha errada daria p0, p2, p3).
+    expect(simplificarTraco(traco, 25)).toEqual([traco[0], traco[1], traco[3]]);
+    expect(simplificarTraco(traco, 40)).toEqual([traco[0], traco[3]]);
+  });
+});
+
 describe("Requisito: Prefixo do desenho", () => {
   const quatroMaisSeis = criarDesenho([
     Array.from({ length: 4 }, (_, i) => [2 * i, 2 * i + 1] as const),

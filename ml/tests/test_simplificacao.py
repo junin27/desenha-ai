@@ -3,7 +3,7 @@
 import numpy as np
 
 from desenha_ml.desenho import Desenho
-from desenha_ml.simplificacao import preparar_desenho_capturado, simplificar_traco
+from desenha_ml.simplificacao import _ponto_mais_distante, preparar_desenho_capturado, simplificar_traco
 
 
 def test_pontos_colineares_sao_removidos() -> None:
@@ -43,3 +43,13 @@ def test_traco_longo_nao_estoura_recursao() -> None:
     traco = np.stack([angulos, np.sin(angulos) * 50], axis=1)
     simplificado = simplificar_traco(traco, epsilon=2.0)
     assert 2 < simplificado.shape[0] < traco.shape[0]
+
+
+def test_empate_de_distancias_escolhe_o_menor_indice() -> None:
+    # Pontos simétricos ficam à mesma distância do segmento; diferenças na última casa decimal entre
+    # Python e TypeScript não podem mudar o ponto escolhido (D8 do design).
+    traco = np.array([[0.0, 0.0], [50.0, 30.0], [100.0, 0.0], [150.0, 30.0 + 1e-12], [200.0, 0.0]])
+    traco_reduzido = np.array([traco[0], traco[1], traco[3], traco[4]])
+    simplificado = simplificar_traco(traco_reduzido, epsilon=40.0)
+    np.testing.assert_allclose(simplificado, [traco[0], traco[4]])
+    assert _ponto_mais_distante(traco_reduzido, 0, 3)[0] == 1
