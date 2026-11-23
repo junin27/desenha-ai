@@ -8,7 +8,7 @@
 
 ## 2. Núcleo em Python (TDD, um módulo por vez)
 
-- [ ] 2.1 `resultado.py` e `desenho.py`: testes de desenho vazio e traços vazios ignorados → implementar; verificar `pytest ml/tests/test_desenho.py`
+- [x] 2.1 `resultado.py` e `desenho.py`: testes de desenho vazio e traços vazios ignorados → implementar; verificar `pytest ml/tests/test_desenho.py`
 - [ ] 2.2 `normalizacao.py`: testes dos cenários "mais largo que alto" e "ponto único" → implementar
 - [ ] 2.3 `simplificacao.py` (RDP iterativo, ε = 2): testes de colineares removidos e canto preservado → implementar
 - [ ] 2.4 `prefixo.py`: testes de corte no meio do traço, mínimo de 2 pontos e fração inválida → implementar
