@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from desenha_ml.contratos import CASOS_OBRIGATORIOS, gerar_contrato_de_pre_processamento
+from desenha_ml.contratos_conversa import FALAS_COMPLETAS, gerar_contrato_da_conversa
 from desenha_ml.contratos_regras import gerar_contrato_de_regras
 from desenha_ml.desenho import Desenho
 
@@ -73,5 +74,23 @@ def test_contrato_de_regras_versionado_esta_atualizado() -> None:
     versionado = json.loads(CONTRATO_DE_REGRAS.read_text(encoding="utf8"))
     assert versionado == _contrato_de_regras_em_json(), (
         "contratos/regras.json está desatualizado; rode "
+        "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
+    )
+
+
+CONTRATO_DA_CONVERSA = Path(__file__).parents[2] / "contratos" / "conversa.json"
+
+
+def test_contrato_da_conversa_cobre_todos_os_prefixos() -> None:
+    contrato = json.loads(json.dumps(gerar_contrato_da_conversa()))
+    esperado = sum(len(fala) + 1 for fala in FALAS_COMPLETAS)
+    assert len(contrato["ler_parcial"]) == esperado
+    assert {caso["etapa"] for caso in contrato["ler_parcial"]} == {"pensando", "respondendo", "completa"}
+
+
+def test_contrato_da_conversa_versionado_esta_atualizado() -> None:
+    versionado = json.loads(CONTRATO_DA_CONVERSA.read_text(encoding="utf8"))
+    assert versionado == json.loads(json.dumps(gerar_contrato_da_conversa())), (
+        "contratos/conversa.json está desatualizado; rode "
         "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
     )
