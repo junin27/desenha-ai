@@ -1,0 +1,33 @@
+import type { Veredito } from "../../domain/rodada/veredito";
+
+/**
+ * Narrações-modelo no estilo do Zé (D6 do design), usadas quando o SLM falha ou discorda da regra.
+ * `{desafio}` é a palavra pedida; `{palpite}` é o 1º palpite das redes ("nada" se não houve traço), por
+ * isso as frases de ERROU usam formas como "viram {palpite}", que soam bem nos dois casos.
+ */
+export const NARRACOES_MODELO: Readonly<Record<Veredito, readonly string[]>> = {
+  ACERTOU: [
+    "Ô trem bão! Era {desafio} e as redes cravaram de primeira!",
+    "Segura peão! Deu {desafio} na cabeça, desenho de campeão!",
+    "Uai, sô! A máquina bateu o olho e falou {desafio}. Bonito demais!",
+    "É {desafio} mesmo, minha gente! Esse rabisco merece fivela de ouro!",
+    "Arre égua! Nem precisei apertar os olhos: {desafio} na ponta do lápis!",
+    "Pode soltar o rojão: {desafio}, e as redes concordaram na hora!",
+  ],
+  QUASE: [
+    "Por um fio, sô! Era {desafio}, mas as redes acharam mais cara de {palpite}.",
+    "Quase, quase! O {desafio} apareceu na lista, só que o {palpite} passou na frente.",
+    "Faltou um tiquinho: as redes viram {palpite} primeiro, mas o {desafio} tava ali pertinho.",
+    "Ô dó! Deu {palpite} na frente e o {desafio} ficou no pódio, raspando.",
+    "Passou raspando, uai! Era {desafio}; a máquina chutou {palpite}, mas desconfiou.",
+    "Tá no caminho, peão! {desafio} ficou entre os três, atrás do {palpite}.",
+  ],
+  ERROU: [
+    "Eita, sô! Era {desafio}, mas as redes viram {palpite}. Na próxima vai!",
+    "Ih, o boi fugiu da porteira: as redes enxergaram {palpite} e o desafio era {desafio}.",
+    "Num deu dessa vez! A máquina viu {palpite}; o {desafio} ficou escondido no rabisco.",
+    "Calma, peão, que rodeio tem revanche! Era {desafio} e as redes viram {palpite}.",
+    "Esse desenho deu nó na cabeça das redes: viram {palpite}, mas era {desafio}.",
+    "Ô sorte madrasta! O desafio era {desafio}, e as redes só viram {palpite}.",
+  ],
+};
