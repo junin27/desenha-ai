@@ -22,8 +22,8 @@
 
 ## 4. Curadoria e exportação (TDD)
 
-- [ ] 4.1 `curadoria.py` — reparos (markdown, emoji) e filtros com os códigos da spec: um teste por código, reutilizando `vazamento` e `veredito` → implementar
-- [ ] 4.2 Desduplicação por Jaccard de trigramas na forma comparável: testes → implementar
+- [x] 4.1 `curadoria.py` — reparos (markdown, emoji) e filtros com os códigos da spec: um teste por código, reutilizando `vazamento` e `veredito` → implementar
+- [x] 4.2 Desduplicação por Jaccard de trigramas na forma comparável: testes → implementar
 - [ ] 4.3 `exportacao_dataset.py` — separação estratificada, ShareGPT e ChatML: testes de proporção, mínimo de 3 por tarefa e ausência de vazamento entre treino e teste → implementar
 - [ ] 4.4 Relatório com volume mínimo (300 no total, 60 por tarefa) e charadas de reserva: testes → implementar
 
