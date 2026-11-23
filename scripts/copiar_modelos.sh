@@ -4,12 +4,16 @@
 # Uso (a partir de projeto_final/):
 #   bash scripts/copiar_modelos.sh                          # ensaio local: saida/ensaio + saida/dataset_ensaio
 #   bash scripts/copiar_modelos.sh modelos_redes.zip        # redes do Colab (zip do notebook 1)
-#   bash scripts/copiar_modelos.sh pasta_das_redes charadas_reserva.json
+#   bash scripts/copiar_modelos.sh pasta_das_redes charadas_reserva.json [metricas_slm.json]
+#
+# metricas_redes.json (junto das redes) e metricas_slm.json (notebook 3) são opcionais: alimentam o painel
+# técnico, que mostra "—" sem eles.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 ORIGEM_DAS_REDES="${1:-saida/ensaio}"
 CHARADAS="${2:-saida/dataset_ensaio/charadas_reserva.json}"
+METRICAS_SLM="${3:-}"
 DESTINO="app/public/modelos"
 ARQUIVOS_DAS_REDES=(cnn.onnx lstm.onnx classes.json teste_paridade_redes.json)
 
@@ -34,6 +38,17 @@ if [[ -f "$CHARADAS" ]]; then
   cp "$CHARADAS" "$DESTINO/charadas_reserva.json"
 else
   echo "AVISO: $CHARADAS não encontrado; o jogo usará a charada genérica de reserva." >&2
+fi
+
+if [[ -f "$ORIGEM_DAS_REDES/metricas_redes.json" ]]; then
+  cp "$ORIGEM_DAS_REDES/metricas_redes.json" "$DESTINO/"
+fi
+if [[ -n "$METRICAS_SLM" ]]; then
+  if [[ -f "$METRICAS_SLM" ]]; then
+    cp "$METRICAS_SLM" "$DESTINO/metricas_slm.json"
+  else
+    echo "AVISO: $METRICAS_SLM não encontrado; o painel mostrará — nas métricas do SLM." >&2
+  fi
 fi
 
 echo "OK: modelos copiados de $ORIGEM_DAS_REDES para $DESTINO"
