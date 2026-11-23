@@ -42,7 +42,8 @@ Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe
 
 ## Comandos (rodar a partir de `projeto_final/`)
 
-- Python: `ml/.venv/Scripts/python -m pytest ml` · `… -m mypy ml/src` · `… -m ruff check ml` · `… -m ruff format ml`
+- Python: `ml/.venv/Scripts/python -m pytest ml` · `… -m mypy --config-file ml/pyproject.toml ml/src ml/tests` · `… -m ruff check ml` · `… -m ruff format ml`
+- Tudo de uma vez: `bash scripts/verificar.sh`
 - Contratos: `ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`
 - App: `npm --prefix app test` · `npm --prefix app run lint` · `npm --prefix app run typecheck` · `npm --prefix app run build`
 - Specs: `openspec validate --all --strict` · `openspec list`
@@ -50,6 +51,7 @@ Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe
 
 ## Armadilhas conhecidas
 
+- `mypy` rodado da raiz não acha `ml/pyproject.toml` e roda **sem** `--strict` sem avisar: sempre passe `--config-file ml/pyproject.toml`.
 - O Python local é 3.15: não há `onnxruntime` para ele. A conferência do ONNX roda no Colab (Python do Colab) e no navegador (`onnxruntime-web`).
 - Sem GPU NVIDIA nesta máquina: treino só no Colab (T4). A demo roda em CPU.
 - O Claude Code carrega também o CLAUDE.md da pasta pai: não coloque regras de outros projetos em `n3sandro/` (as antigas estão em `n3sandro/_referencia_regras_terram/`).

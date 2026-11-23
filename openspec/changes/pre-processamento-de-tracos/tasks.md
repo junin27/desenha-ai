@@ -2,9 +2,9 @@
 
 ## 1. Estrutura dos projetos
 
-- [ ] 1.1 Criar `ml/` (pyproject com hatchling, layout `src/`, extras `dev`), o venv `ml/.venv` e instalar; verificar com `pytest` rodando sem testes e `mypy --strict` + `ruff check` verdes
-- [ ] 1.2 Criar `app/` (Vite + TypeScript strict + Vitest + ESLint + Prettier) com as pastas `domain/application/infrastructure/presentation`; verificar `npm test`, `lint` e `typecheck` verdes
-- [ ] 1.3 Escrever o teste de arquitetura `app/tests/arquitetura.test.ts` (domain não importa nada externo; application só importa domain) e verificar que ele falha com um import proibido de propósito e passa sem ele
+- [x] 1.1 Criar `ml/` (pyproject com hatchling, layout `src/`, extras `dev`), o venv `ml/.venv` e instalar; verificar com `pytest` rodando sem testes e `mypy --strict` + `ruff check` verdes
+- [x] 1.2 Criar `app/` (Vite + TypeScript strict + Vitest + ESLint + Prettier) com as pastas `domain/application/infrastructure/presentation`; verificar `npm test`, `lint` e `typecheck` verdes
+- [x] 1.3 Escrever o teste de arquitetura `app/tests/arquitetura.test.ts` (domain não importa nada externo; application só importa domain) e verificar que ele falha com um import proibido de propósito e passa sem ele
 
 ## 2. Núcleo em Python (TDD, um módulo por vez)
 
