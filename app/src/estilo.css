@@ -1,0 +1,251 @@
+/*
+ * Visual do estande: legível a 1,5 m (texto principal >= 24 px) e sem rolagem em 1366x768 e 1920x1080
+ * (spec interface-do-jogo). Fontes do sistema: nada de fonte externa (o jogo roda offline).
+ */
+:root {
+  --papel: #f7ecd4;
+  --papel-escuro: #ead7ad;
+  --tinta: #2b1a0a;
+  --tinta-suave: #6b4f2e;
+  --destaque: #b5401f;
+  --acerto: #2f7d32;
+  --quase: #c98a00;
+  --erro: #b3261e;
+  --quadro: #fffdf6;
+  --texto-base: clamp(24px, 2.2vw, 34px);
+  --texto-grande: clamp(34px, 3.4vw, 56px);
+  --texto-enorme: clamp(56px, 6vw, 104px);
+  --espaco: clamp(12px, 1.6vh, 24px);
+  font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  color: var(--tinta);
+  background: var(--papel);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: radial-gradient(circle at 20% 10%, #fff7e3 0%, var(--papel) 55%, var(--papel-escuro) 100%);
+}
+
+#jogo {
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--espaco);
+  font-size: var(--texto-base);
+}
+
+.tela {
+  width: min(100%, 1500px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco);
+  text-align: center;
+}
+
+.tela[hidden] {
+  display: none;
+}
+
+h1 {
+  margin: 0;
+  font-size: var(--texto-enorme);
+  color: var(--destaque);
+  letter-spacing: 0.02em;
+}
+
+h2 {
+  margin: 0;
+  font-size: var(--texto-grande);
+}
+
+p {
+  margin: 0;
+}
+
+.linha {
+  display: flex;
+  gap: var(--espaco);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+button {
+  font: inherit;
+  font-weight: bold;
+  padding: 0.4em 1.2em;
+  border: 3px solid var(--tinta);
+  border-radius: 14px;
+  background: var(--destaque);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--tinta);
+}
+
+button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--tinta);
+}
+
+button:disabled {
+  background: var(--tinta-suave);
+  opacity: 0.5;
+  cursor: wait;
+}
+
+input {
+  font: inherit;
+  padding: 0.35em 0.6em;
+  border: 3px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--quadro);
+  width: 12em;
+}
+
+.subtitulo,
+.dica,
+.rodada {
+  color: var(--tinta-suave);
+}
+
+.erro,
+.aviso {
+  color: var(--erro);
+  font-weight: bold;
+}
+
+.aviso {
+  border: 3px dashed var(--erro);
+  border-radius: 12px;
+  padding: 0.3em 0.8em;
+}
+
+.placar {
+  margin: 0;
+  padding-left: 1.6em;
+  text-align: left;
+  columns: 2;
+  column-gap: 3em;
+}
+
+.charada {
+  font-size: var(--texto-grande);
+  max-width: 28em;
+  font-style: italic;
+}
+
+.ze-ao-vivo {
+  color: var(--tinta-suave);
+  max-width: 34em;
+  min-height: 1.5em;
+}
+
+/* Desenho: canvas quadrado à esquerda, informações à direita. */
+.tela-desenho {
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  height: calc(100vh - 2 * var(--espaco));
+}
+
+.quadro {
+  height: 100%;
+  max-height: 900px;
+  aspect-ratio: 1;
+  background: var(--quadro);
+  border: 4px solid var(--tinta);
+  border-radius: 18px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco);
+  justify-content: center;
+  width: min(36vw, 560px);
+}
+
+.cronometro {
+  font-size: var(--texto-enorme);
+  font-weight: bold;
+  color: var(--destaque);
+  line-height: 1;
+}
+
+.charada-pequena {
+  font-style: italic;
+}
+
+.palpites {
+  margin: 0;
+  padding-left: 1.4em;
+  text-align: left;
+  font-size: var(--texto-grande);
+}
+
+/* Veredito */
+.veredito {
+  font-size: var(--texto-enorme);
+  font-weight: bold;
+}
+
+.veredito[data-veredito="ACERTOU"] {
+  color: var(--acerto);
+}
+
+.veredito[data-veredito="QUASE"] {
+  color: var(--quase);
+}
+
+.veredito[data-veredito="ERROU"] {
+  color: var(--erro);
+}
+
+.pontos {
+  font-size: var(--texto-grande);
+  font-weight: bold;
+}
+
+.narracao {
+  max-width: 30em;
+  font-style: italic;
+}
+
+.resultado,
+.julgando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco);
+}
+
+.resultado[hidden],
+.julgando[hidden],
+.aviso[hidden],
+.ze-ao-vivo[hidden],
+.dica[hidden] {
+  display: none;
+}
+
+.total {
+  font-size: var(--texto-grande);
+}
+
+.posicao {
+  font-size: var(--texto-enorme);
+  font-weight: bold;
+  color: var(--destaque);
+}

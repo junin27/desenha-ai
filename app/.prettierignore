@@ -2,3 +2,5 @@ node_modules
 dist
 coverage
 package-lock.json
+# Artefatos copiados por scripts/copiar_modelos.sh (gerados pelo Python, fora do Git)
+public/modelos

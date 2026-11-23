@@ -52,6 +52,9 @@ Os renderizadores recebem o estado e devolvem/atualizam elementos; são testados
 - **"Desenho concluído" na entrada VEREDITO:** 100% quando a rodada acaba pelo Pronto ou pelo tempo; na vitória antecipada, a fração dos 20 s já usada (aos 6 s, 30%). É a forma mais próxima do "prefixo do desenho" usado no dataset, que o jogo não tem como medir.
 - **Palpites na entrada VEREDITO:** top-5 de cada rede, como no dataset do Zé.
 - **Rodada sem traço:** vale ERROU e usa a narração-modelo direto, sem chamar o Zé (não há palpites para ele narrar).
+- **Runtime do ONNX no build (ajuste do D4):** em vez de copiar os `.wasm` para `public/ort/`, o jogo importa `onnxruntime-web/wasm` e o arquivo `ort-wasm-simd-threaded.wasm` com `?url`; o Vite o emite em `dist/assets/` com hash e `ort.env.wasm.wasmPaths` aponta para ele. Mesmo resultado offline, sem script de cópia nem arquivo esquecido.
+- **Endereço do Zé:** padrão `http://127.0.0.1:8080`; o parâmetro `?ze=` na URL troca sem rebuild (útil para o Zé base × destilado da `bancada-do-ze`).
+- **Arquivos ausentes:** sem `classes.json` ou sem os `.onnx`, o jogo mostra uma tela de erro dizendo o que rodar; sem `charadas_reserva.json`, segue com uma charada genérica de reserva e avisa no console.
 - **Discordância do Zé:** só conta quando a fala está no formato e traz outro veredito; fala fora do formato ou falha do narrador usam a narração-modelo sem marcar discordância.
 
 ## Risks / Trade-offs
