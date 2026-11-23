@@ -44,6 +44,9 @@ Ordem: minúsculas → NFD sem marcas de acento → palavras `[a-z0-9]+` → "qu
 ### D6 — Contrato `contratos/regras.json`
 Gerado pela mesma CLI (`python -m desenha_ml.contratos contratos/`, que passa a gerar os dois arquivos), com seções `ensemble`, `top_k`, `veredito`, `vitoria_antecipada`, `pontos_da_rodada`, `nome`, `placar`, `forma_comparavel` e `vazamento`. Comparação exata no TypeScript, exceto as probabilidades do ensemble (1e-12).
 
+### D7 — Nome: espaços explícitos e contagem por caractere (achado na implementação)
+`str.split()` do Python e `\s` do JavaScript não tratam os mesmos caracteres como espaço, e `len()` (pontos de código) difere de `.length` (unidades UTF-16) em emojis. As duas linguagens usam o conjunto `[ \t\n\r ]` e contam pontos de código (`[...nome].length` no TypeScript). O contrato inclui um nome com 16 emojis.
+
 ## Risks / Trade-offs
 
 - [Falsos positivos de vazamento ("soldado" para "sol", "casca" para "casa")] → aceitos de propósito: no jogo, só trocam a charada por uma da reserva; na curadoria, descartam uma amostra a mais. A taxa será medida na curadoria (change `dataset-do-ze`).

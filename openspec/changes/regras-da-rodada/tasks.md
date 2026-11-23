@@ -9,9 +9,9 @@
 
 ## 2. Pontuação e placar — Python (TDD)
 
-- [ ] 2.1 `pontuacao.py`: testes de pontos da rodada (125, 101, 30, 0, limites −3 e 25) e da partida (155) → implementar com piso (D3)
-- [ ] 2.2 Nome no placar: testes de limpeza e de `nome_invalido` → implementar
-- [ ] 2.3 Ordem do placar: testes de empate por horário e do corte em 10 → implementar
+- [x] 2.1 `pontuacao.py`: testes de pontos da rodada (125, 101, 30, 0, limites −3 e 25) e da partida (155) → implementar com piso (D3)
+- [x] 2.2 Nome no placar: testes de limpeza e de `nome_invalido` → implementar
+- [x] 2.3 Ordem do placar: testes de empate por horário e do corte em 10 → implementar
 
 ## 3. Vazamento — Python (TDD)
 
