@@ -2,8 +2,8 @@
 
 ## 1. Julgamento do desenho — Python (TDD)
 
-- [ ] 1.1 `ensemble.py`: testes da média ponderada, tamanhos diferentes, soma fora de [0,999; 1,001] e peso inválido → implementar; `pytest ml/tests/test_ensemble.py` verde
-- [ ] 1.2 Top-k em `ensemble.py`: teste do empate decidido pelo índice e de k fora do intervalo → implementar com ordenação estável (D2)
+- [x] 1.1 `ensemble.py`: testes da média ponderada, tamanhos diferentes, soma fora de [0,999; 1,001] e peso inválido → implementar; `pytest ml/tests/test_ensemble.py` verde
+- [x] 1.2 Top-k em `ensemble.py`: teste do empate decidido pelo índice e de k fora do intervalo → implementar com ordenação estável (D2)
 - [ ] 1.3 `veredito.py`: testes de ACERTOU, QUASE, ERROU, empate no 1º lugar e alvo inválido → implementar
 - [ ] 1.4 Vitória antecipada em `veredito.py`: testes dos três cenários (0,85 e 6 s; 0,79; 1,5 s) → implementar com as constantes de D4
 

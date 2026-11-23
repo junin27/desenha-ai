@@ -12,7 +12,15 @@ from typing import Generic, Literal, TypeVar
 
 T = TypeVar("T")
 
-CodigoDeErro = Literal["desenho_vazio", "fracao_invalida"]
+CodigoDeErro = Literal[
+    "desenho_vazio",
+    "fracao_invalida",
+    "probabilidades_invalidas",
+    "peso_invalido",
+    "k_invalido",
+    "alvo_invalido",
+    "nome_invalido",
+]
 
 
 @dataclass(frozen=True)

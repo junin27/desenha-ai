@@ -22,11 +22,15 @@ O ensemble SHALL calcular, para cada categoria, `w_cnn × p_cnn + (1 − w_cnn) 
 - **THEN** o resultado é o erro `peso_invalido`
 
 ### Requirement: Palpites ordenados (top-k)
-Os palpites SHALL ser ordenados por probabilidade decrescente; em empate exato, a categoria de menor índice SHALL vir primeiro. O top-k SHALL devolver os k primeiros pares (categoria, probabilidade), com k entre 1 e o número de categorias.
+Os palpites SHALL ser ordenados por probabilidade decrescente; em empate exato, a categoria de menor índice SHALL vir primeiro. O top-k SHALL devolver os k primeiros pares (categoria, probabilidade), com k entre 1 e o número de categorias; k fora desse intervalo SHALL gerar o erro `k_invalido`.
 
 #### Scenario: Empate decidido pelo índice
 - **WHEN** as probabilidades são [0,1; 0,45; 0,45]
 - **THEN** o top-3 é [(1; 0,45), (2; 0,45), (0; 0,1)]
+
+#### Scenario: k fora do intervalo
+- **WHEN** há 3 categorias e k = 0 ou k = 4
+- **THEN** o resultado é o erro `k_invalido`
 
 ### Requirement: Veredito
 Dado o índice do desenho pedido (alvo) e as probabilidades do ensemble, o veredito SHALL ser `ACERTOU` se o 1º palpite for o alvo, `QUASE` se o alvo estiver na 2ª ou 3ª posição, e `ERROU` nos outros casos. Alvo fora do intervalo de categorias SHALL gerar o erro `alvo_invalido`.
