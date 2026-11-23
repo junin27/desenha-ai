@@ -29,7 +29,7 @@
 
 - [x] 5.1 `scripts/ensaio_treino_local.py`: baixa 300 desenhos por categoria, treina 2 épocas, gera os artefatos e confere o ONNX; executar e registrar o tempo e as métricas do ensaio no `design.md`
 - [x] 5.2 Reescrever `notebooks/fontes/01_redes_neurais_cnn_lstm.py` usando o pacote (download, treino na GPU, gráficos, critério mínimo, zip dos artefatos) e regenerar o `.ipynb`; verificar que nenhuma célula define regra (só chamadas ao pacote)
-- [ ] 5.3 Gerar o wheel (`ml/dist/`) e documentar no README o passo a passo do Colab
+- [x] 5.3 Gerar o wheel (`ml/dist/`) e documentar no README o passo a passo do Colab
 
 ## 6. Verificação final
 

@@ -44,6 +44,23 @@ bash scripts/verificar.sh
 ml/.venv/Scripts/python -m desenha_ml.contratos contratos/
 ```
 
+## Treino das redes (Google Colab)
+
+O treino roda no Colab com GPU; a lógica vem do pacote `desenha_ml`, já testado e ensaiado localmente.
+
+1. Gere o pacote: `ml/.venv/Scripts/python -m build --wheel ml` → `ml/dist/desenha_ml-0.1.0-py3-none-any.whl`.
+2. No Colab, abra `notebooks/01_redes_neurais_cnn_lstm.ipynb` e escolha *Ambiente de execução → Alterar o tipo → T4 GPU*.
+3. Envie o `.whl` para o painel *Arquivos* (pasta `/content`).
+4. *Ambiente de execução → Executar tudo* (≈ 30–40 min). Ao final, o navegador baixa `modelos_redes.zip`, com `cnn.onnx`, `lstm.onnx`, `classes.json`, `metricas_redes.json`, `predicoes_validacao.json`, `teste_paridade_redes.json` e as figuras do banner.
+5. Confira no notebook a linha **Critério mínimo**: o treino só vale com o ensemble ≥ 85% e cada rede ≥ 80% de acurácia no teste.
+
+Ensaio local do mesmo pipeline (CPU, amostra pequena, sem critério de qualidade):
+
+```bash
+ml/.venv/Scripts/python -m pip install -e "ml[dev,treino]"
+ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epocas 2 --saida saida/ensaio
+```
+
 ## Créditos e licenças
 
 - Desenhos: [Quick, Draw! Dataset](https://github.com/googlecreativelab/quickdraw-dataset), Google, licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Uma amostra de 90 desenhos está em `ml/tests/amostras/`.
