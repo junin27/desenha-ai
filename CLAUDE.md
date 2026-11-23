@@ -56,4 +56,6 @@ Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe
 - Sem GPU NVIDIA nesta máquina: treino só no Colab (T4). A demo roda em CPU.
 - As ferramentas de escrita/edição do agente convertem escapes como ` ` em caracteres reais e invisíveis. Para caracteres especiais em código, gere o texto com `chr()` num script ou use escapes que não sejam `\uXXXX` (ex.: `\xa0` em regex JS); confira com `grep -rl $'\xc2\xa0' ml app/src app/tests`.
 - O pytest coleta como teste qualquer função cujo nome comece com `test`, inclusive `teste_...` em português dentro do pacote (`--doctest-modules` importa `src/`). Não nomeie funções do pacote começando com "teste".
+- Script Python que reescreve arquivo no Windows grava CRLF: abra com `open(p, 'w', encoding='utf8', newline='')` (ou rode o Prettier depois) e confira com `git diff --stat` antes do commit.
+- O `.gitignore` ignora qualquer pasta `build/` (inclusive `app/tests/build`): use outro nome para pastas versionadas.
 - O Claude Code carrega também o CLAUDE.md da pasta pai: não coloque regras de outros projetos em `n3sandro/` (as antigas estão em `n3sandro/_referencia_regras_terram/`).
