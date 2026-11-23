@@ -3,7 +3,7 @@
 ## 1. Núcleo puro `desenha_ml.demo` (TDD)
 
 - [x] 1.1 `manifesto`: SHA-256 por arquivo, comparação com o disco (ausente, tamanho, hash), modo ensaio e (de)serialização do `manifesto.json`: testes "Manifesto completo", "Preparação repetida" e "Sem o GGUF do Zé" → implementar
-- [ ] 1.2 `servidores`: linhas de comando do destilado, do base e do modo ensaio, e decisão de memória: testes "Linhas de comando dos servidores", "Modo ensaio" e "Memória curta" → implementar
+- [x] 1.2 `servidores`: linhas de comando do destilado, do base e do modo ensaio, e decisão de memória: testes "Linhas de comando dos servidores", "Modo ensaio" e "Memória curta" → implementar
 - [ ] 1.3 `saude` e `navegador`: interpretação do `/health`, prazo de 90 s com mensagem e últimas 20 linhas do registro, escolha Chrome/Edge e argumentos de tela cheia: testes "Servidor que não sobe" e "Sem Chrome" → implementar
 - [ ] 1.4 `checklist`: itens ✓/✗/⚠ com ação, voz pt-BR a partir da lista de vozes, fala real (formato e 25 s) e resultado final com código de saída: testes "Arquivo corrompido", "Sem voz pt-BR", "Zé respondendo" e "Só avisos" → implementar
 
