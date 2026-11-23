@@ -1,6 +1,7 @@
 """Erros esperados como valores (D3 do design): o chamador trata o erro sem try/except.
 
 Exemplo:
+    >>> from desenha_ml.desenho import desenho_de_pontos
     >>> resultado = desenho_de_pontos([])
     >>> isinstance(resultado, Erro) and resultado.codigo == "desenho_vazio"
     True

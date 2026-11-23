@@ -19,8 +19,8 @@ dev = ["pytest>=8", "mypy>=1.11", "ruff>=0.6"]
 packages = ["src/desenha_ml"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-q"
+testpaths = ["tests", "src"]
+addopts = "-q --doctest-modules"
 
 [tool.mypy]
 strict = true

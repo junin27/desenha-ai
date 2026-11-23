@@ -27,3 +27,8 @@ def test_normalizar_duas_vezes_nao_muda_o_resultado() -> None:
     desenho = Desenho.de_arrays([np.array([[3, 9], [50, 12], [20, 80]])])
     uma = normalizar(desenho)
     assert normalizar(uma) == uma
+
+
+def test_maior_dimensao_vai_exatamente_para_255() -> None:
+    desenho = Desenho.de_arrays([np.array([[10.0, 20.0], [110.0, 20.0]])])
+    assert float(np.max(normalizar(desenho).todos_os_pontos())) == 255.0

@@ -1,6 +1,7 @@
 """Prefixo do desenho: o que o jogo "vê" enquanto a pessoa ainda está desenhando.
 
 Exemplo:
+    >>> import numpy as np
     >>> d = Desenho.de_arrays([np.arange(8).reshape(4, 2), np.arange(12).reshape(6, 2)])
     >>> [len(t) for t in prefixo(d, 0.5).valor.tracos]
     [4, 1]

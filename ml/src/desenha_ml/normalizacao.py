@@ -17,5 +17,6 @@ def normalizar(desenho: Desenho) -> Desenho:
     pontos = desenho.todos_os_pontos()
     origem = pontos.min(axis=0)
     maior_dimensao = max(float(np.max(pontos.max(axis=0) - origem)), DIMENSAO_MINIMA)
-    fator = ESCALA_MAXIMA / maior_dimensao
-    return Desenho.de_arrays((t - origem) * fator for t in desenho.tracos)
+    # Multiplica antes de dividir: 100 * (255 / 100) dá 254,99999999999997, e 100 * 255 / 100 dá 255 exato.
+    # O TypeScript faz as operações nesta mesma ordem para o contrato bater.
+    return Desenho.de_arrays((t - origem) * ESCALA_MAXIMA / maior_dimensao for t in desenho.tracos)
