@@ -23,7 +23,7 @@
 
 ## 4. Núcleo em TypeScript (TDD)
 
-- [ ] 4.1 `domain/resultado.ts` e `domain/desenho/` (desenho, normalização, simplificação, prefixo): testes espelhando os cenários da spec → implementar
+- [x] 4.1 `domain/resultado.ts` e `domain/desenho/` (desenho, normalização, simplificação, prefixo): testes espelhando os cenários da spec → implementar
 - [ ] 4.2 `domain/desenho/rasterizacao.ts` e `sequencia.ts`: testes dos cenários → implementar
 - [ ] 4.3 `tests/contrato-pre-processamento.test.ts`: lê `contratos/pre_processamento.json` e verifica as tolerâncias da spec
 - [ ] 4.4 Teste de desempenho: mediana ≤ 15 ms para 130 pontos (50 execuções)
