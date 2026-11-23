@@ -3,7 +3,10 @@
  * os adaptadores reais, monta a partida e liga a tela.
  */
 import "./estilo.css";
+import { conferirParidade } from "./application/autoteste-de-paridade";
 import { Partida } from "./application/partida";
+import type { ClassificadorDeDesenho } from "./application/portas";
+import { lerCasosDeParidade } from "./infrastructure/arquivos/casos-de-paridade";
 import { lerClassesDoJogo, type ClassesDoJogo } from "./infrastructure/arquivos/classes-do-jogo";
 import { buscarJson } from "./infrastructure/arquivos/buscar-json";
 import { NarradorLlamaServer, type Buscador } from "./infrastructure/narrador-llama-server";
@@ -57,6 +60,7 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
     tela.mostrar(estado);
   });
   tela.mostrar(partida.estado);
+  void conferirRedesAoAbrir(redes.valor, tela);
   instalarAtalhoDeZerarPlacar(document, {
     podeZerar: () => partida.estado.etapa === "inicio",
     confirmar: (pergunta) => window.confirm(pergunta),
@@ -65,6 +69,19 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
       tela.mostrar(partida.estado);
     },
   });
+}
+
+/** Autoteste de paridade (spec `palpites-ao-vivo`): avisa na tela de início, mas não impede o jogo. */
+async function conferirRedesAoAbrir(redes: ClassificadorDeDesenho, tela: InterfaceDoJogo): Promise<void> {
+  const arquivo = await buscarJson(buscar, `${PASTA_DOS_MODELOS}/teste_paridade_redes.json`);
+  const casos = arquivo.ok ? lerCasosDeParidade(arquivo.valor) : arquivo;
+  const paridade = casos.ok ? await conferirParidade(redes, casos.valor) : undefined;
+  if (paridade?.passou === true) {
+    console.info(`Paridade das redes conferida em ${paridade.casos} desenhos.`, paridade);
+    return;
+  }
+  console.warn("Redes divergentes do treino.", casos.ok ? paridade : casos.erro.detalhe);
+  tela.avisarRedesDivergentes();
 }
 
 /** Devolve as classes ou a mensagem de erro para a tela. */
