@@ -30,8 +30,8 @@
 
 ## 5. Verificação final
 
-- [ ] 5.1 Rodar pytest, mypy --strict, ruff, vitest, eslint, tsc e `openspec validate --all --strict`; todos verdes
-- [ ] 5.2 Atualizar o README com os comandos de teste e a atribuição do Quick, Draw!
+- [x] 5.1 Rodar pytest, mypy --strict, ruff, vitest, eslint, tsc e `openspec validate --all --strict`; todos verdes
+- [x] 5.2 Atualizar o README com os comandos de teste e a atribuição do Quick, Draw!
 
 ## Workflow follow-up
 
