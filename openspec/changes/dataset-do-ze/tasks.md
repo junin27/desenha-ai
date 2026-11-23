@@ -29,7 +29,7 @@
 
 ## 5. Notebook e ensaio
 
-- [ ] 5.1 Ensaio local da geração ponta a ponta com Teacher falso (respostas gravadas) e os artefatos do ensaio de treino; conferir os arquivos exportados
+- [x] 5.1 Ensaio local da geração ponta a ponta com Teacher falso (respostas gravadas) e os artefatos do ensaio de treino; conferir os arquivos exportados
 - [ ] 5.2 Reescrever `notebooks/fontes/02_slm_destilacao_dataset.py` só orquestrando (instalação, chave, geração, curadoria, exportação, gráficos) e regenerar o `.ipynb`; nenhuma função de regra nas células
 
 ## 6. Verificação final

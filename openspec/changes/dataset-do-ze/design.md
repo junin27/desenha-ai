@@ -45,6 +45,20 @@ O caso de VEREDITO traz o top-5 do ensemble já ordenado. A primeira ideia era r
 ### D6 — Execução
 O notebook 2 roda no Colab, com a chave em *Secrets*, ou localmente com `GEMINI_API_KEY` no ambiente. São cerca de 110 chamadas de 5 a 6 exemplos cada, com intervalo de 4,5 s (15 RPM do *free tier*): de 10 a 20 min. Modelo padrão: `gemini-3.5-flash-lite` (o mesmo que funcionou na atividade N2), configurável.
 
+### D7 — Ensaio local da geração (tarefa 5.1, 23/11/2026)
+`scripts/ensaio_dataset_local.py` com o `TeacherDeEnsaio` (offline, erra de propósito 1 em cada 7 itens) e as predições reais do ensaio de treino:
+
+| | |
+|---|---|
+| Pedidos / respostas | 504 / 504 (87 lotes) |
+| Rejeições | `vazou` 30 · `veredito_errado` 29 · `duplicata` 344 |
+| Aprovadas | 101 (CHARADA 3 · VEREDITO 74 · PERGUNTA 24) → **insuficiente**, com os motivos no relatório |
+
+- As rejeições de `vazou` e `veredito_errado` batem com os erros plantados: a curadoria pega tudo.
+- As duplicatas são esperadas: o Teacher de ensaio usa frases-modelo. Com o Gemini as respostas variam; o volume mínimo é conferido na geração real.
+- Achado: o primeiro ensaio deu 100 vereditos errados porque o regex do próprio Teacher de ensaio grudava a vírgula no nome ("`, cavalo`"). Corrigido com teste de regressão; o pipeline e a curadoria estavam certos (rejeitaram).
+- Orquestração no pacote (`pipeline_dataset.py`), como no treino: o notebook 2 e o ensaio chamam `gerar_dataset`.
+
 ## Risks / Trade-offs
 
 - [Teacher erra a regra do veredito com frequência] → a curadoria descarta; se faltar volume, gera-se mais um lote de casos (o *checkpoint* permite incrementar).
