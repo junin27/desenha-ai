@@ -27,6 +27,9 @@ export interface ClassificadorDeDesenho {
   classificar(desenho: Desenho): Promise<Resultado<ProbabilidadesDasRedes, ErroDoClassificador>>;
 }
 
+/** Qual SLM responde: o Zé destilado (fine-tuning) ou o Qwen3 base, para comparação (bancada-do-ze). */
+export type ModeloDoZe = "destilado" | "base";
+
 /** Texto completo gerado pelo Zé e a velocidade medida pelo próprio servidor. */
 export interface FalaFinal {
   readonly texto: string;
