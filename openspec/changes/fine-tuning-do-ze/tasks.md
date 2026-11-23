@@ -4,7 +4,7 @@
 
 - [x] 1.1 `prompt_qwen.py`: testes do prompt de inferência (cenário da charada) e do texto de treino (começa pelo prompt, termina em `</resposta><|im_end|>\n`) → implementar
 - [x] 1.2 Contrato `contratos/prompt_qwen.json` (prompts das três tarefas) com teste de atualização
-- [ ] 1.3 `app/src/domain/ze/prompt.ts` + `tests/contrato-prompt.test.ts`: TypeScript reproduz o contrato; validar falhando com o contrato adulterado
+- [x] 1.3 `app/src/domain/ze/prompt.ts` + `tests/contrato-prompt.test.ts`: TypeScript reproduz o contrato; validar falhando com o contrato adulterado
 
 ## 2. Avaliação do Zé (TDD)
 
