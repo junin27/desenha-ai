@@ -33,7 +33,7 @@
 
 ## 6. Verificação final
 
-- [ ] 6.1 `bash scripts/verificar.sh` verde (inclui os testes de redes com torch CPU)
+- [x] 6.1 `bash scripts/verificar.sh` verde (inclui os testes de redes com torch CPU)
 
 ## Workflow follow-up
 
