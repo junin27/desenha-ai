@@ -2,9 +2,9 @@
 
 ## 1. Conversa com o Zé — Python (TDD)
 
-- [ ] 1.1 `conversa.py` — instrução de sistema e entradas das três tarefas: testes dos cenários (vaca fácil, arredondamento 0,345 → 35%, pergunta limpa) e dos erros `nivel_invalido` e `pergunta_invalida` → implementar
-- [ ] 1.2 Leitura da fala completa e por tarefa: testes de fala válida, texto fora das tags, veredito lido e charada sem prefixo → implementar
-- [ ] 1.3 Leitura progressiva: testes de "pensando", "respondendo", "completa" e pedaço de tag no fim → implementar
+- [x] 1.1 `conversa.py` — instrução de sistema e entradas das três tarefas: testes dos cenários (vaca fácil, arredondamento 0,345 → 35%, pergunta limpa) e dos erros `nivel_invalido` e `pergunta_invalida` → implementar
+- [x] 1.2 Leitura da fala completa e por tarefa: testes de fala válida, texto fora das tags, veredito lido e charada sem prefixo → implementar
+- [x] 1.3 Leitura progressiva: testes de "pensando", "respondendo", "completa" e pedaço de tag no fim → implementar
 
 ## 2. Conversa com o Zé — contrato e TypeScript (TDD)
 

@@ -21,6 +21,9 @@ CodigoDeErro = Literal[
     "alvo_invalido",
     "nome_invalido",
     "dados_insuficientes",
+    "nivel_invalido",
+    "pergunta_invalida",
+    "formato_invalido",
 ]
 
 
