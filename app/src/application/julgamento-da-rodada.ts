@@ -82,10 +82,14 @@ function narracaoDeReserva(
   veredito: Veredito,
   discordanciaDoZe: boolean,
 ): Narracao {
-  const primeiro =
-    rodada.palpite === undefined ? SEM_PALPITE : palpitesComNome(rodada, rodada.palpite.ensemble)[0];
-  const texto = reserva.narracao(veredito, nomeDa(rodada, rodada.categoria), primeiro?.[0] ?? SEM_PALPITE);
+  const texto = reserva.narracao(veredito, nomeDa(rodada, rodada.categoria), primeiroPalpite(rodada));
   return { texto, origem: "reserva", discordanciaDoZe };
+}
+
+/** Nome do 1º palpite do ensemble, ou "nada" quando não houve traço. */
+function primeiroPalpite(rodada: RodadaParaJulgar): string {
+  if (rodada.palpite === undefined) return SEM_PALPITE;
+  return palpitesComNome(rodada, rodada.palpite.ensemble)[0]?.[0] ?? SEM_PALPITE;
 }
 
 function entradaDaRodada(rodada: RodadaParaJulgar, palpite: PalpiteDaRodada): string {

@@ -90,6 +90,7 @@ describe("veredito e pontos pela regra", () => {
     montada.relogio.avancar(20_000);
     await montada.partida.aguardar();
     expect(montada.partida.estado.resultados[0]).toMatchObject({ veredito: "ERROU", pontos: 0 });
+    expect(montada.partida.estado.resultados[0]?.narracao).toBe("Narração-modelo ERROU: vaca / nada");
     expect(montada.narrador.entradasRecebidas.some((e) => e.startsWith("TAREFA: VEREDITO"))).toBe(false);
   });
 
