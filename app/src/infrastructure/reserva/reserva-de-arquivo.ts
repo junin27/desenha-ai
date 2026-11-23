@@ -1,7 +1,7 @@
 import type { ReservaDoZe, Sorteador } from "../../application/portas";
 import { falha, ok, type Resultado } from "../../domain/resultado";
 import type { Veredito } from "../../domain/rodada/veredito";
-import { NARRACOES_MODELO } from "./narracoes";
+import { NARRACOES_MODELO, RESPOSTA_BLOQUEADA, RESPOSTAS_MODELO } from "./narracoes";
 
 /** Conteúdo de `charadas_reserva.json` (change dataset-do-ze): categoria em português → charadas. */
 export type CharadasDeReserva = Readonly<Record<string, readonly string[]>>;
@@ -34,6 +34,14 @@ export class ReservaDeArquivo implements ReservaDoZe {
   narracao(veredito: Veredito, desafio: string, primeiroPalpite: string): string {
     const modelo = this.sorteador.embaralhar(NARRACOES_MODELO[veredito])[0] ?? "{desafio}";
     return modelo.replaceAll("{desafio}", desafio).replaceAll("{palpite}", primeiroPalpite);
+  }
+
+  resposta(): string {
+    return this.sorteador.embaralhar(RESPOSTAS_MODELO)[0] ?? RESPOSTA_BLOQUEADA;
+  }
+
+  respostaBloqueada(): string {
+    return RESPOSTA_BLOQUEADA;
   }
 }
 

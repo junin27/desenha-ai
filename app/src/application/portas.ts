@@ -76,4 +76,8 @@ export interface Sorteador {
 export interface ReservaDoZe {
   charada(categoria: string): string;
   narracao(veredito: Veredito, desafio: string, primeiroPalpite: string): string;
+  /** Resposta do "Pergunte ao Zé" quando ele falha (bancada-do-ze). */
+  resposta(): string;
+  /** Resposta educada para pergunta bloqueada; o Zé nem é chamado. */
+  respostaBloqueada(): string;
 }

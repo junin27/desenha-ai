@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { SorteadorFixo } from "../application/dubles";
-import { NARRACOES_MODELO } from "../../src/infrastructure/reserva/narracoes";
+import {
+  NARRACOES_MODELO,
+  RESPOSTA_BLOQUEADA,
+  RESPOSTAS_MODELO,
+} from "../../src/infrastructure/reserva/narracoes";
 import { lerCharadasDeReserva, ReservaDeArquivo } from "../../src/infrastructure/reserva/reserva-de-arquivo";
 import type { Veredito } from "../../src/domain/rodada/veredito";
 
@@ -69,5 +73,25 @@ describe("narrações-modelo coerentes com o veredito", () => {
     expect(reserva(0).narracao("ACERTOU", "vaca", "vaca")).not.toBe(
       reserva(1).narracao("ACERTOU", "vaca", "vaca"),
     );
+  });
+});
+
+// Spec `pergunte-ao-ze`, requisitos "Resposta de reserva" e "Bloqueio de perguntas ofensivas".
+describe("respostas de reserva do Pergunte ao Zé", () => {
+  it("há 6 respostas-modelo, escolhidas pelo sorteador", () => {
+    expect(RESPOSTAS_MODELO).toHaveLength(6);
+    expect(reserva(2).resposta()).toBe(RESPOSTAS_MODELO[2]);
+  });
+
+  it("respostas-modelo não têm marcadores nem as marcas da fala do Zé", () => {
+    for (const texto of [...RESPOSTAS_MODELO, RESPOSTA_BLOQUEADA]) {
+      expect(texto).not.toMatch(/[{}<>]/);
+      expect(texto.length).toBeGreaterThan(20);
+    }
+  });
+
+  it("a resposta de bloqueio é educada e sempre a mesma", () => {
+    expect(reserva(0).respostaBloqueada()).toBe(RESPOSTA_BLOQUEADA);
+    expect(reserva(5).respostaBloqueada()).toBe(RESPOSTA_BLOQUEADA);
   });
 });

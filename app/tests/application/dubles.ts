@@ -196,4 +196,12 @@ export class ReservaFalsa implements ReservaDoZe {
   narracao(veredito: Veredito, desafio: string, primeiroPalpite: string): string {
     return `Narração-modelo ${veredito}: ${desafio} / ${primeiroPalpite}`;
   }
+
+  resposta(): string {
+    return "Resposta de reserva";
+  }
+
+  respostaBloqueada(): string {
+    return "Resposta de bloqueio";
+  }
 }

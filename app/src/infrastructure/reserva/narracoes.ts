@@ -31,3 +31,17 @@ export const NARRACOES_MODELO: Readonly<Record<Veredito, readonly string[]>> = {
     "Ô sorte madrasta! O desafio era {desafio}, e as redes só viram {palpite}.",
   ],
 };
+
+/** Respostas do "Pergunte ao Zé" quando o SLM falha, demora ou sai do formato (D4 da bancada-do-ze). */
+export const RESPOSTAS_MODELO: readonly string[] = [
+  "Ô sô, essa me pegou de calça curta! O Zé tá meio rouco agora; pergunta de novo daqui a pouquinho.",
+  "Uai, deu um nó aqui no meu chapéu! Tenta perguntar de novo, que eu tô voltando do curral.",
+  "Eita, a moda de viola travou no meio! Pergunta outra vez, que o Zé responde já já.",
+  "Segura peão, que o Zé tá tomando um café! Faz a pergunta de novo daqui a pouco.",
+  "Arre, sumiu a ideia da cabeça! Me pergunta outra vez, que dessa vez eu acerto a porteira.",
+  "O Zé foi buscar a resposta lá na roça e ainda não voltou. Tenta de novo, sô!",
+];
+
+/** Resposta para pergunta bloqueada: o Zé nem é chamado. */
+export const RESPOSTA_BLOQUEADA =
+  "Opa, essa aí o Zé não responde não, sô! Pergunta de desenho, de rede neural ou da roça, que eu te conto tudo.";
