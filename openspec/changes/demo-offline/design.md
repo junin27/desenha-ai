@@ -63,4 +63,6 @@ Os `.bat` chamam `ml\.venv\Scripts\python scripts\<script>.py` a partir da pasta
 - [Com ~3 GB livres, o base talvez não suba junto] → a demo sobe só o destilado e avisa; a comparação no painel cai na reserva. Recomendação no checklist: fechar outros programas antes do evento.
 - [A *tag* do llama.cpp pode mudar argumentos do `llama-server`] → versão fixada; o ensaio da tarefa 3.1 confere a linha de comando na versão escolhida.
 - [Antivírus pode bloquear o `llama-server.exe` baixado] → o checklist roda o servidor de verdade; se for bloqueado, aparece ✗ com a orientação de liberar a pasta `demo/`.
+- [O GGUF do Zé destilado só existe depois do notebook 3] → o modo ensaio (D4) mantém a demo utilizável, e o manifesto o registra; a comparação base × destilado só é válida fora dele. O ensaio final com o Zé treinado é a primeira tarefa do "Workflow follow-up".
+- [CORS da porta 8081 e a linha de comando são suposições até o ensaio real] → a tarefa 3.1 os confere com o `llama-server` da *tag* fixada. Se o CORS não vier aberto, a decisão NÃO é tomada em silêncio: a 3.1 para, registra aqui e pede ajuste da spec (alternativa a avaliar: servir o base com `--path` e `Access-Control-Allow-Origin` explícito, ou um proxy local mínimo).
 - [O GGUF base tem ~1,1 GB] → só é baixado na preparação, com retomada segura (arquivo `.parcial` renomeado só depois de conferido).
