@@ -19,7 +19,7 @@
 ## 3. Contrato
 
 - [x] 3.1 Adicionar `ml/tests/amostras/quickdraw_amostra.ndjson` (poucos desenhos reais, com atribuição CC BY 4.0)
-- [ ] 3.2 `contratos.py` (CLI) gera `contratos/pre_processamento.json` com os casos exigidos pela spec; teste que regenera em memória e compara com o arquivo versionado
+- [x] 3.2 `contratos.py` (CLI) gera `contratos/pre_processamento.json` com os casos exigidos pela spec; teste que regenera em memória e compara com o arquivo versionado
 
 ## 4. Núcleo em TypeScript (TDD)
 
