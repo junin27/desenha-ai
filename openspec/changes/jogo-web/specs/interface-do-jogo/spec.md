@@ -28,8 +28,12 @@ Charada, palpites, cronômetro e narração SHALL usar fonte de no mínimo 24 px
 - **THEN** a tela de desenho mostra canvas, cronômetro, charada e palpites sem rolagem
 
 ### Requirement: Funcionamento offline
-O build do jogo SHALL conter todos os recursos (scripts, estilos, fontes, modelos e runtime), sem CDN e sem fontes externas.
+O build do jogo SHALL conter todos os recursos (scripts, estilos, fontes, modelos e runtime), sem CDN e sem fontes externas. Nenhum recurso SHALL ser carregado de fora de `localhost`/`127.0.0.1` e o código do próprio jogo SHALL NOT conter endereços externos. Endereços que aparecem só como texto dentro de bibliotecas de terceiros (links de documentação, mensagens de erro) SHALL estar numa lista fechada conferida pelo teste, que reprova qualquer endereço novo.
 
 #### Scenario: Build sem endereços externos
 - **WHEN** o build é inspecionado
-- **THEN** nenhum arquivo referencia `http://` ou `https://` fora de `localhost`/`127.0.0.1`
+- **THEN** nenhum `src`, `href`, `url()` ou `import` aponta para fora de `localhost`/`127.0.0.1`, e os únicos endereços externos são os da lista fechada de textos de terceiros
+
+#### Scenario: Endereço externo novo
+- **WHEN** uma dependência atualizada ou o código do jogo passa a conter um endereço externo fora da lista
+- **THEN** a verificação do build falha mostrando o endereço e o arquivo

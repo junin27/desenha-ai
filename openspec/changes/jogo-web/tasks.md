@@ -26,7 +26,7 @@
 
 ## 4. Verificação no navegador e build
 
-- [ ] 4.1 `npm run build` + teste que varre o `dist/` em busca de `http(s)://` externos (spec "Build sem endereços externos")
+- [x] 4.1 `npm run build` + teste que varre o `dist/` em busca de `http(s)://` externos (spec "Build sem endereços externos")
 - [x] 4.2 Abrir o build no painel de navegador com os modelos do ensaio local: jogar uma partida sem o `llama-server` (reserva) e tirar capturas a 1366×768 e 1920×1080
 - [ ] 4.3 `bash scripts/verificar.sh` verde e `openspec validate --all --strict`
 
