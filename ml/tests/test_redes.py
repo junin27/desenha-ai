@@ -13,16 +13,16 @@ pytest.importorskip("onnx")
 
 from desenha_ml.dados import montar_lote_de_avaliacao, montar_lote_de_treino  # noqa: E402
 from desenha_ml.desenho import Desenho  # noqa: E402
-from desenha_ml.redes import (  # noqa: E402
-    NUMERO_DE_CLASSES,
-    ConfiguracaoDeTreino,
-    DadosDeTreino,
-    RabiscoNet,
-    TracoLSTM,
+from desenha_ml.exportacao_onnx import (  # noqa: E402
     conferir_onnx_cnn,
     conferir_onnx_lstm,
     exportar_cnn_onnx,
     exportar_lstm_onnx,
+)
+from desenha_ml.redes import NUMERO_DE_CLASSES, RabiscoNet, TracoLSTM  # noqa: E402
+from desenha_ml.treino import (  # noqa: E402
+    ConfiguracaoDeTreino,
+    DadosDeTreino,
     prever_cnn,
     prever_lstm,
     treinar,
