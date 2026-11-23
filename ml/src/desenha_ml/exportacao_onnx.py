@@ -58,19 +58,29 @@ def exportar_lstm_onnx(modelo: TracoLSTM, caminho: Path) -> None:
     _exportar(LSTMComSoftmax(modelo), torch.zeros(1, 20, 3), "sequencia", {0: "lote", 1: "tempo"}, caminho)
 
 
-def conferir_onnx_cnn(caminho: Path, modelo: RabiscoNet, imagens: NDArray[np.uint8]) -> float:
-    """Maior diferença absoluta entre o ONNX (avaliador de referência) e o PyTorch."""
+def probabilidades_onnx_cnn(caminho: Path, imagens: NDArray[np.uint8]) -> NDArray[np.float32]:
+    """Executa o ONNX da CNN no avaliador de referência (Python puro), com imagens em 16 avos."""
     avaliador = ReferenceEvaluator(onnx.load(str(caminho)))
     entrada = imagens[:, None].astype(np.float32) / NIVEIS_DE_COBERTURA
-    (saida_onnx,) = avaliador.run(None, {"imagem": entrada})
-    return float(np.max(np.abs(np.asarray(saida_onnx) - prever_cnn(modelo, imagens))))
+    (saida,) = avaliador.run(None, {"imagem": entrada})
+    return np.asarray(saida, dtype=np.float32)
+
+
+def probabilidades_onnx_lstm(caminho: Path, sequencias: Sequence[NDArray[np.float32]]) -> NDArray[np.float32]:
+    """Executa o ONNX da LSTM um desenho por vez, sem padding (como no jogo)."""
+    avaliador = ReferenceEvaluator(onnx.load(str(caminho)))
+    saidas = []
+    for sequencia in sequencias:
+        (saida,) = avaliador.run(None, {"sequencia": sequencia[None].astype(np.float32)})
+        saidas.append(np.asarray(saida, dtype=np.float32))
+    return np.concatenate(saidas)
+
+
+def conferir_onnx_cnn(caminho: Path, modelo: RabiscoNet, imagens: NDArray[np.uint8]) -> float:
+    """Maior diferença absoluta entre o ONNX (avaliador de referência) e o PyTorch."""
+    return float(np.max(np.abs(probabilidades_onnx_cnn(caminho, imagens) - prever_cnn(modelo, imagens))))
 
 
 def conferir_onnx_lstm(caminho: Path, modelo: TracoLSTM, sequencias: Sequence[NDArray[np.float32]]) -> float:
-    avaliador = ReferenceEvaluator(onnx.load(str(caminho)))
-    diferencas = []
-    for sequencia in sequencias:
-        (saida_onnx,) = avaliador.run(None, {"sequencia": sequencia[None].astype(np.float32)})
-        esperado = prever_lstm(modelo, sequencia[None], np.array([len(sequencia)]))
-        diferencas.append(float(np.max(np.abs(np.asarray(saida_onnx) - esperado))))
-    return max(diferencas)
+    esperado = np.concatenate([prever_lstm(modelo, s[None], np.array([len(s)])) for s in sequencias])
+    return float(np.max(np.abs(probabilidades_onnx_lstm(caminho, sequencias) - esperado)))

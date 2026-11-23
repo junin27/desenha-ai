@@ -50,10 +50,12 @@ def test_metricas_de_teste_e_relatorio() -> None:
         latencia_cpu_ms={"cnn": 1.2, "lstm": 3.4},
         tamanhos={"treino": 210_000, "validacao": 30_000, "teste": 30_000},
         confusoes=[("vaca", "cavalo", 0.12)],
+        conferencia_onnx={"cnn": 1e-6, "lstm": 2e-6},
     )
     assert relatorio["criterio_minimo"] == {"aprovado": False, "motivos": ["LSTM: acurácia 0.7900 < 0.80"]}
     assert relatorio["teste"]["CNN"] == {"acuracia": 1.0, "f1_macro": 1.0, "top3": 1.0}
     assert relatorio["curva_antecipada"] == {"CNN": {"0.5": 0.6, "1.0": 0.9}}
+    assert relatorio["conferencia_onnx"] == {"cnn": 1e-6, "lstm": 2e-6}
 
 
 def test_plano_com_fracoes_em_partes_iguais() -> None:

@@ -67,6 +67,7 @@ class RelatorioDeMetricas(TypedDict):
     latencia_cpu_ms: dict[str, float]
     dados: dict[str, int]
     confusoes: list[tuple[str, str, float]]
+    conferencia_onnx: dict[str, float]
 
 
 class PredicaoJson(TypedDict):
@@ -118,6 +119,7 @@ def metricas_redes_json(  # noqa: PLR0913 - um argumento por campo do relatório
     latencia_cpu_ms: Mapping[str, float],
     tamanhos: Mapping[str, int],
     confusoes: Sequence[tuple[str, str, float]],
+    conferencia_onnx: Mapping[str, float],
 ) -> RelatorioDeMetricas:
     return {
         "teste": {nome: asdict(m) for nome, m in teste.items()},
@@ -128,16 +130,17 @@ def metricas_redes_json(  # noqa: PLR0913 - um argumento por campo do relatório
         "latencia_cpu_ms": dict(latencia_cpu_ms),
         "dados": dict(tamanhos),
         "confusoes": list(confusoes),
+        "conferencia_onnx": dict(conferencia_onnx),
     }
 
 
-def plano_de_predicoes(quantidade_de_exemplos: int, semente: int) -> list[tuple[int, float]]:
-    """Desenhos de validação distintos, sorteados, com as 4 frações em partes iguais."""
-    if quantidade_de_exemplos < CASOS_DE_PREDICAO:
-        raise ValueError(
-            f"validação com {quantidade_de_exemplos} exemplos; esperado ao menos {CASOS_DE_PREDICAO}"
-        )
-    indices = np.random.default_rng(semente).choice(quantidade_de_exemplos, CASOS_DE_PREDICAO, replace=False)
+def plano_de_predicoes(
+    quantidade_de_exemplos: int, semente: int, casos: int = CASOS_DE_PREDICAO
+) -> list[tuple[int, float]]:
+    """Desenhos de validação distintos, sorteados, com as 4 frações em partes iguais (1.200 no treino)."""
+    if quantidade_de_exemplos < casos:
+        raise ValueError(f"validação com {quantidade_de_exemplos} exemplos; esperado ao menos {casos}")
+    indices = np.random.default_rng(semente).choice(quantidade_de_exemplos, casos, replace=False)
     fracoes = FRACOES_DAS_PREDICOES
     return [(int(i), fracoes[n % len(fracoes)]) for n, i in enumerate(indices)]
 
