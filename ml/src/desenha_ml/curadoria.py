@@ -83,7 +83,7 @@ def _avaliar(
     fala = ler_fala(texto)
     if isinstance(fala, Erro):
         return "formato_invalido", None, reparos
-    codigo = _filtro_comum(texto, fala.valor) or _filtro_da_tarefa(registro, fala.valor, numeros_permitidos)
+    codigo = _filtro_comum(texto, fala.valor) or filtro_da_tarefa(registro, fala.valor, numeros_permitidos)
     return codigo, fala.valor, reparos
 
 
@@ -95,15 +95,15 @@ def _filtro_comum(texto: str, fala: Fala) -> str | None:
     return None
 
 
-def _filtro_da_tarefa(registro: RegistroBruto, fala: Fala, numeros_permitidos: frozenset[str]) -> str | None:
+def filtro_da_tarefa(registro: RegistroBruto, fala: Fala, numeros_permitidos: frozenset[str]) -> str | None:
     if registro["tarefa"] == "CHARADA":
-        return _filtro_da_charada(fala, str(registro["meta"]["palavra"]))
+        return filtro_da_charada(fala, str(registro["meta"]["palavra"]))
     if registro["tarefa"] == "VEREDITO":
-        return _filtro_do_veredito(fala, registro["meta"]["regra"])
-    return _filtro_da_pergunta(fala, numeros_permitidos | frozenset(_NUMERO.findall(registro["entrada"])))
+        return filtro_do_veredito(fala, registro["meta"]["regra"])
+    return filtro_da_pergunta(fala, numeros_permitidos | frozenset(_NUMERO.findall(registro["entrada"])))
 
 
-def _filtro_da_charada(fala: Fala, palavra: str) -> str | None:
+def filtro_da_charada(fala: Fala, palavra: str) -> str | None:
     charada = ler_charada(fala.resposta)
     if isinstance(charada, Erro):
         return "formato_invalido"
@@ -112,14 +112,14 @@ def _filtro_da_charada(fala: Fala, palavra: str) -> str | None:
     return "vazou" if vaza(palavra, charada.valor) else None
 
 
-def _filtro_do_veredito(fala: Fala, regra: object) -> str | None:
+def filtro_do_veredito(fala: Fala, regra: object) -> str | None:
     veredito = ler_veredito(fala.resposta)
     if isinstance(veredito, Erro):
         return "formato_invalido"
     return "veredito_errado" if veredito.valor[0] != regra else None
 
 
-def _filtro_da_pergunta(fala: Fala, numeros_permitidos: frozenset[str]) -> str | None:
+def filtro_da_pergunta(fala: Fala, numeros_permitidos: frozenset[str]) -> str | None:
     if not _dentro(fala.resposta, PALAVRAS_DA_PERGUNTA):
         return "tamanho_resposta"
     citados = set(_NUMERO.findall(fala.resposta)) - numeros_permitidos
