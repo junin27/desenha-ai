@@ -81,3 +81,12 @@ export interface ReservaDoZe {
   /** Resposta educada para pergunta bloqueada; o Zé nem é chamado. */
   respostaBloqueada(): string;
 }
+
+/** Voz do Zé (bancada-do-ze): só fala com voz local em português; sem ela, fica indisponível. */
+export interface VozDoZe {
+  disponivel(): boolean;
+  /** Avisa quando as vozes do sistema terminam de carregar (podem chegar depois de abrir o jogo). */
+  aoMudarDisponibilidade(ouvinte: (disponivel: boolean) => void): Cancelamento;
+  falar(texto: string): void;
+  calar(): void;
+}

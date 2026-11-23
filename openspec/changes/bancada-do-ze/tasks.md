@@ -15,7 +15,7 @@
 
 ## 3. Voz do Zé
 
-- [ ] 3.1 Porta `VozDoZe` e adaptador `VozDoNavegador` com sintetizador falso: testes "Só voz online disponível", "Preferência pelo português do Brasil" e vozes que chegam depois (`voiceschanged`) → implementar
+- [x] 3.1 Porta `VozDoZe` e adaptador `VozDoNavegador` com sintetizador falso: testes "Só voz online disponível", "Preferência pelo português do Brasil" e vozes que chegam depois (`voiceschanged`) → implementar
 - [ ] 3.2 `PreferenciasDoEstande` no `localStorage` (leitura tolerante): teste "Recarregar mantém a escolha" → implementar
 - [ ] 3.3 `LeitorEmVoz` assinando partida e conversa: testes "Charada de reserva falada", "Pensamento não é falado", "Troca de tela interrompe a fala" e "Desligar no meio da fala" → implementar
 
