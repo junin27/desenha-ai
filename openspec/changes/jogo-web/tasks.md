@@ -20,7 +20,7 @@
 ## 3. Apresentação e composição
 
 - [x] 3.1 Canvas com Pointer Events (mouse/toque/caneta), botão Limpar e conversão para traços: testes com happy-dom → implementar
-- [ ] 3.2 Telas por etapa (início com aviso de paridade e placar, charada ao vivo, desenho com cronômetro e top-3, veredito, fim): testes do essencial → implementar
+- [x] 3.2 Telas por etapa (início com aviso de paridade e placar, charada ao vivo, desenho com cronômetro e top-3, veredito, fim): testes do essencial → implementar
 - [ ] 3.3 `main.ts` (composição), CSS legível (≥ 24 px) e `scripts/copiar_modelos.sh`; atalho Ctrl+Shift+Z para zerar o placar
 - [ ] 3.4 Autoteste de paridade ao abrir, com o aviso "Redes divergentes do treino"
 
