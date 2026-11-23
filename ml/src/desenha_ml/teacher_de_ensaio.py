@@ -19,7 +19,7 @@ _PEDIDO_DE_CHARADA = re.compile(r"^\d+\. nível (\S+)", flags=re.MULTILINE)
 _CASO = re.compile(r"Desafio: (.+)\n.*\n.*\n.*\nEnsemble: (.+)")
 _PERGUNTA = re.compile(r"^\d+\. (.+)$", flags=re.MULTILINE)
 _ORIGINAL = re.compile(r'Original: "(.+?)" →')
-_PALPITE = re.compile(r"(.+?) (\d+)%")
+_PALPITE = re.compile(r"([^,]+?) (\d+)%")  # nomes podem ter espaço ("xícara de café"), mas nunca vírgula
 ERRO_A_CADA = 7  # um em cada 7 itens sai errado de propósito
 
 PENSAMENTO = (

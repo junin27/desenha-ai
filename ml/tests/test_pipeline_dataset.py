@@ -44,3 +44,20 @@ def test_retomada_nao_chama_o_teacher_de_novo(tmp_path: Path) -> None:
         teacher=segundo, predicoes=PREDICOES, metricas_redes=None, pasta=tmp_path, registrar=lambda _: None
     )
     assert primeiro.chamadas > 0 and segundo.chamadas == 0
+
+
+def test_teacher_de_ensaio_le_os_nomes_do_top5_sem_virgula() -> None:
+    linhas = [
+        "TAREFA: VEREDITO",
+        "Desafio: cavalo",
+        "Desenho concluído: 50%",
+        "CNN (imagem): vaca 60%, cavalo 30%",
+        "LSTM (traços): vaca 60%, cavalo 30%",
+        "Ensemble: vaca 60%, cavalo 30%",
+    ]
+    caso = "\n".join(linhas)
+    prompt = "\n".join(["TAREFA: julgar o desenho", "CASO 1:", caso, "", "CASO 2:", caso])
+    resposta = TeacherDeEnsaio().gerar(prompt, 0.3)
+    assert isinstance(resposta, dict)
+    # o 1º item é errado de propósito (ERRO_A_CADA); o 2º tem de seguir a regra: cavalo em 2º lugar = QUASE
+    assert "VEREDITO: QUASE" in resposta["exemplos"][1]
