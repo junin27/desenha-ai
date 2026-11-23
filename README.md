@@ -61,6 +61,16 @@ ml/.venv/Scripts/python -m pip install -e "ml[dev,treino]"
 ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epocas 2 --saida saida/ensaio
 ```
 
+## Dataset destilado e fine-tuning do Zé (Google Colab)
+
+**Notebook 2 — dataset** (sem GPU): envie o `.whl` e o `modelos_redes.zip`; coloque a chave gratuita do Gemini nos *Secrets* do Colab como `GEMINI_API_KEY`; execute tudo (≈ 15–25 min). O *checkpoint* fica no Drive (`desenha_ai_so/dataset_ze`), e rodar de novo continua de onde parou. Confira **suficiente: true** (≥ 300 amostras, ≥ 60 por tarefa) e baixe o `dataset_slm.zip`. Ensaio local sem API: `ml/.venv/Scripts/python scripts/ensaio_dataset_local.py`.
+
+**Notebook 3 — fine-tuning** (GPU T4): envie o `.whl`, o `dataset_slm.zip` e o `modelos_redes.zip`.
+1. Rode com `MODO_ENSAIO = True` (≈ 10 min): testa todas as etapas, inclusive a exportação GGUF.
+2. Troque para `MODO_ENSAIO = False` e rode de novo (≈ 40–60 min).
+3. Confira a linha **CRITÉRIO DE APROVAÇÃO** (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o Qwen3 base).
+4. Baixe do Drive (`desenha_ai_so/`) o `zedorabisco-1.7b-Q4_K_M.gguf` e o `metricas_slm.json`.
+
 ## Créditos e licenças
 
 - Desenhos: [Quick, Draw! Dataset](https://github.com/googlecreativelab/quickdraw-dataset), Google, licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Uma amostra de 90 desenhos está em `ml/tests/amostras/`.
