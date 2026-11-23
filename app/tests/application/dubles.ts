@@ -6,11 +6,13 @@ import type {
   FalaFinal,
   NarradorDoJogo,
   OuvinteDaFala,
+  PreferenciasDoEstande,
   ProbabilidadesDasRedes,
   Relogio,
   RepositorioDePlacar,
   ReservaDoZe,
   Sorteador,
+  VozDoZe,
 } from "../../src/application/portas";
 import type { Desenho } from "../../src/domain/desenho/desenho";
 import { falha, ok, type Resultado } from "../../src/domain/resultado";
@@ -203,5 +205,44 @@ export class ReservaFalsa implements ReservaDoZe {
 
   respostaBloqueada(): string {
     return "Resposta de bloqueio";
+  }
+}
+
+/** Registra o que foi falado e calado, na ordem. */
+export class VozFalsa implements VozDoZe {
+  readonly eventos: string[] = [];
+  private ouvinte: ((disponivel: boolean) => void) | undefined;
+
+  constructor(private estaDisponivel = true) {}
+
+  disponivel(): boolean {
+    return this.estaDisponivel;
+  }
+  aoMudarDisponibilidade(ouvinte: (disponivel: boolean) => void): Cancelamento {
+    this.ouvinte = ouvinte;
+    return () => (this.ouvinte = undefined);
+  }
+  falar(texto: string): void {
+    this.eventos.push(`falar:${texto}`);
+  }
+  calar(): void {
+    this.eventos.push("calar");
+  }
+  ficarDisponivel(): void {
+    this.estaDisponivel = true;
+    this.ouvinte?.(true);
+  }
+  get falas(): string[] {
+    return this.eventos.filter((e) => e.startsWith("falar:")).map((e) => e.slice("falar:".length));
+  }
+}
+
+export class PreferenciasEmMemoria implements PreferenciasDoEstande {
+  constructor(private voz?: boolean) {}
+  vozLigada(): boolean | undefined {
+    return this.voz;
+  }
+  gravarVozLigada(ligada: boolean): void {
+    this.voz = ligada;
   }
 }
