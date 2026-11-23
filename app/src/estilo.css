@@ -278,3 +278,73 @@ textarea {
 .selo[hidden] {
   display: none;
 }
+
+/* Barra do estande e painel técnico (bancada-do-ze): fora do fluxo, não empurram a tela do jogo. */
+.barra-do-estande {
+  position: fixed;
+  right: var(--espaco);
+  bottom: var(--espaco);
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+}
+
+.barra-do-estande button {
+  font-size: 18px;
+  padding: 0.3em 0.8em;
+  background: var(--tinta-suave);
+  box-shadow: 0 3px 0 var(--tinta);
+}
+
+.painel {
+  position: fixed;
+  top: var(--espaco);
+  right: var(--espaco);
+  bottom: calc(var(--espaco) + 56px);
+  width: min(560px, 46vw);
+  overflow-y: auto;
+  padding: var(--espaco);
+  background: rgba(43, 26, 10, 0.94);
+  color: var(--papel);
+  border-radius: 16px;
+  font-size: 20px;
+  text-align: left;
+  z-index: 10;
+}
+
+.painel[hidden] {
+  display: none;
+}
+
+.painel h2,
+.painel h3 {
+  color: #ffd27a;
+  margin: 0.4em 0 0.2em;
+}
+
+.painel h2 {
+  font-size: 30px;
+}
+
+.painel h3 {
+  font-size: 22px;
+}
+
+.painel button[aria-pressed="true"] {
+  background: var(--acerto);
+}
+
+.painel button[aria-pressed="false"] {
+  background: var(--tinta-suave);
+}
+
+.contadores {
+  border-collapse: collapse;
+  margin-top: 0.4em;
+}
+
+.contadores th,
+.contadores td {
+  padding: 0.1em 0.5em;
+  text-align: center;
+}
