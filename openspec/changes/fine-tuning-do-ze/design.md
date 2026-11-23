@@ -32,8 +32,11 @@ A curadoria já decide, para uma fala, o primeiro código de rejeição. A avali
 Qwen3-1.7B (`unsloth/Qwen3-1.7B`) em 4 bits NF4; LoRA r = 16, α = 16, dropout 0 em `q,k,v,o,gate,up,down`; 3 épocas; lr 2e-4 cosseno com 5% de aquecimento; lote efetivo 16 (4 × 4 de acumulação); `adamw_8bit`; avaliação na validação a cada 10 passos. Geração da avaliação: gulosa (`do_sample=False`), até 300 tokens novos. Modo ensaio: `max_steps=10` e 15 exemplos de teste.
 - **Alternativa descartada:** Qwen3-0.6B. É mais rápido em CPU, mas tem menos capacidade de seguir o formato; fica como plano B se a latência no evento for ruim (troca só uma constante).
 
-### D4 — Número de parâmetros medido, não fixado
-A tabela de quantização usa o total de parâmetros contado no modelo carregado (sem o LoRA), e não um número escrito à mão. O cenário da spec (2,03 × 10⁹) é só um exemplo para testar a conta.
+### D4 — Número de parâmetros medido, não fixado (revisado na implementação)
+A tabela de quantização usa o total de parâmetros medido, e não um número escrito à mão. Contar no modelo carregado não funciona: em 4 bits o `numel()` conta valores empacotados (dois pesos por byte) e daria metade. A contagem vem dos metadados safetensors do modelo original no Hugging Face (`get_safetensors_metadata("Qwen/Qwen3-1.7B").parameter_count`). O cenário da spec (2,03 × 10⁹) é só um exemplo para testar a conta.
+
+### D6 — Única função no notebook
+`gerar_respostas` (laço de geração em lote na GPU) é a única função definida no notebook 3: é infraestrutura de inferência com o modelo do Unsloth, sem regra; toda decisão (formato, tarefa, critério, quantização) vem do pacote.
 
 ### D5 — Exportação
 `save_pretrained_gguf(..., quantization_method=["q4_k_m", "q8_0"])`, copiado para o Drive (`MyDrive/desenha_ai_so/`), porque o download direto de mais de 1 GB pelo navegador costuma falhar. O Q8_0 serve só para a tabela (comparação real de tamanho); o evento usa o Q4_K_M.
