@@ -12,8 +12,19 @@ import re
 
 ESPACOS = "[ \t\n\r\u00a0]"
 _SEQUENCIA_DE_ESPACOS = re.compile(ESPACOS + "+")
+_CARACTERES_DE_ESPACO = " \t\n\r\u00a0"
 
 
 def normalizar_espacos(texto: str) -> str:
     """Troca sequências de espaços por um só e tira os das pontas."""
     return _SEQUENCIA_DE_ESPACOS.sub(" ", texto).strip(" ")
+
+
+def aparar(texto: str) -> str:
+    """Tira espaços das pontas pelo conjunto explícito (`str.strip()` e o `trim()` do JS diferem)."""
+    return texto.strip(_CARACTERES_DE_ESPACO)
+
+
+def aparar_inicio(texto: str) -> str:
+    """Como `aparar`, só no início (texto parcial do streaming ainda pode crescer no fim)."""
+    return texto.lstrip(_CARACTERES_DE_ESPACO)

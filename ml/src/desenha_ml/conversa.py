@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from desenha_ml.resultado import Erro, Ok, Resultado
-from desenha_ml.texto import ESPACOS, normalizar_espacos
+from desenha_ml.texto import ESPACOS, aparar, aparar_inicio, normalizar_espacos
 from desenha_ml.veredito import Veredito
 
 INSTRUCAO_DE_SISTEMA = (
@@ -102,34 +102,34 @@ def ler_fala(texto: str) -> Resultado[Fala]:
     encontrado = _FALA.match(texto)
     if encontrado is None or any(texto.count(tag) != 1 for tag in TAGS):
         return Erro("formato_invalido", f"fala fora do formato <pensamento>/<resposta>: {texto[:80]!r}")
-    return Ok(Fala(pensamento=encontrado.group(1).strip(), resposta=encontrado.group(2).strip()))
+    return Ok(Fala(pensamento=aparar(encontrado.group(1)), resposta=aparar(encontrado.group(2))))
 
 
 def ler_charada(resposta: str) -> Resultado[str]:
-    texto = resposta.strip()
-    if not texto.startswith(PREFIXO_DA_CHARADA) or not texto[len(PREFIXO_DA_CHARADA) :].strip():
+    texto = aparar(resposta)
+    if not texto.startswith(PREFIXO_DA_CHARADA) or not aparar(texto[len(PREFIXO_DA_CHARADA) :]):
         return Erro("formato_invalido", f"charada sem o prefixo {PREFIXO_DA_CHARADA!r}: {texto[:80]!r}")
-    return Ok(texto[len(PREFIXO_DA_CHARADA) :].strip())
+    return Ok(aparar(texto[len(PREFIXO_DA_CHARADA) :]))
 
 
 def ler_veredito(resposta: str) -> Resultado[tuple[Veredito, str]]:
-    encontrado = _VEREDITO.match(resposta.strip())
-    if encontrado is None or not encontrado.group(2).strip():
+    encontrado = _VEREDITO.match(aparar(resposta))
+    if encontrado is None or not aparar(encontrado.group(2)):
         return Erro("formato_invalido", f"veredito fora do formato VEREDITO/NARRAÇÃO: {resposta[:80]!r}")
-    return Ok((_VEREDITOS[encontrado.group(1)], encontrado.group(2).strip()))
+    return Ok((_VEREDITOS[encontrado.group(1)], aparar(encontrado.group(2))))
 
 
 def ler_parcial(texto: str) -> LeituraParcial:
     """Leitura durante o streaming: corta pedaço de tag incompleto no fim e informa a etapa (D3)."""
     texto = _sem_tag_incompleta(texto)
     if "</pensamento>" not in texto:
-        return LeituraParcial("pensando", _depois_de(texto, "<pensamento>").lstrip(), "")
-    pensamento = _depois_de(texto, "<pensamento>").split("</pensamento>")[0].strip()
+        return LeituraParcial("pensando", aparar_inicio(_depois_de(texto, "<pensamento>")), "")
+    pensamento = aparar(_depois_de(texto, "<pensamento>").split("</pensamento>")[0])
     resto = texto.split("</pensamento>", 1)[1]
     if "</resposta>" not in resto:
-        return LeituraParcial("respondendo", pensamento, _depois_de(resto, "<resposta>").lstrip())
+        return LeituraParcial("respondendo", pensamento, aparar_inicio(_depois_de(resto, "<resposta>")))
     return LeituraParcial(
-        "completa", pensamento, _depois_de(resto, "<resposta>").split("</resposta>")[0].strip()
+        "completa", pensamento, aparar(_depois_de(resto, "<resposta>").split("</resposta>")[0])
     )
 
 
