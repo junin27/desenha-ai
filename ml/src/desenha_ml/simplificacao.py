@@ -14,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from desenha_ml.desenho import Desenho, Traco
+from desenha_ml.geometria import distancias_ao_segmento
 from desenha_ml.normalizacao import normalizar
 
 EPSILON_PADRAO = 2.0
@@ -47,16 +48,3 @@ def _ponto_mais_distante(traco: Traco, inicio: int, fim: int) -> tuple[int, floa
     distancias = distancias_ao_segmento(traco[inicio + 1 : fim], traco[inicio], traco[fim])
     posicao = int(np.argmax(distancias))
     return inicio + 1 + posicao, float(distancias[posicao])
-
-
-def distancias_ao_segmento(
-    pontos: NDArray[np.float64], a: NDArray[np.float64], b: NDArray[np.float64]
-) -> NDArray[np.float64]:
-    """Distância euclidiana de cada ponto (n, 2) ao segmento AB; se A == B, distância até A."""
-    ab = b - a
-    comprimento2 = float(np.dot(ab, ab))
-    if comprimento2 == 0.0:
-        return np.asarray(np.hypot(*(pontos - a).T), dtype=np.float64)
-    t = np.clip(((pontos - a) @ ab) / comprimento2, 0.0, 1.0)
-    projecoes = a + t[:, None] * ab
-    return np.asarray(np.hypot(*(pontos - projecoes).T), dtype=np.float64)
