@@ -1,4 +1,5 @@
 import { falha, ok, type Resultado } from "../resultado";
+import { normalizarEspacos } from "../texto";
 import type { ErroDeRegra } from "./erros";
 import type { Veredito } from "./veredito";
 
@@ -9,8 +10,6 @@ const PONTOS_QUASE = 30;
 const BONUS_MAXIMO = 50;
 const TAMANHO_DO_PLACAR = 10;
 const TAMANHO_MAXIMO_DO_NOME = 16;
-// Conjunto explícito de espaços: o \s do JS e o str.split() do Python não concordam (D7 do design).
-const ESPACOS = /[ \t\n\r\xa0]+/g;
 
 export interface PartidaNoPlacar {
   readonly nome: string;
@@ -38,7 +37,7 @@ export function pontosDaPartida(pontosDasRodadas: readonly number[]): number {
 
 /** Tira espaços das pontas e repetidos; conta pontos de código (um emoji vale 1, como no Python). */
 export function limparNome(nome: string): Resultado<string, ErroDeRegra> {
-  const limpo = nome.replace(ESPACOS, " ").replace(/^ +| +$/g, "");
+  const limpo = normalizarEspacos(nome);
   const tamanho = Array.from(limpo).length; // pontos de código, como len() no Python (D7)
   if (tamanho < 1 || tamanho > TAMANHO_MAXIMO_DO_NOME) {
     const detalhe = `nome "${limpo}" com ${tamanho} caracteres; esperado de 1 a ${TAMANHO_MAXIMO_DO_NOME}`;

@@ -9,7 +9,7 @@
 ## 2. Conversa com o Zé — contrato e TypeScript (TDD)
 
 - [x] 2.1 Gerar `contratos/conversa.json` (CLI de contratos) com teste de atualização
-- [ ] 2.2 `app/src/domain/ze/conversa.ts`: testes espelhando os cenários → implementar
+- [x] 2.2 `app/src/domain/ze/conversa.ts`: testes espelhando os cenários → implementar
 - [ ] 2.3 `tests/contrato-conversa.test.ts`: TypeScript reproduz o contrato; validar falhando com o contrato adulterado
 
 ## 3. Geração do dataset (TDD, Teacher falso)
