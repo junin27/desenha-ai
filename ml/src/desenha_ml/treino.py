@@ -189,7 +189,7 @@ def _uma_epoca(
         logits = modelo(aumentar_imagens(entradas[0])) if eh_cnn else modelo(*entradas)
         perda = F.cross_entropy(logits, dados.rotulos[indices], label_smoothing=configuracao.suavizacao)
         _passo(modelo, otimizacao, perda)
-        soma_da_perda += float(perda) * len(indices)
+        soma_da_perda += float(perda.detach()) * len(indices)
         acertos += int((logits.argmax(1) == dados.rotulos[indices]).sum())
     total = len(ordem)
     segundos = time.perf_counter() - inicio
