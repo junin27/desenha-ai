@@ -12,7 +12,10 @@ def test_normalizar_espacos() -> None:
 
 def test_aparar_usa_so_o_conjunto_explicito() -> None:
     assert aparar(f"\n {ESPACO_INSEPARAVEL}ok\r\t") == "ok"
-    assert aparar(f"{SEPARADOR_DE_ARQUIVO}ok{SEPARADOR_DE_ARQUIVO}") == f"{SEPARADOR_DE_ARQUIVO}ok{SEPARADOR_DE_ARQUIVO}"
+    assert (
+        aparar(f"{SEPARADOR_DE_ARQUIVO}ok{SEPARADOR_DE_ARQUIVO}")
+        == f"{SEPARADOR_DE_ARQUIVO}ok{SEPARADOR_DE_ARQUIVO}"
+    )
 
 
 def test_aparar_inicio_mantem_o_fim() -> None:
