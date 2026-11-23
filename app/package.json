@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
