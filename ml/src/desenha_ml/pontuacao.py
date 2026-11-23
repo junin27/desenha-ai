@@ -6,11 +6,11 @@ Exemplo:
 """
 
 import math
-import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 from desenha_ml.resultado import Erro, Ok, Resultado
+from desenha_ml.texto import normalizar_espacos
 from desenha_ml.veredito import Veredito
 
 SEGUNDOS_DA_RODADA = 20.0
@@ -20,9 +20,6 @@ PONTOS_QUASE = 30
 BONUS_MAXIMO = 50
 TAMANHO_DO_PLACAR = 10
 TAMANHO_MAXIMO_DO_NOME = 16
-
-# Conjunto explícito de espaços: str.split() e o \s do JavaScript não concordam em todos os caracteres.
-_ESPACOS = re.compile("[ \t\n\r\u00a0]+")
 
 
 @dataclass(frozen=True)
@@ -48,7 +45,7 @@ def pontos_da_partida(pontos_das_rodadas: Iterable[int]) -> int:
 
 def limpar_nome(nome: str) -> Resultado[str]:
     """Tira espaços das pontas e repetidos; o tamanho conta caracteres (um emoji vale 1)."""
-    limpo = _ESPACOS.sub(" ", nome).strip(" ")
+    limpo = normalizar_espacos(nome)
     if not 1 <= len(limpo) <= TAMANHO_MAXIMO_DO_NOME:
         detalhe = f"nome {limpo!r} com {len(limpo)} caracteres; esperado de 1 a {TAMANHO_MAXIMO_DO_NOME}"
         return Erro("nome_invalido", detalhe)
