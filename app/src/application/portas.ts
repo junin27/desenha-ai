@@ -13,6 +13,8 @@ import type { LeituraParcial } from "../domain/ze/conversa";
 export interface ProbabilidadesDasRedes {
   readonly cnn: readonly number[];
   readonly lstm: readonly number[];
+  /** Quanto cada rede levou, quando o adaptador mede (painel técnico). */
+  readonly milissegundos?: { readonly cnn: number; readonly lstm: number };
 }
 
 export interface ErroDoClassificador {

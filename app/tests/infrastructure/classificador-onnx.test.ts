@@ -56,6 +56,18 @@ describe("palpite a cada traço (adaptador ONNX)", () => {
     expect(lstm.formas).toEqual([[1, 3, 3]]);
   });
 
+  it("informa quantos milissegundos cada rede levou", async () => {
+    const instantes = [100, 112.5, 112.5, 142.75];
+    const instante = (): number => instantes.shift() ?? 0;
+    const desenho = criarDesenho([[[0, 0]]]);
+    const resposta = await new ClassificadorOnnx(
+      new ExecutorEspiao(),
+      new ExecutorEspiao(),
+      instante,
+    ).classificar(desenho);
+    expect(resposta.ok && resposta.valor.milissegundos).toEqual({ cnn: 12.5, lstm: 30.25 });
+  });
+
   it("falha da sessão vira classificador_indisponivel, sem exceção", async () => {
     const quebrado: ExecutorDeRede = { executar: () => Promise.reject(new Error("sessão encerrada")) };
     const resposta = await new ClassificadorOnnx(quebrado, quebrado).classificar(criarDesenho([[[0, 0]]]));

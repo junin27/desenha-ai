@@ -23,6 +23,7 @@ export class ClassificadorOnnx implements ClassificadorDeDesenho {
   constructor(
     private readonly cnn: ExecutorDeRede,
     private readonly lstm: ExecutorDeRede,
+    private readonly instante: () => number = () => performance.now(),
   ) {}
 
   async classificar(desenho: Desenho): Promise<Resultado<ProbabilidadesDasRedes, ErroDoClassificador>> {
@@ -30,9 +31,13 @@ export class ClassificadorOnnx implements ClassificadorDeDesenho {
     const sequencia = sequenciar(desenho);
     try {
       // Uma rede de cada vez: o wasm roda com 1 thread (D4), então em paralelo não ganharia nada.
+      const inicioDaCnn = this.instante();
       const cnn = await this.cnn.executar(imagem, [1, CANAIS_DA_IMAGEM, LADO_DA_IMAGEM, LADO_DA_IMAGEM]);
+      const fimDaCnn = this.instante();
+      const inicioDaLstm = this.instante();
       const lstm = await this.lstm.executar(sequencia.valores, [1, sequencia.pontos, VALORES_POR_PONTO]);
-      return ok({ cnn: Array.from(cnn), lstm: Array.from(lstm) });
+      const milissegundos = { cnn: fimDaCnn - inicioDaCnn, lstm: this.instante() - inicioDaLstm };
+      return ok({ cnn: Array.from(cnn), lstm: Array.from(lstm), milissegundos });
     } catch (erro) {
       return falha({ codigo: "classificador_indisponivel", detalhe: `redes ONNX falharam: ${String(erro)}` });
     }
