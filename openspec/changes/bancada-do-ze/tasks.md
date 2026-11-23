@@ -25,7 +25,7 @@
 - [x] 4.2 Botão de voz e selo do Zé (destilado, base, reserva) nas telas de charada, veredito e pergunta (happy-dom): teste "Selo da reserva" → implementar
 - [x] 4.3 Leitura de `metricas_redes.json` e `metricas_slm.json` (tolerante) e `copiar_modelos.sh` copiando as métricas: testes com os arquivos do ensaio e "Sem métricas do SLM" → implementar
 - [x] 4.4 `PainelTecnico` (botão "Bastidores", F2, chave base × destilado, medições, paridade e métricas do treino) com happy-dom: teste "Painel durante o desenho" → implementar
-- [ ] 4.5 `main.ts`: dois narradores (`?ze=`, `?zebase=`), decoradores de medição, voz e conversa: teste "Endereço do base pela URL" na função que lê a URL → implementar
+- [x] 4.5 `main.ts`: dois narradores (`?ze=`, `?zebase=`), decoradores de medição, voz e conversa: teste "Endereço do base pela URL" na função que lê a URL → implementar
 
 ## 5. Verificação
 

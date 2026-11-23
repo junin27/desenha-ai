@@ -69,3 +69,25 @@ function escolherVoz<Voz extends VozDoSistema>(vozes: readonly Voz[]): Voz | und
 function idioma(voz: VozDoSistema): string {
   return voz.lang.toLowerCase().replace("_", "-");
 }
+
+/** Navegador sem síntese de voz: o Zé fica mudo e o botão diz que não há voz. */
+const VOZ_AUSENTE: VozDoZe = {
+  disponivel: () => false,
+  aoMudarDisponibilidade: () => () => undefined,
+  falar: () => undefined,
+  calar: () => undefined,
+};
+
+const VELOCIDADE_DA_FALA = 1.05; // um pouco mais rápida que o padrão: narração de rodeio
+
+/** Voz real do navegador; sem `speechSynthesis`, a voz ausente. */
+export function criarVozDoNavegador(janela: Window): VozDoZe {
+  if (!("speechSynthesis" in janela)) return VOZ_AUSENTE;
+  return new VozDoNavegador(janela.speechSynthesis, (texto, voz: SpeechSynthesisVoice) => {
+    const enunciado = new SpeechSynthesisUtterance(texto);
+    enunciado.voice = voz;
+    enunciado.lang = voz.lang;
+    enunciado.rate = VELOCIDADE_DA_FALA;
+    return enunciado;
+  });
+}
