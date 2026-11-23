@@ -1,6 +1,16 @@
-import { limparNome, RODADAS_POR_PARTIDA } from "../domain/rodada/pontuacao";
+import type { Desenho } from "../domain/desenho/desenho";
+import { prepararDesenhoCapturado } from "../domain/desenho/simplificacao";
+import { limparNome, RODADAS_POR_PARTIDA, SEGUNDOS_DA_RODADA } from "../domain/rodada/pontuacao";
+import { deveEncerrarAntes } from "../domain/rodada/veredito";
 import type { LeituraParcial } from "../domain/ze/conversa";
 import { nivelDaRodada, obterCharada } from "./charada-da-rodada";
+import {
+  esperaEsgotada,
+  INTERVALO_DO_CRONOMETRO_MS,
+  segundosDecorridos,
+  segundosRestantes,
+} from "./cronometro";
+import { montarPalpite } from "./palpite";
 import { ESTADO_INICIAL, type EstadoDaPartida } from "./estado-da-partida";
 import type {
   Cancelamento,
@@ -41,6 +51,10 @@ export type OuvinteDaPartida = (estado: EstadoDaPartida) => void;
 export class Partida {
   private estadoAtual: EstadoDaPartida = ESTADO_INICIAL;
   private readonly ouvintes = new Set<OuvinteDaPartida>();
+  private inicioDaEtapaMs = 0;
+  private primeiroTracoMs: number | undefined;
+  private pararCronometro: Cancelamento = () => undefined;
+  private julgamento: Promise<void> = Promise.resolve();
 
   constructor(
     private readonly dependencias: DependenciasDaPartida,
@@ -69,16 +83,43 @@ export class Partida {
     await this.iniciarRodada(0);
   }
 
+  /** Espera o que a partida disparou sozinha (fim do tempo, julgamento); usado pelos testes e pela tela. */
+  aguardar(): Promise<void> {
+    return this.julgamento;
+  }
+
   desenhar(): void {
     if (this.estadoAtual.etapa !== "charada" || this.estadoAtual.charada === undefined) return;
-    this.mudar({ etapa: "desenhando" });
+    this.inicioDaEtapaMs = this.dependencias.relogio.agora();
+    this.primeiroTracoMs = undefined;
+    this.mudar({ etapa: "desenhando", segundosRestantes: SEGUNDOS_DA_RODADA, palpite: undefined });
+    this.pararCronometro = this.dependencias.relogio.aCada(INTERVALO_DO_CRONOMETRO_MS, () => {
+      this.conferirTempo();
+    });
+  }
+
+  /** Recebe o desenho inteiro capturado até agora e atualiza o palpite das redes. */
+  async registrarTraco(desenho: Desenho): Promise<void> {
+    if (this.estadoAtual.etapa !== "desenhando") return;
+    this.primeiroTracoMs ??= this.dependencias.relogio.agora();
+    const probabilidades = await this.dependencias.classificador.classificar(
+      prepararDesenhoCapturado(desenho),
+    );
+    // A etapa pode ter mudado enquanto as redes calculavam (tempo esgotado, "Pronto").
+    if (!this.estaDesenhando() || !probabilidades.ok) return;
+    const palpite = montarPalpite(probabilidades.valor, this.configuracao.pesoDaCnn);
+    if (palpite === undefined) return;
+    this.mudar({ palpite });
+    if (this.venceuAntes(palpite.ensemble)) await this.encerrarDesenho();
+  }
+
+  /** Botão "Limpar": apaga o palpite, mas o cronômetro segue (spec `interface-do-jogo`). */
+  limparDesenho(): void {
+    if (this.estadoAtual.etapa === "desenhando") this.mudar({ palpite: undefined });
   }
 
   async pronto(): Promise<void> {
-    if (this.estadoAtual.etapa !== "desenhando") return;
-    this.mudar({ etapa: "julgando" });
-    await Promise.resolve();
-    this.mudar({ etapa: "resultado" });
+    await this.encerrarDesenho();
   }
 
   async proximaRodada(): Promise<void> {
@@ -101,6 +142,48 @@ export class Partida {
     const categoria = this.nomeDaCategoria(rodada);
     const charada = await obterCharada(narrador, reserva, categoria, nivelDaRodada(rodada), this.mostrarFala);
     this.mudar({ charada, falaAoVivo: undefined });
+  }
+
+  private conferirTempo(): void {
+    const agora = this.dependencias.relogio.agora();
+    if (this.primeiroTracoMs === undefined) {
+      if (esperaEsgotada(this.inicioDaEtapaMs, agora)) void this.encerrarDesenho();
+      return;
+    }
+    const restantes = segundosRestantes(this.primeiroTracoMs, agora);
+    this.mudar({ segundosRestantes: restantes });
+    if (restantes <= 0) void this.encerrarDesenho();
+  }
+
+  private venceuAntes(ensemble: readonly number[]): boolean {
+    if (this.primeiroTracoMs === undefined) return false;
+    const decorridos = segundosDecorridos(this.primeiroTracoMs, this.dependencias.relogio.agora());
+    const encerrar = deveEncerrarAntes(this.categoriaDaRodada(), ensemble, decorridos);
+    return encerrar.ok && encerrar.valor;
+  }
+
+  /** Sai do desenho uma vez só, venha o fim do tempo, a vitória antecipada ou o "Pronto". */
+  private encerrarDesenho(): Promise<void> {
+    if (this.estadoAtual.etapa !== "desenhando") return this.julgamento;
+    this.pararCronometro();
+    const agora = this.dependencias.relogio.agora();
+    const restantes = this.primeiroTracoMs === undefined ? 0 : segundosRestantes(this.primeiroTracoMs, agora);
+    this.mudar({ etapa: "julgando", segundosRestantes: restantes });
+    this.julgamento = this.julgar();
+    return this.julgamento;
+  }
+
+  private async julgar(): Promise<void> {
+    await Promise.resolve();
+    this.mudar({ etapa: "resultado" });
+  }
+
+  private estaDesenhando(): boolean {
+    return this.estadoAtual.etapa === "desenhando";
+  }
+
+  private categoriaDaRodada(): number {
+    return this.estadoAtual.categorias[this.estadoAtual.rodada] ?? 0;
   }
 
   private nomeDaCategoria(rodada: number): string {

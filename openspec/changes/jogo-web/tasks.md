@@ -5,7 +5,7 @@
 - [x] 1.1 Portas e dublês (`ClassificadorFalso`, `NarradorFalso`, `PlacarEmMemoria`, `RelogioFalso`, `SorteadorFixo`) e teste de arquitetura verde com a nova camada
 - [x] 1.2 `Partida` — etapas, nome inválido e categorias sem repetição: testes → implementar
 - [x] 1.3 Charada com reserva (falha, demora, formato inválido, vazamento): testes → implementar
-- [ ] 1.4 Tempo do desenho, vitória antecipada, botão Pronto e rodada sem traço: testes com o `RelogioFalso` → implementar
+- [x] 1.4 Tempo do desenho, vitória antecipada, botão Pronto e rodada sem traço: testes com o `RelogioFalso` → implementar
 - [ ] 1.5 Veredito e pontos pela regra, discordância do Zé e narração-modelo: testes → implementar
 - [ ] 1.6 Fim da partida gravando no placar: teste da partida completa (135 + 30 + 0 = 165) → implementar
 
