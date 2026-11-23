@@ -32,7 +32,9 @@ function listarArquivosTs(pasta: string): string[] {
 
 function camadaDe(caminhoAbsoluto: string): Camada | undefined {
   const primeiraPasta = relative(RAIZ_SRC, caminhoAbsoluto).split(sep)[0];
-  return (["domain", "application", "infrastructure", "presentation"] as const).find((c) => c === primeiraPasta);
+  return (["domain", "application", "infrastructure", "presentation"] as const).find(
+    (c) => c === primeiraPasta,
+  );
 }
 
 function importsDe(arquivo: string): string[] {
