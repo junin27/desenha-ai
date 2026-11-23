@@ -15,6 +15,7 @@ dependencies = ["numpy>=1.26"]
 [project.optional-dependencies]
 dev = ["pytest>=8", "mypy>=1.11", "ruff>=0.6", "build>=1.2"]
 treino = ["torch>=2.4", "onnx>=1.16"]
+teacher = ["google-genai>=1.0", "groq>=0.11"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/desenha_ml"]
@@ -38,3 +39,6 @@ ignore = ["RUF001", "RUF002", "RUF003", "PLR2004"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR2004"]
+# Arquivos de texto em prosa enviado ao Teacher: quebrar frases para caber em 110 colunas muda o prompt.
+"src/desenha_ml/prompts_do_teacher.py" = ["E501"]
+"src/desenha_ml/ficha_tecnica.py" = ["E501"]
