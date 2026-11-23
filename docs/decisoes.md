@@ -13,3 +13,4 @@ Decisões que valem para o projeto todo. Decisões de uma mudança específica f
 | D-07 | 23/11/2026 | Destilação em nível de sequência (SFT nas saídas do Teacher com CoT) | A API do Teacher (Gemini) não expõe logits, então a perda KL nos logits é inviável | KD por logits (precisaria do Teacher local) |
 | D-08 | 23/11/2026 | Pontuação do placar usa a regra determinística; a fala do Zé é avaliada contra ela | Placar justo para votação popular; a concordância Zé × regra vira métrica do SLM | Pontuação pela fala do SLM (injusta se ele errar) |
 | D-09 | 23/11/2026 | Git só local até o fim; o usuário cria o repositório público depois | Pedido do usuário | — |
+| D-10 | 23/11/2026 | Repositório publicado em github.com/junin27/desenha-ai; push só a pedido do usuário (substitui D-09) | O usuário pediu para continuar o trabalho em outra máquina | Continuar só local (impediria a troca de máquina) |

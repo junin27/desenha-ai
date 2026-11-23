@@ -4,6 +4,8 @@ Jogo interativo para o 5º Workshop de IA da FASOFT/UniRV (30/11/2026) e projeto
 
 Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe naquela pasta.
 
+> **Continuando o trabalho?** Leia primeiro `docs/continuacao.md` (estado das changes, preferências do usuário e como configurar outra máquina).
+
 ## Mapa
 
 | Pasta | O que é |
@@ -21,7 +23,7 @@ Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe
 1. **Spec antes do código (OpenSpec).** Comportamento novo ou alterado começa em `/openspec-propose`: `proposal.md` (o porquê e o que NÃO entra), deltas em `specs/` com cenários `#### Scenario:` (WHEN/THEN), `design.md` e `tasks.md`. **Só implemente change aprovada pelo usuário.** Ao terminar, `/openspec-archive-change` para a spec viva refletir o código. `openspec validate --strict` tem de passar.
 2. **TDD.** Cada cenário da spec vira ao menos um teste, que cita o requisito no nome (`test_veredito_quase_quando_alvo_no_top3`). Primeiro o teste falhando, depois o código mínimo, depois a refatoração. "Funciona" só com teste que prova.
 3. **Confirme o entendimento em 2–3 linhas antes de implementar.** Lacuna ou ambiguidade na spec → pergunte com opções concretas; nunca decida em silêncio. Decisão tomada → registre no `design.md` da change ou em `docs/decisoes.md`.
-4. **Uma responsabilidade por commit**, mensagem `tipo(escopo): descrição` (Conventional Commits) citando a change. O corpo diz **por que**. Commits e branches são locais: **nunca** `git push`, nunca criar remoto (o usuário publica depois). Nunca restaure arquivos via Git sem pedir.
+4. **Uma responsabilidade por commit**, mensagem `tipo(escopo): descrição` (Conventional Commits) citando a change. O corpo diz **por que**. Remoto: `https://github.com/junin27/desenha-ai` (branch `main`); **`git push` só quando o usuário pedir**, nunca `--force`. Nunca restaure arquivos via Git sem pedir.
 5. **Opinião técnica franca.** Abordagem ruim → diga que é ruim e por quê. Problema não documentado (API que mudou, dependência estranha) → avise e proponha registrar em "Armadilhas" abaixo.
 
 ## Arquitetura (resumo; detalhes em `docs/decisoes.md`)

@@ -1,33 +1,65 @@
 # Continuação do trabalho (handoff entre sessões do Claude Code)
 
-Atualizado em 23/11/2026, no fim da sessão anterior.
+Atualizado em 23/11/2026, ao fim da sessão que implementou a `jogo-web` e a `bancada-do-ze`. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
 
-## Estado
+## Quem é o usuário e o que ele espera (antes só na memória local do Claude)
 
-- Projeto: jogo "Desenha Aí, Sô!" (trabalho final de Redes Neurais + SLM, UniRV; evento em 30/11/2026; cadastro do título até 27/11). Também é projeto de portfólio: TDD, SDD com OpenSpec, arquitetura hexagonal no app e núcleo funcional no Python.
-- Regras de trabalho: `CLAUDE.md` e `.claude/rules/`. Decisões: `docs/decisoes.md`. Roteiro: `docs/roteiro.md`.
-- Git só local. Nunca fazer push. Commits pequenos, com o corpo explicando o porquê e terminando com `Co-Authored-By`.
-- Verificação completa: `bash scripts/verificar.sh` (329 testes Python e 395 TypeScript, todos verdes; inclui o build do app).
+- Trabalho final de **Redes Neurais + Small Language Models** (Engenharia de Software, UniRV, prof. Sandro). Exposição no 5º Workshop de IA da FASOFT em **30/11/2026**, com votação popular. O cadastro do título e do escopo fecha em **27/11/2026**.
+- Também é **projeto de portfólio** (LinkedIn): precisa parecer profissional. Ele quer nota alta nas duas matérias, principalmente em SLM.
+- Exige: **SDD com OpenSpec** (spec aprovada por ele antes do código), **TDD** (teste falhando antes do código), arquitetura **hexagonal** no app e **núcleo funcional** testado no Python, contratos Python ↔ TypeScript e commits pequenos com o porquê no corpo. Ele interrompeu uma sessão que foi direto ao código sem spec, então **nunca pule a aprovação**.
+- Antes de implementar, confirme o entendimento em 2 a 3 linhas. Converse em **português**.
+- Remoto: `https://github.com/junin27/desenha-ai` (branch `main`). **Push só quando ele pedir.**
 
-## Changes
+## Estado das changes (OpenSpec)
 
-| Change | Estado |
-|---|---|
-| pre-processamento-de-tracos, regras-da-rodada | arquivadas (specs vivas em `openspec/specs/`) |
-| treino-das-redes | 17/17 tarefas; falta o usuário rodar o notebook 1 no Colab; arquivar depois do critério mínimo |
-| dataset-do-ze | 18/18; falta rodar o notebook 2 com GEMINI_API_KEY; arquivar depois do volume suficiente |
-| fine-tuning-do-ze | 11/11; falta rodar o notebook 3 (ensaio, depois completo); arquivar depois do critério de aprovação |
-| jogo-web | 18/18 tarefas, verificada no navegador (capturas em `docs/capturas/`); falta testar com o `llama-server` real (demo-offline) e arquivar |
-| bancada-do-ze | 17/17 tarefas, verificada no navegador; falta ouvir a voz real (instalar voz pt-BR) e testar os dois `llama-server` (demo-offline); arquivar depois |
-| demo-offline | a propor: scripts do llama-server (base e destilado), modelos, início com um clique, checklist |
+| Change | Estado | Próximo passo |
+|---|---|---|
+| pre-processamento-de-tracos, regras-da-rodada | arquivadas (specs vivas em `openspec/specs/`) | — |
+| treino-das-redes | 17/17 | ele roda o notebook 1 no Colab; arquivar quando bater o critério mínimo |
+| dataset-do-ze | 18/18 | rodar o notebook 2 com `GEMINI_API_KEY`; arquivar quando o volume for suficiente |
+| fine-tuning-do-ze | 11/11 | rodar o notebook 3 (ensaio, depois completo); arquivar quando bater o critério |
+| jogo-web | **18/18**, conferida no navegador | testar com o `llama-server` real (vem na demo-offline) e arquivar |
+| bancada-do-ze | **17/17**, conferida no navegador | ouvir a voz real (instalar voz pt-BR) e testar os dois `llama-server`; arquivar |
+| **demo-offline** | **proposta escrita e válida, AGUARDANDO APROVAÇÃO** (0/10) | mostrar a proposta, pedir aprovação e só então implementar com `/openspec-apply-change demo-offline` |
+
+Para retomar, a próxima sessão deve: ler os arquivos acima, rodar `git log --oneline | head -30` e `bash scripts/verificar.sh`, confirmar o estado em 2 a 3 linhas e pedir a aprovação da `demo-offline` (`openspec/changes/demo-offline/`).
+
+## Configurar outra máquina
+
+```bash
+git clone https://github.com/junin27/desenha-ai.git && cd desenha-ai
+python -m venv ml/.venv            # Python >= 3.11
+ml/.venv/Scripts/python -m pip install -e "ml[dev]"        # Linux/macOS: ml/.venv/bin/python
+npm --prefix app install
+npm install -g @fission-ai/openspec   # CLI do OpenSpec (openspec validate/list/instructions)
+bash scripts/verificar.sh             # tem de terminar com "OK: verificação completa passou."
+```
+
+- **Fora do Git** (são gerados ou baixados): `saida/` (artefatos de ensaio), `app/public/modelos/`, `app/dist/`, `*.gguf`, `*.zip` e `demo/`. Sem `saida/ensaio`, os testes de paridade ONNX são **pulados** (e não reprovados). Para recriar:
+  - redes de ensaio: `ml/.venv/Scripts/python -m pip install -e "ml[dev,treino]"` e `ml/.venv/Scripts/python scripts/ensaio_treino_local.py` (ver o README);
+  - dataset de ensaio: `ml/.venv/Scripts/python scripts/ensaio_dataset_local.py --redes saida/ensaio --saida saida/dataset_ensaio`.
+- **Jogar localmente:** `bash scripts/copiar_modelos.sh` (ensaio ou o zip do Colab), `npm --prefix app run build` e `npm --prefix app run preview` (porta 4173). `?ze=` troca o endereço do Zé destilado (padrão 8080) e `?zebase=` o do Qwen3 base (padrão 8081). O painel técnico abre com F2. Ctrl+Shift+Z zera o placar na tela de início.
+- As skills do OpenSpec estão em `.claude/skills/` e `.agents/skills/`, versionadas. Se o Claude Code não as listar, siga o `SKILL.md` à mão, como foi feito nesta sessão.
+
+## O que foi feito nesta sessão (resumo)
+
+- **jogo-web:** partida (máquina de estados imutável), palpites ao vivo com ONNX no navegador, narrador por *streaming* com reserva, placar no `localStorage`, telas, autoteste de paridade e build sem endereços externos (lista fechada de textos de terceiros, aprovada pelo usuário). Um bug achado jogando foi corrigido: a narração dizia "n" em vez de "nada".
+- **bancada-do-ze:** voz local pt-BR com botão, "Pergunte ao Zé" com bloqueio de ofensas, narrador alternável base × destilado com selo e painel técnico (F2) com medições e métricas do treino.
+- Capturas e o que foi conferido em `docs/capturas/README.md`.
+
+## Pendências e observações
+
+- **Voz:** o Windows desta máquina só tem a "Microsoft Zira" (en-US). Para o Zé falar, instale "Português (Brasil)" com a voz **Microsoft Maria** em Configurações → Hora e idioma → Fala.
+- **Painel a 1366×768:** quando aberto, cobre a coluna dos palpites e o botão Pronto (F2 fecha). Dá para estreitá-lo, se ele quiser.
+- **Memória:** com ~3 GB livres, o Qwen3 base pode não subir junto com o destilado (a proposta da demo-offline trata disso).
+- **Cronograma** (`docs/roteiro.md`): cadastro do título até 27/11; banner, pitch e ensaio em 29/11.
 
 ## Armadilhas (também no CLAUDE.md)
 
 - A ferramenta de edição converte `\uXXXX` em caracteres reais. Gere esses textos com `chr()` num script e confira com `grep -rl $'\xc2\xa0' ml app/src app/tests`.
+- O Python do Windows grava CRLF: use `open(p, 'w', encoding='utf8', newline='')` e confira `git diff --stat` antes do commit.
+- O `.gitignore` ignora qualquer pasta `build/`.
 - Use `set -o pipefail` antes de `| tail`, senão uma falha passa despercebida.
 - O mypy precisa de `--config-file ml/pyproject.toml`.
 - Não nomeie funções do pacote começando com "teste" (o pytest coleta como teste).
 - Heredoc do bash com `\n` dentro de strings Python vira quebra de linha real: prefira escrever o script num arquivo.
-- Artefatos de ensaio estão em `saida/ensaio` (redes) e `saida/dataset_ensaio` (fora do Git).
-- Para jogar localmente: `bash scripts/copiar_modelos.sh` (ensaio ou zip do Colab), `npm --prefix app run build` e `npm --prefix app run preview`; `?ze=http://...` troca o endereço do llama-server.
-- Bancada do Zé: `?ze=` (destilado, 8080) e `?zebase=` (Qwen3 base, 8081); painel técnico com F2; o Windows desta máquina não tem voz pt-BR local (só Microsoft Zira, en-US).
