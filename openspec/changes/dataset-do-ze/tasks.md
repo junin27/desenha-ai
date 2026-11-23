@@ -34,7 +34,7 @@
 
 ## 6. Verificação final
 
-- [ ] 6.1 `bash scripts/verificar.sh` verde e `openspec validate --all --strict`
+- [x] 6.1 `bash scripts/verificar.sh` verde e `openspec validate --all --strict`
 
 ## Workflow follow-up
 
