@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+app/dist/
+coverage/
+
+# Artefatos pesados (vêm do Colab; não versionar)
+*.gguf
+*.zip
+modelos/
+app/public/modelos/*.onnx
+dados/
+saida/
+
+# Sistema
+.DS_Store
+Thumbs.db
+.env

@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  Language: pt-BR
+  All artifacts must be written in pt-BR.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Projeto: "Desenha Aí, Sô!", jogo de desenho para feira acadêmica (UniRV, 30/11/2026) e portfólio.
+  Integra duas disciplinas: Redes Neurais (CNN sobre imagem 28x28 + LSTM sobre sequência de traços,
+  dados Google Quick, Draw!, 30 categorias) e Small Language Models (Qwen3-1.7B destilado de um LLM
+  Teacher, fine-tuning QLoRA com Unsloth, quantizado em GGUF Q4_K_M, servido pelo llama.cpp).
+  Restrições: a demo roda offline em notebook sem GPU NVIDIA (CPU, 15 GB RAM); o treino roda no
+  Google Colab (GPU T4). Pacote Python `desenha_ml` (núcleo puro, pytest, mypy strict) e app
+  TypeScript (Vite, Vitest, arquitetura hexagonal). Regras que existem nas duas linguagens são
+  verificadas por fixtures em `contratos/`.
+
+rules:
+  proposal:
+    - Sempre liste explicitamente o que NÃO entra (seção de fora do escopo).
+    - Diga a qual disciplina (Redes Neurais, SLM ou ambas) a mudança contribui.
+  specs:
+    - Todo requisito tem ao menos um cenário WHEN/THEN com resultado observável e verificável por teste.
+    - Proibido "rápido", "adequado", "amigável" sem número ou critério mensurável.
+  design:
+    - Registre alternativas descartadas e o motivo.
+  tasks:
+    - Cada tarefa é pequena (até ~2h) e começa pelo teste que falha (TDD).
+    - Termine com uma tarefa de verificação (pytest, mypy, ruff, vitest, lint, openspec validate).
+
+operations:
+  apply:
+    guidance:
+      - Siga TDD, teste falhando antes do código, e faça um commit local por tarefa lógica (nunca git push).
+      - Rode a verificação completa antes de marcar a última tarefa.
