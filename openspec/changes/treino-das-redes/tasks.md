@@ -20,10 +20,10 @@
 
 ## 4. Redes (TDD com torch CPU)
 
-- [ ] 4.1 Instalar o extra `[treino]` no `ml/.venv` (torch CPU, onnx) e marcar os testes de redes para serem pulados quando o torch não estiver instalado
-- [ ] 4.2 `redes.py` — arquiteturas: testes de forma [4, 30] e soma 1 ± 1e-5 → implementar
-- [ ] 4.3 Laço de treino e previsão em lote: teste de que a perda cai em um mini-dataset sintético → implementar
-- [ ] 4.4 Exportação ONNX + conferência com `ReferenceEvaluator`: testes com sequências de 5 e 130 pontos (≤ 1e-4) → implementar com *fallback* de exportador
+- [x] 4.1 Instalar o extra `[treino]` no `ml/.venv` (torch CPU, onnx) e marcar os testes de redes para serem pulados quando o torch não estiver instalado
+- [x] 4.2 `redes.py` — arquiteturas: testes de forma [4, 30] e soma 1 ± 1e-5 → implementar
+- [x] 4.3 Laço de treino e previsão em lote: teste de que a perda cai em um mini-dataset sintético → implementar
+- [x] 4.4 Exportação ONNX + conferência com `ReferenceEvaluator`: testes com sequências de 5 e 130 pontos (≤ 1e-4) → implementar com *fallback* de exportador
 
 ## 5. Ensaio local e Colab
 
