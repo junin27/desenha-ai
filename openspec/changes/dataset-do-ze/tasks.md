@@ -15,7 +15,7 @@
 ## 3. Geração do dataset (TDD, Teacher falso)
 
 - [x] 3.1 `ficha_tecnica.py`: testes da ficha sem e com `metricas_redes.json` e dos números permitidos → implementar
-- [ ] 3.2 `teacher.py`: testes do *checkpoint* (pula lotes gravados), das novas tentativas com espera crescente (relógio injetado) e do lote que falha → implementar
+- [x] 3.2 `teacher.py`: testes do *checkpoint* (pula lotes gravados), das novas tentativas com espera crescente (relógio injetado) e do lote que falha → implementar
 - [ ] 3.3 `geracao_dataset.py` — pedidos de CHARADA (180) e casos de VEREDITO balanceados (80/80/80, completando com sintéticos): testes → implementar
 - [ ] 3.4 Evol-Instruct das perguntas (12 → 24 → 48, com origem): teste com Teacher falso → implementar
 - [ ] 3.5 `teacher_apis.py`: adaptadores Gemini e Groq, importação só com o extra; teste de que o pacote importa sem o extra instalado
