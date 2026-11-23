@@ -7,7 +7,7 @@
 - [x] 1.3 Charada com reserva (falha, demora, formato inválido, vazamento): testes → implementar
 - [x] 1.4 Tempo do desenho, vitória antecipada, botão Pronto e rodada sem traço: testes com o `RelogioFalso` → implementar
 - [x] 1.5 Veredito e pontos pela regra, discordância do Zé e narração-modelo: testes → implementar
-- [ ] 1.6 Fim da partida gravando no placar: teste da partida completa (135 + 30 + 0 = 165) → implementar
+- [x] 1.6 Fim da partida gravando no placar: teste da partida completa (135 + 30 + 0 = 165) → implementar
 
 ## 2. Infraestrutura (TDD)
 

@@ -47,6 +47,8 @@ export interface EstadoDaPartida {
   readonly segundosRestantes: number;
   readonly palpite: PalpiteDaRodada | undefined;
   readonly resultados: readonly ResultadoDaRodada[];
+  /** Soma das rodadas, preenchida no fim. */
+  readonly total: number;
 }
 
 export const ESTADO_INICIAL: EstadoDaPartida = {
@@ -60,4 +62,5 @@ export const ESTADO_INICIAL: EstadoDaPartida = {
   segundosRestantes: SEGUNDOS_DA_RODADA,
   palpite: undefined,
   resultados: [],
+  total: 0,
 };

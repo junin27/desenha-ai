@@ -1,6 +1,11 @@
 import type { Desenho } from "../domain/desenho/desenho";
 import { prepararDesenhoCapturado } from "../domain/desenho/simplificacao";
-import { limparNome, RODADAS_POR_PARTIDA, SEGUNDOS_DA_RODADA } from "../domain/rodada/pontuacao";
+import {
+  limparNome,
+  pontosDaPartida,
+  RODADAS_POR_PARTIDA,
+  SEGUNDOS_DA_RODADA,
+} from "../domain/rodada/pontuacao";
 import { deveEncerrarAntes } from "../domain/rodada/veredito";
 import type { LeituraParcial } from "../domain/ze/conversa";
 import { nivelDaRodada, obterCharada } from "./charada-da-rodada";
@@ -134,7 +139,7 @@ export class Partida {
       await this.iniciarRodada(proxima);
       return;
     }
-    this.mudar({ etapa: "fim" });
+    this.terminar();
   }
 
   novaPartida(): void {
@@ -147,6 +152,18 @@ export class Partida {
     const categoria = this.nomeDaCategoria(rodada);
     const charada = await obterCharada(narrador, reserva, categoria, nivelDaRodada(rodada), this.mostrarFala);
     this.mudar({ charada, falaAoVivo: undefined });
+  }
+
+  /** Soma as rodadas e grava no placar (spec `partida`, "Fim da partida e placar"). */
+  private terminar(): void {
+    const { nome, resultados } = this.estadoAtual;
+    const total = pontosDaPartida(resultados.map((resultado) => resultado.pontos));
+    this.dependencias.placar.gravar({
+      nome,
+      pontos: total,
+      terminadaEmMs: this.dependencias.relogio.agora(),
+    });
+    this.mudar({ etapa: "fim", total });
   }
 
   private conferirTempo(): void {
