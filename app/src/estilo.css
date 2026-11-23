@@ -339,12 +339,14 @@ textarea {
 }
 
 .contadores {
+  width: 100%;
   border-collapse: collapse;
   margin-top: 0.4em;
+  font-size: 18px;
 }
 
 .contadores th,
 .contadores td {
-  padding: 0.1em 0.5em;
+  padding: 0.1em 0.3em;
   text-align: center;
 }
