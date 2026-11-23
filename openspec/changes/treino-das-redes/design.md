@@ -45,6 +45,27 @@ AdamW + OneCycle, *label smoothing* 0,1, *clip* de gradiente 1,0 (protege a LSTM
 ### D6 — Escolha de `w_cnn`
 Grade de 0 a 1 com passo 0,05 (21 valores, calculados como `i / 20` para não acumular erro de ponto flutuante). O desempate pelo mais próximo de 0,5 evita confiar só em uma rede por acaso.
 
+### D7 — Orquestração também no pacote (decisão da implementação)
+O ensaio local e o notebook executariam a mesma sequência de passos; para não duplicar, ela virou `desenha_ml.pipeline` (com `etapas_de_avaliacao.py`) e o download virou `desenha_ml.fonte_quickdraw` (abridor de URL injetável). Os dois só chamam `executar_pipeline` com tamanhos diferentes. O notebook 1 não define nenhuma função ou classe.
+
+### D8 — Resultado do ensaio local (tarefa 5.1, 23/11/2026)
+`scripts/ensaio_treino_local.py --por-categoria 300 --epocas 2` nesta máquina (CPU, 8 threads):
+
+| Etapa | Tempo |
+|---|---|
+| Download (9.000 desenhos, streaming) | 4 s |
+| Pré-processamento (Pool, ~14 mil exemplos) | 17 s |
+| Treino da CNN (2 épocas) | 54 s |
+| Treino da LSTM (2 épocas) | 220 s |
+| **Total** | **5,5 min** |
+
+- Os 6 artefatos foram gerados; `predicoes_validacao.json` tem 1.200 casos no formato do dataset do SLM.
+- Conferência ONNX × PyTorch: CNN 2,1e-7 e LSTM 7,5e-8 (limite 1e-4).
+- Latência em CPU de um desenho: CNN 5,0 ms e LSTM 6,4 ms.
+- Acurácia de teste com 200 desenhos por categoria e 2 épocas: CNN 0,39, LSTM 0,15, ensemble 0,43. O critério mínimo reprovou, como esperado, e informou os três motivos. Isso prova o caminho de reprovação; o critério de qualidade vale para o treino completo no Colab.
+- Achado: aviso do PyTorch ao converter a perda com gradiente para `float` (corrigido com `.detach()`).
+- A LSTM é o gargalo em CPU (~110 s por época com 5 mil exemplos); no Colab, o cuDNN acelera a LSTM na GPU.
+
 ## Risks / Trade-offs
 
 - [Acurácia abaixo do critério no Colab] → o critério é checado no próprio notebook; plano B é treinar mais épocas ou aumentar `N_treino` para 10.000 (o download por streaming suporta).
