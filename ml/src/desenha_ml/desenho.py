@@ -9,7 +9,7 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from desenha_ml.resultado import Erro, Ok, Resultado
 
@@ -22,7 +22,7 @@ class Desenho:
     tracos: tuple[Traco, ...]
 
     @staticmethod
-    def de_arrays(tracos: Iterable[NDArray[np.floating]]) -> "Desenho":
+    def de_arrays(tracos: Iterable[ArrayLike]) -> "Desenho":
         """Cria o desenho sem validar; use `desenho_de_pontos` para entradas externas."""
         # Copia para não congelar (setflags) o array de quem chamou.
         return Desenho(tuple(_congelar(np.array(t, dtype=np.float64).reshape(-1, 2)) for t in tracos))
