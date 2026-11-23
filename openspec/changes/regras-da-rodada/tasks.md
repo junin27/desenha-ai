@@ -20,7 +20,7 @@
 
 ## 4. Contrato
 
-- [ ] 4.1 Estender `desenha_ml.contratos` para gerar `contratos/regras.json` (seções de D6); teste que regenera e compara com o arquivo versionado
+- [x] 4.1 Estender `desenha_ml.contratos` para gerar `contratos/regras.json` (seções de D6); teste que regenera e compara com o arquivo versionado
 
 ## 5. TypeScript (TDD)
 

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from desenha_ml.contratos import CASOS_OBRIGATORIOS, gerar_contrato_de_pre_processamento
+from desenha_ml.contratos_regras import gerar_contrato_de_regras
 from desenha_ml.desenho import Desenho
 
 CONTRATO_VERSIONADO = Path(__file__).parents[2] / "contratos" / "pre_processamento.json"
@@ -28,5 +29,49 @@ def test_contrato_versionado_esta_atualizado(desenhos_da_amostra: list[tuple[str
     versionado = json.loads(CONTRATO_VERSIONADO.read_text(encoding="utf8"))
     assert versionado == gerado, (
         "contratos/pre_processamento.json está desatualizado; rode "
+        "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
+    )
+
+
+CONTRATO_DE_REGRAS = Path(__file__).parents[2] / "contratos" / "regras.json"
+SECOES_DE_REGRAS = {
+    "ensemble",
+    "top_k",
+    "veredito",
+    "vitoria_antecipada",
+    "pontos_da_rodada",
+    "nome",
+    "placar",
+    "forma_comparavel",
+    "vazamento",
+}
+
+
+def _contrato_de_regras_em_json() -> dict[str, list[dict[str, object]]]:
+    """O contrato como o TypeScript o lê: depois de serializar em JSON."""
+    contrato: dict[str, list[dict[str, object]]] = json.loads(json.dumps(gerar_contrato_de_regras()))
+    return contrato
+
+
+def test_contrato_de_regras_tem_todas_as_secoes() -> None:
+    contrato = _contrato_de_regras_em_json()
+    assert contrato.keys() >= SECOES_DE_REGRAS
+    assert all(len(contrato[secao]) > 0 for secao in SECOES_DE_REGRAS)
+
+
+def test_contrato_de_regras_cobre_erros_e_o_plural_das_30_categorias() -> None:
+    contrato = _contrato_de_regras_em_json()
+    resultados = [
+        caso["resultado"] for secao in ("ensemble", "top_k", "veredito") for caso in contrato[secao]
+    ]
+    codigos = {r["codigo"] for r in resultados if isinstance(r, dict) and r["ok"] is False}
+    assert {"probabilidades_invalidas", "peso_invalido", "k_invalido", "alvo_invalido"} <= codigos
+    assert sum(1 for caso in contrato["vazamento"] if str(caso["texto"]).startswith("Desenhei ")) == 30
+
+
+def test_contrato_de_regras_versionado_esta_atualizado() -> None:
+    versionado = json.loads(CONTRATO_DE_REGRAS.read_text(encoding="utf8"))
+    assert versionado == _contrato_de_regras_em_json(), (
+        "contratos/regras.json está desatualizado; rode "
         "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
     )

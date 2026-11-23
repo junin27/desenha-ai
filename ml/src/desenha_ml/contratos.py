@@ -1,4 +1,4 @@
-"""Gera `contratos/pre_processamento.json`: entradas e saídas de referência para o TypeScript (D4).
+"""Gera os contratos para o TypeScript: `pre_processamento.json` (D4) e `regras.json` (`contratos_regras`).
 
 Uso (a partir de `projeto_final/`):
     ml/.venv/Scripts/python -m desenha_ml.contratos contratos/
@@ -15,6 +15,7 @@ import math
 from pathlib import Path
 from typing import TypedDict
 
+from desenha_ml.contratos_regras import gerar_contrato_de_regras
 from desenha_ml.desenho import Desenho
 from desenha_ml.leitura_quickdraw import ler_desenhos_ndjson
 from desenha_ml.normalizacao import normalizar
@@ -110,9 +111,13 @@ def main() -> None:
     with argumentos.amostra.open(encoding="utf8") as arquivo:
         contrato = gerar_contrato_de_pre_processamento(ler_desenhos_ndjson(arquivo))
     argumentos.pasta.mkdir(parents=True, exist_ok=True)
-    destino = argumentos.pasta / "pre_processamento.json"
+    _gravar(argumentos.pasta / "pre_processamento.json", contrato)
+    _gravar(argumentos.pasta / "regras.json", gerar_contrato_de_regras())
+
+
+def _gravar(destino: Path, contrato: object) -> None:
     destino.write_text(json.dumps(contrato, ensure_ascii=False) + "\n", encoding="utf8")
-    print(f"{destino}: {len(contrato['casos'])} casos")
+    print(f"{destino}: {destino.stat().st_size // 1024} KB")
 
 
 if __name__ == "__main__":
