@@ -11,7 +11,7 @@
 - [x] 2.1 `resultado.py` e `desenho.py`: testes de desenho vazio e traços vazios ignorados → implementar; verificar `pytest ml/tests/test_desenho.py`
 - [x] 2.2 `normalizacao.py`: testes dos cenários "mais largo que alto" e "ponto único" → implementar
 - [x] 2.3 `simplificacao.py` (RDP iterativo, ε = 2): testes de colineares removidos e canto preservado → implementar
-- [ ] 2.4 `prefixo.py`: testes de corte no meio do traço, mínimo de 2 pontos e fração inválida → implementar
+- [x] 2.4 `prefixo.py`: testes de corte no meio do traço, mínimo de 2 pontos e fração inválida → implementar
 - [ ] 2.5 `rasterizacao.py`: testes de valores k/16, linha horizontal, ponto isolado e espessura → implementar vetorizado
 - [ ] 2.6 `sequencia.py`: testes de dois traços e corte em 130 → implementar
 - [ ] 2.7 Medir a rasterização de 1.000 desenhos de amostra e registrar o tempo no `design.md` (meta: ≤ 2 ms por desenho)
