@@ -26,7 +26,7 @@
 
 - [x] 5.1 `domain/rodada/ensemble.ts` e `veredito.ts`: testes espelhando os cenários de `julgamento-do-desenho` → implementar
 - [x] 5.2 `domain/rodada/pontuacao.ts`: testes espelhando `pontuacao-e-placar` → implementar
-- [ ] 5.3 `domain/rodada/vazamento.ts`: testes espelhando `vazamento-da-palavra-secreta` → implementar
+- [x] 5.3 `domain/rodada/vazamento.ts`: testes espelhando `vazamento-da-palavra-secreta` → implementar
 - [ ] 5.4 `tests/contrato-regras.test.ts`: verifica todas as seções de `contratos/regras.json`
 
 ## 6. Verificação final
