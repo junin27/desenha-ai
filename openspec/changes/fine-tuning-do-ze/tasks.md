@@ -9,9 +9,9 @@
 ## 2. Avaliação do Zé (TDD)
 
 - [x] 2.1 Extrair da curadoria os filtros por tarefa como funções públicas, sem mudar o comportamento (testes da curadoria continuam verdes)
-- [ ] 2.2 `avaliacao_do_ze.py` — `avaliar_saida`: testes de saída fora do formato, veredito correto, charada que vaza e pergunta com número inventado → implementar
-- [ ] 2.3 Agregação por modelo e tarefa (taxas e tokens médios): testes → implementar
-- [ ] 2.4 Critério de aprovação: testes dos cenários aprovado e reprovado no veredito (mensagem "VEREDITO: 84,0% < 90%") e do modo ensaio (critério não aplicado) → implementar
+- [x] 2.2 `avaliacao_do_ze.py` — `avaliar_saida`: testes de saída fora do formato, veredito correto, charada que vaza e pergunta com número inventado → implementar
+- [x] 2.3 Agregação por modelo e tarefa (taxas e tokens médios): testes → implementar
+- [x] 2.4 Critério de aprovação: testes dos cenários aprovado e reprovado no veredito (mensagem "VEREDITO: 84,0% < 90%") e do modo ensaio (critério não aplicado) → implementar
 
 ## 3. Quantização (TDD)
 
