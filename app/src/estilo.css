@@ -266,3 +266,15 @@ textarea {
   font-size: var(--texto-grande);
   font-style: italic;
 }
+
+.selo {
+  display: inline-block;
+  padding: 0.1em 0.8em;
+  border: 2px solid var(--tinta-suave);
+  border-radius: 999px;
+  color: var(--tinta-suave);
+}
+
+.selo[hidden] {
+  display: none;
+}

@@ -5,6 +5,12 @@ import { porcentagem, type LeituraParcial } from "../domain/ze/conversa";
 
 const PALPITES_NA_TELA = 3;
 
+/** Selo de quem gerou a fala mostrada (spec `comparacao-base-destilado`). */
+export function seloDaFala(origem: "ze" | "reserva", modelo: "destilado" | "base" | undefined): string {
+  if (origem === "reserva") return "Reserva";
+  return modelo === "base" ? "Qwen3 base (sem fine-tuning)" : "Zé destilado";
+}
+
 export const TITULO_DO_VEREDITO: Readonly<Record<Veredito, string>> = {
   ACERTOU: "Acertou!",
   QUASE: "Quase!",

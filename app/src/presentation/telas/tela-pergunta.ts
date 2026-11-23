@@ -1,6 +1,6 @@
 import type { EstadoDaConversa } from "../../application/conversa-com-o-ze";
 import { botao, criar } from "../dom";
-import { falaAoVivoNaTela } from "../textos";
+import { falaAoVivoNaTela, seloDaFala } from "../textos";
 import type { ComandosDaConversa } from "./tela";
 
 const TAMANHO_MAXIMO_DA_PERGUNTA = 200;
@@ -14,6 +14,7 @@ export class TelaPergunta {
   private readonly aoVivo = criar("p", { classe: "ze-ao-vivo", dados: { texto: "ze-pergunta-ao-vivo" } });
   private readonly resposta = criar("p", { classe: "resposta", dados: { texto: "resposta" } });
   private readonly erro = criar("p", { classe: "erro", dados: { texto: "erro-pergunta" } });
+  private readonly selo = criar("p", { classe: "selo", dados: { texto: "selo" } });
   readonly rodape = criar("div", { classe: "linha" });
 
   constructor(conversa: ComandosDaConversa) {
@@ -34,6 +35,7 @@ export class TelaPergunta {
       this.erro,
       this.aoVivo,
       this.resposta,
+      this.selo,
     ]);
   }
 
@@ -42,6 +44,10 @@ export class TelaPergunta {
     this.aoVivo.hidden = !estado.respondendo;
     this.aoVivo.textContent = falaAoVivoNaTela(estado.falaAoVivo) || "Pensando…";
     this.resposta.textContent = estado.resposta?.texto ?? "";
+    this.selo.hidden = estado.resposta === undefined;
+    if (estado.resposta !== undefined) {
+      this.selo.textContent = seloDaFala(estado.resposta.origem, estado.resposta.modelo);
+    }
     this.erro.textContent = estado.erro === undefined ? "" : MENSAGEM_DE_PERGUNTA_INVALIDA;
     if (!estado.aberta) this.campo.value = "";
   }
