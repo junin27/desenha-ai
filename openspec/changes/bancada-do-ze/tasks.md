@@ -30,7 +30,7 @@
 ## 5. Verificação
 
 - [x] 5.1 Navegador embutido com o build e as redes do ensaio: partida com a voz ligada (fala conferida pelo console do sintetizador), "Pergunte ao Zé" sem o `llama-server` (reserva e bloqueio), painel aberto durante o desenho e chave base × destilado; capturas a 1366×768 e 1920×1080 em `docs/capturas/`
-- [ ] 5.2 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build) e `openspec validate --all --strict`
+- [x] 5.2 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build) e `openspec validate --all --strict`
 
 ## Workflow follow-up
 
