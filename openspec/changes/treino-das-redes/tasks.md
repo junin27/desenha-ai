@@ -14,9 +14,9 @@
 
 ## 3. Artefatos (TDD, sem torch)
 
-- [ ] 3.1 `artefatos.py`: testes de `classes.json` (30 categorias em ordem, `w_cnn`, parâmetros do pré-processamento) e de `metricas_redes.json` → implementar
-- [ ] 3.2 `predicoes_validacao.json`: testes de frações em partes iguais, ≥ 1.200 casos e top-5 na ordem do `top_k` → implementar
-- [ ] 3.3 `teste_paridade_redes.json`: teste do formato (8 desenhos, traços, probabilidades esperadas) → implementar
+- [x] 3.1 `artefatos.py`: testes de `classes.json` (30 categorias em ordem, `w_cnn`, parâmetros do pré-processamento) e de `metricas_redes.json` → implementar
+- [x] 3.2 `predicoes_validacao.json`: testes de frações em partes iguais, ≥ 1.200 casos e top-5 na ordem do `top_k` → implementar
+- [x] 3.3 `teste_paridade_redes.json`: teste do formato (8 desenhos, traços, probabilidades esperadas) → implementar
 
 ## 4. Redes (TDD com torch CPU)
 
