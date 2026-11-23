@@ -1,3 +1,4 @@
+import type { ConversaComOZe } from "./conversa-com-o-ze";
 import type { EstadoDaPartida } from "./estado-da-partida";
 import type { MedicoesDaSessao } from "./medicoes-da-sessao";
 import type { Partida } from "./partida";
@@ -28,4 +29,14 @@ function registrarNovidades(
   }
   const novo = atual.resultados.length > anterior.resultados.length ? atual.resultados.at(-1) : undefined;
   if (novo !== undefined) medicoes.registrarUso(novo.origemDaNarracao, novo.discordanciaDoZe);
+}
+
+/** Conta a resposta do "Pergunte ao Zé" quando ela fica pronta. */
+export function contarFalasDaConversa(conversa: ConversaComOZe, medicoes: MedicoesDaSessao): Cancelamento {
+  let anterior = conversa.estado.resposta;
+  return conversa.aoMudar((estado) => {
+    if (anterior === undefined && estado.resposta !== undefined)
+      medicoes.registrarUso(estado.resposta.origem, false);
+    anterior = estado.resposta;
+  });
 }
