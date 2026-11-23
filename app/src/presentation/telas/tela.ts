@@ -13,6 +13,13 @@ export interface ComandosDoJogo {
   novaPartida(): void;
 }
 
+/** Comandos do "Pergunte ao Zé" (a `ConversaComOZe` da aplicação os implementa). */
+export interface ComandosDaConversa {
+  abrir(): void;
+  perguntar(pergunta: string): Promise<void>;
+  voltar(): void;
+}
+
 /** O que a tela precisa ler fora do estado da partida. */
 export interface InformacoesDoJogo {
   readonly nomesDasCategorias: readonly string[];

@@ -249,3 +249,20 @@ input {
   font-weight: bold;
   color: var(--destaque);
 }
+
+/* Pergunte ao Zé (bancada-do-ze) */
+textarea {
+  font: inherit;
+  padding: 0.35em 0.6em;
+  border: 3px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--quadro);
+  width: min(32em, 90vw);
+  resize: none;
+}
+
+.resposta {
+  max-width: 32em;
+  font-size: var(--texto-grande);
+  font-style: italic;
+}

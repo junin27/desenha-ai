@@ -4,6 +4,7 @@
  */
 import "./estilo.css";
 import { conferirParidade } from "./application/autoteste-de-paridade";
+import { ConversaComOZe } from "./application/conversa-com-o-ze";
 import { Partida } from "./application/partida";
 import type { ClassificadorDeDesenho } from "./application/portas";
 import { lerCasosDeParidade } from "./infrastructure/arquivos/casos-de-paridade";
@@ -41,23 +42,20 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
   const relogio = new RelogioDoNavegador();
   const sorteador = new SorteadorAleatorio();
   const placar = new PlacarLocalStorage(window.localStorage);
+  const narrador = new NarradorLlamaServer(buscar, relogio, configuracaoDoZe());
+  const reserva = new ReservaDeArquivo(await lerCharadas(), sorteador);
   const partida = new Partida(
-    {
-      classificador: redes.valor,
-      narrador: new NarradorLlamaServer(buscar, relogio, configuracaoDoZe()),
-      placar,
-      relogio,
-      sorteador,
-      reserva: new ReservaDeArquivo(await lerCharadas(), sorteador),
-    },
+    { classificador: redes.valor, narrador, placar, relogio, sorteador, reserva },
     { categorias: classes.nomesDasCategorias, pesoDaCnn: classes.pesoDaCnn },
   );
-  const tela = new InterfaceDoJogo(raiz, partida, {
-    nomesDasCategorias: classes.nomesDasCategorias,
-    lerPlacar: () => placar.ler(),
-  });
+  const conversa = new ConversaComOZe(narrador, reserva, () => partida.estado.etapa === "inicio");
+  const informacoes = { nomesDasCategorias: classes.nomesDasCategorias, lerPlacar: () => placar.ler() };
+  const tela = new InterfaceDoJogo(raiz, partida, informacoes, conversa);
   partida.aoMudar((estado) => {
     tela.mostrar(estado);
+  });
+  conversa.aoMudar((estado) => {
+    tela.mostrarConversa(estado);
   });
   tela.mostrar(partida.estado);
   void conferirRedesAoAbrir(redes.valor, tela);

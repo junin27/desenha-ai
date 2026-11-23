@@ -3,43 +3,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { probabilidadesCom } from "../application/dubles";
 import { CATEGORIAS } from "../application/montagem";
 import { ESTADO_INICIAL, type EstadoDaPartida } from "../../src/application/estado-da-partida";
-import type { Desenho } from "../../src/domain/desenho/desenho";
 import type { PartidaNoPlacar } from "../../src/domain/rodada/pontuacao";
-import { InterfaceDoJogo, type ComandosDoJogo } from "../../src/presentation/interface-do-jogo";
+import { InterfaceDoJogo } from "../../src/presentation/interface-do-jogo";
+import { ComandosEspioes } from "./comandos-espioes";
 
 // Spec `interface-do-jogo`, requisito "Telas da partida" (D7: só o essencial; o resto no navegador).
-class ComandosEspioes implements ComandosDoJogo {
-  readonly chamadas: string[] = [];
-  readonly desenhos: Desenho[] = [];
-
-  comecar(nome: string): Promise<void> {
-    this.chamadas.push(`comecar:${nome}`);
-    return Promise.resolve();
-  }
-  desenhar(): void {
-    this.chamadas.push("desenhar");
-  }
-  registrarTraco(desenho: Desenho, tracoTerminado: boolean): Promise<void> {
-    this.desenhos.push(desenho);
-    this.chamadas.push(`traco:${tracoTerminado}`);
-    return Promise.resolve();
-  }
-  limparDesenho(): void {
-    this.chamadas.push("limpar");
-  }
-  pronto(): Promise<void> {
-    this.chamadas.push("pronto");
-    return Promise.resolve();
-  }
-  proximaRodada(): Promise<void> {
-    this.chamadas.push("proxima");
-    return Promise.resolve();
-  }
-  novaPartida(): void {
-    this.chamadas.push("nova");
-  }
-}
-
 let raiz: HTMLElement;
 let comandos: ComandosEspioes;
 let placar: PartidaNoPlacar[];
@@ -78,7 +46,13 @@ beforeEach(() => {
   raiz = document.querySelector("main") ?? document.body;
   comandos = new ComandosEspioes();
   placar = [];
-  tela = new InterfaceDoJogo(raiz, comandos, { nomesDasCategorias: CATEGORIAS, lerPlacar: () => placar });
+  const semConversa = { abrir: () => undefined, perguntar: () => Promise.resolve(), voltar: () => undefined };
+  tela = new InterfaceDoJogo(
+    raiz,
+    comandos,
+    { nomesDasCategorias: CATEGORIAS, lerPlacar: () => placar },
+    semConversa,
+  );
 });
 
 describe("etapa e tela coincidem", () => {

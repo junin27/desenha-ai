@@ -1,7 +1,7 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
 import { ordenarPlacar } from "../../domain/rodada/pontuacao";
 import { botao, criar, preencherLista } from "../dom";
-import type { ComandosDoJogo, InformacoesDoJogo, Tela } from "./tela";
+import type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo, Tela } from "./tela";
 
 const TAMANHO_MAXIMO_DO_APELIDO = 16;
 const MENSAGEM_DE_NOME_INVALIDO = "Escolha um apelido de 1 a 16 letras, sô!";
@@ -21,6 +21,7 @@ export class TelaInicio implements Tela {
   constructor(
     private readonly comandos: ComandosDoJogo,
     private readonly informacoes: InformacoesDoJogo,
+    conversa: ComandosDaConversa,
   ) {
     this.campo.maxLength = TAMANHO_MAXIMO_DO_APELIDO;
     this.campo.placeholder = "Seu apelido";
@@ -43,6 +44,9 @@ export class TelaInicio implements Tela {
       this.aviso,
       formulario,
       this.erro,
+      botao("Pergunte ao Zé", "pergunte-ao-ze", () => {
+        conversa.abrir();
+      }),
       criar("h2", { texto: "Placar" }),
       this.placar,
     ]);
