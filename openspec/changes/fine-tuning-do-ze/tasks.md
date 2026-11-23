@@ -15,7 +15,7 @@
 
 ## 3. Quantização (TDD)
 
-- [ ] 3.1 `quantizacao.py`: teste do cenário de 2,03 × 10⁹ parâmetros (8,12 / 4,06 / 2,03 / 1,015 GB, cabe/margem) e da junção com os tamanhos reais dos GGUF → implementar
+- [x] 3.1 `quantizacao.py`: teste do cenário de 2,03 × 10⁹ parâmetros (8,12 / 4,06 / 2,03 / 1,015 GB, cabe/margem) e da junção com os tamanhos reais dos GGUF → implementar
 
 ## 4. Notebook 3
 
