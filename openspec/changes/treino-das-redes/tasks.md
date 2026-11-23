@@ -8,9 +8,9 @@
 
 ## 2. Avaliação (TDD, sem torch)
 
-- [ ] 2.1 `avaliacao.py`: testes de acurácia, F1 macro (cenário 0,7778), top-3 e matriz de confusão → implementar
-- [ ] 2.2 Escolha de `w_cnn`: teste do empate que favorece o peso mais próximo de 0,5 → implementar (grade `i / 20`)
-- [ ] 2.3 Curva antecipada e critério mínimo: testes de aprovação/reprovação com a mensagem do critério → implementar
+- [x] 2.1 `avaliacao.py`: testes de acurácia, F1 macro (cenário 0,7778), top-3 e matriz de confusão → implementar
+- [x] 2.2 Escolha de `w_cnn`: teste do empate que favorece o peso mais próximo de 0,5 → implementar (grade `i / 20`)
+- [x] 2.3 Curva antecipada e critério mínimo: testes de aprovação/reprovação com a mensagem do critério → implementar
 
 ## 3. Artefatos (TDD, sem torch)
 
