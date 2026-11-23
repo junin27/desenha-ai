@@ -7,9 +7,9 @@ PY=ml/.venv/Scripts/python
 [ -x "$PY" ] || PY=ml/.venv/bin/python
 
 echo "== Python: ruff, mypy --strict, pytest"
-"$PY" -m ruff check ml
-"$PY" -m ruff format --check ml
-"$PY" -m mypy --config-file ml/pyproject.toml ml/src ml/tests
+"$PY" -m ruff check ml scripts
+"$PY" -m ruff format --check ml scripts
+"$PY" -m mypy --config-file ml/pyproject.toml ml/src ml/tests scripts
 "$PY" -m pytest ml
 
 echo "== TypeScript: typecheck, lint, testes"
