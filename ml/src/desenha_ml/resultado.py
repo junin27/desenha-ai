@@ -20,6 +20,7 @@ CodigoDeErro = Literal[
     "k_invalido",
     "alvo_invalido",
     "nome_invalido",
+    "dados_insuficientes",
 ]
 
 

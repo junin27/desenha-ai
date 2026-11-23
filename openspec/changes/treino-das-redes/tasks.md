@@ -2,9 +2,9 @@
 
 ## 1. Dados (TDD, sem torch)
 
-- [ ] 1.1 `dados.py` — separação por categoria: testes dos blocos sem sobreposição e de `dados_insuficientes` → implementar
-- [ ] 1.2 Montagem dos exemplos: testes de reprodutibilidade com semente, frações em [0,3; 0,9], espessura em [1,2; 2,0] e validação/teste sem sorteio → implementar sobre o pré-processamento existente
-- [ ] 1.3 Empacotamento das sequências (padding + comprimentos): testes de forma e de corte em 130 → implementar
+- [x] 1.1 `dados.py` — separação por categoria: testes dos blocos sem sobreposição e de `dados_insuficientes` → implementar
+- [x] 1.2 Montagem dos exemplos: testes de reprodutibilidade com semente, frações em [0,3; 0,9], espessura em [1,2; 2,0] e validação/teste sem sorteio → implementar sobre o pré-processamento existente
+- [x] 1.3 Empacotamento das sequências (padding + comprimentos): testes de forma e de corte em 130 → implementar
 
 ## 2. Avaliação (TDD, sem torch)
 
