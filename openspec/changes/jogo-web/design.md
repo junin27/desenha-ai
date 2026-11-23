@@ -46,6 +46,10 @@ Para cada veredito, 6 narrações curtas no estilo do Zé, com o nome do desafio
 ### D7 — Testes da apresentação
 Os renderizadores recebem o estado e devolvem/atualizam elementos; são testados com `happy-dom` (DOM leve no Vitest) só no essencial (etapa → tela, textos de charada/palpites/pontos). O resto é conferido no navegador: o agente abre o build no painel de navegador e tira capturas a 1366×768 e 1920×1080 (spec "Legibilidade no estande").
 
+### D8 — Decisões tomadas na implementação
+- **Nível da charada por rodada:** rodada 1 fácil, 2 médio, 3 difícil (a spec pede "uma charada", sem nível). A partida fica mais desafiadora e usa os três níveis do dataset.
+- **Botão "Desenhar" entre a charada e o desenho:** o visitante lê a charada no tempo dele; o comando `desenhar()` só funciona depois que a charada chegou (do Zé ou da reserva).
+
 ## Risks / Trade-offs
 
 - [O `onnxruntime-web` aumenta o build em ~10 MB de wasm] → aceitável (offline, local).

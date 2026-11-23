@@ -1,4 +1,6 @@
 import { limparNome, RODADAS_POR_PARTIDA } from "../domain/rodada/pontuacao";
+import type { LeituraParcial } from "../domain/ze/conversa";
+import { nivelDaRodada, obterCharada } from "./charada-da-rodada";
 import { ESTADO_INICIAL, type EstadoDaPartida } from "./estado-da-partida";
 import type {
   Cancelamento,
@@ -95,15 +97,21 @@ export class Partida {
 
   private async iniciarRodada(rodada: number): Promise<void> {
     this.mudar({ etapa: "charada", rodada, charada: undefined });
-    await Promise.resolve();
+    const { narrador, reserva } = this.dependencias;
     const categoria = this.nomeDaCategoria(rodada);
-    this.mudar({ charada: { texto: this.dependencias.reserva.charada(categoria), origem: "reserva" } });
+    const charada = await obterCharada(narrador, reserva, categoria, nivelDaRodada(rodada), this.mostrarFala);
+    this.mudar({ charada, falaAoVivo: undefined });
   }
 
   private nomeDaCategoria(rodada: number): string {
     const indice = this.estadoAtual.categorias[rodada] ?? 0;
     return this.configuracao.categorias[indice] ?? "";
   }
+
+  /** Repassa à tela o que o Zé está gerando (charada ou narração). */
+  private readonly mostrarFala = (falaAoVivo: LeituraParcial): void => {
+    this.mudar({ falaAoVivo });
+  };
 
   private mudar(alteracao: Partial<EstadoDaPartida>): void {
     this.estadoAtual = { ...this.estadoAtual, ...alteracao };
