@@ -2,7 +2,7 @@
 
 ## 1. Medições e narrador alternável (aplicação, TDD com dublês)
 
-- [ ] 1.1 Porta `Relogio` com `instante()` (monotônico) e `RelogioDoNavegador` com `performance.now()`: testes do adaptador e dos dublês verdes
+- [x] 1.1 Porta `Relogio` com `instante()` (monotônico) e `RelogioDoNavegador` com `performance.now()`: testes do adaptador e dos dublês verdes
 - [ ] 1.2 `MedicoesDaSessao` + `ClassificadorMedido` (ms da CNN e da LSTM por palpite): testes "Depois de um traço" → implementar
 - [ ] 1.3 `NarradorMedido` (tempo até o 1º token, duração, tokens, tokens/s, falhas por código, Zé × reserva × discordância por modelo): testes "Fala medida" e "Servidor desligado contado" → implementar
 - [ ] 1.4 `NarradorAlternavel` + campo `modelo` na `FalaFinal` + `modeloDaFala` na charada e na narração da `Partida`: testes "Trocar para o base", "Troca no meio de uma fala" e "Base fora do formato" → implementar; testes da `jogo-web` continuam verdes

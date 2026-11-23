@@ -12,6 +12,12 @@ describe("relógio do navegador", () => {
     expect(new RelogioDoNavegador().agora()).toBe(1_700_000_000_000);
   });
 
+  it("instante é o relógio monotônico de alta precisão (performance.now), não o horário", () => {
+    vi.spyOn(performance, "now").mockReturnValue(1234.5);
+    expect(new RelogioDoNavegador().instante()).toBe(1234.5);
+    vi.restoreAllMocks();
+  });
+
   it("aCada repete a tarefa no intervalo até ser cancelada", () => {
     vi.useFakeTimers();
     const disparos: number[] = [];

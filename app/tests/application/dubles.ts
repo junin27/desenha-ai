@@ -132,17 +132,22 @@ interface Agendamento {
 
 /** Tempo que só anda quando o teste manda; dispara os agendamentos na ordem em que vencem. */
 export class RelogioFalso implements Relogio {
-  private instante = 0;
+  private momento = 0;
   private readonly agendamentos: Agendamento[] = [];
 
   agora(): number {
-    return this.instante;
+    return this.momento;
+  }
+
+  /** No dublê, o tempo monotônico anda junto com o horário. */
+  instante(): number {
+    return this.momento;
   }
 
   aCada(milissegundos: number, tarefa: () => void): Cancelamento {
     const agendamento = {
       intervalo: milissegundos,
-      proximo: this.instante + milissegundos,
+      proximo: this.momento + milissegundos,
       tarefa,
       ativo: true,
     };
@@ -157,13 +162,13 @@ export class RelogioFalso implements Relogio {
   }
 
   avancar(milissegundos: number): void {
-    const destino = this.instante + milissegundos;
+    const destino = this.momento + milissegundos;
     for (let vencido = this.proximoVencido(destino); vencido; vencido = this.proximoVencido(destino)) {
-      this.instante = vencido.proximo;
+      this.momento = vencido.proximo;
       vencido.proximo += vencido.intervalo;
       vencido.tarefa();
     }
-    this.instante = destino;
+    this.momento = destino;
   }
 
   private proximoVencido(destino: number): Agendamento | undefined {

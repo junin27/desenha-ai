@@ -54,7 +54,10 @@ export interface RepositorioDePlacar {
 export type Cancelamento = () => void;
 
 export interface Relogio {
+  /** Horário em milissegundos (`Date.now()`): vai para o placar. */
   agora(): number;
+  /** Relógio monotônico de alta precisão, em milissegundos: só para medir durações (painel técnico). */
+  instante(): number;
   aCada(milissegundos: number, tarefa: () => void): Cancelamento;
 }
 
