@@ -5,6 +5,7 @@ from pathlib import Path
 
 from desenha_ml.contratos import CASOS_OBRIGATORIOS, gerar_contrato_de_pre_processamento
 from desenha_ml.contratos_conversa import FALAS_COMPLETAS, gerar_contrato_da_conversa
+from desenha_ml.contratos_prompt import gerar_contrato_do_prompt
 from desenha_ml.contratos_regras import gerar_contrato_de_regras
 from desenha_ml.desenho import Desenho
 
@@ -92,5 +93,18 @@ def test_contrato_da_conversa_versionado_esta_atualizado() -> None:
     versionado = json.loads(CONTRATO_DA_CONVERSA.read_text(encoding="utf8"))
     assert versionado == json.loads(json.dumps(gerar_contrato_da_conversa())), (
         "contratos/conversa.json está desatualizado; rode "
+        "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
+    )
+
+
+CONTRATO_DO_PROMPT = Path(__file__).parents[2] / "contratos" / "prompt_qwen.json"
+
+
+def test_contrato_do_prompt_versionado_esta_atualizado() -> None:
+    versionado = json.loads(CONTRATO_DO_PROMPT.read_text(encoding="utf8"))
+    gerado = json.loads(json.dumps(gerar_contrato_do_prompt()))
+    assert len(gerado["casos"]) == 4
+    assert versionado == gerado, (
+        "contratos/prompt_qwen.json está desatualizado; rode "
         "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
     )

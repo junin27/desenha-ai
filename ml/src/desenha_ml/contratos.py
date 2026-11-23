@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import TypedDict
 
 from desenha_ml.contratos_conversa import gerar_contrato_da_conversa
+from desenha_ml.contratos_prompt import gerar_contrato_do_prompt
 from desenha_ml.contratos_regras import gerar_contrato_de_regras
 from desenha_ml.desenho import Desenho
 from desenha_ml.leitura_quickdraw import ler_desenhos_ndjson
@@ -115,6 +116,7 @@ def main() -> None:
     _gravar(argumentos.pasta / "pre_processamento.json", contrato)
     _gravar(argumentos.pasta / "regras.json", gerar_contrato_de_regras())
     _gravar(argumentos.pasta / "conversa.json", gerar_contrato_da_conversa())
+    _gravar(argumentos.pasta / "prompt_qwen.json", gerar_contrato_do_prompt())
 
 
 def _gravar(destino: Path, contrato: object) -> None:
