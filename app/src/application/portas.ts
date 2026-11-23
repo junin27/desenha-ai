@@ -90,3 +90,10 @@ export interface VozDoZe {
   falar(texto: string): void;
   calar(): void;
 }
+
+/** Escolhas da organização que valem entre recarregamentos da página (bancada-do-ze). */
+export interface PreferenciasDoEstande {
+  /** `undefined` quando ninguém escolheu ainda. */
+  vozLigada(): boolean | undefined;
+  gravarVozLigada(ligada: boolean): void;
+}
