@@ -24,6 +24,8 @@ CodigoDeErro = Literal[
     "nivel_invalido",
     "pergunta_invalida",
     "formato_invalido",
+    "servidor_sem_resposta",
+    "navegador_ausente",
 ]
 
 
