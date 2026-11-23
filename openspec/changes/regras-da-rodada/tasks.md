@@ -15,8 +15,8 @@
 
 ## 3. Vazamento — Python (TDD)
 
-- [ ] 3.1 `vazamento.py`: testes de forma comparável (acento, "vaquinha", "aviões", "sóis") → implementar na ordem de D5
-- [ ] 3.2 Detecção: testes dos seis cenários e do plural das 30 categorias → implementar
+- [x] 3.1 `vazamento.py`: testes de forma comparável (acento, "vaquinha", "aviões", "sóis") → implementar na ordem de D5
+- [x] 3.2 Detecção: testes dos seis cenários e do plural das 30 categorias → implementar
 
 ## 4. Contrato
 
