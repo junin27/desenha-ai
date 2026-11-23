@@ -9,7 +9,7 @@
 
 ## 2. Pergunte ao Zé (domínio e aplicação)
 
-- [ ] 2.1 `perguntaBloqueada` em `domain/ze/bloqueio.ts`: testes com acento, maiúscula e palavra parecida que não é ofensa → implementar
+- [x] 2.1 `perguntaBloqueada` em `domain/ze/bloqueio.ts`: testes com acento, maiúscula e palavra parecida que não é ofensa → implementar
 - [ ] 2.2 `ConversaComOZe` (abrir, perguntar, voltar; só com a partida em `inicio`): testes "Ida e volta", "Pergunta vazia", "Pergunta longa demais", "Resposta do Zé", "Uma pergunta por vez", "Zé desligado" e "Palavra bloqueada" → implementar
 - [ ] 2.3 `ReservaDoZe.resposta()` e `respostaBloqueada()` na `ReservaDeArquivo`, com 6 respostas-modelo: testes de formato (sem marcadores, estilo do Zé) → implementar
 
