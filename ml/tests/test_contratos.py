@@ -71,9 +71,37 @@ def test_contrato_de_regras_cobre_erros_e_o_plural_das_30_categorias() -> None:
     assert sum(1 for caso in contrato["vazamento"] if str(caso["texto"]).startswith("Desenhei ")) == 30
 
 
+TOLERANCIA_DOS_FLOATS = (
+    1e-12  # numpy/CPU diferentes erram o último bit (~1e-17); o TypeScript também usa tolerância
+)
+
+
+def _iguais_com_tolerancia(esperado: object, obtido: object) -> bool:
+    """Igualdade estrutural em que só floats têm tolerância; texto, inteiros e booleanos são exatos."""
+    if isinstance(esperado, float) and isinstance(obtido, float):
+        return abs(esperado - obtido) <= TOLERANCIA_DOS_FLOATS
+    if isinstance(esperado, dict) and isinstance(obtido, dict):
+        return esperado.keys() == obtido.keys() and all(
+            _iguais_com_tolerancia(valor, obtido[chave]) for chave, valor in esperado.items()
+        )
+    if isinstance(esperado, list) and isinstance(obtido, list):
+        return len(esperado) == len(obtido) and all(
+            _iguais_com_tolerancia(a, b) for a, b in zip(esperado, obtido, strict=True)
+        )
+    return bool(esperado == obtido) and type(esperado) is type(obtido)
+
+
+def test_comparacao_do_contrato_tolera_so_o_ultimo_bit_dos_floats() -> None:
+    assert _iguais_com_tolerancia({"p": [0.5, 1]}, {"p": [0.5 + 3e-17, 1]})
+    assert not _iguais_com_tolerancia({"p": [0.5]}, {"p": [0.5001]})
+    assert not _iguais_com_tolerancia({"p": [1]}, {"p": [1.0]})
+    assert not _iguais_com_tolerancia({"p": "a"}, {"p": "b"})
+    assert not _iguais_com_tolerancia({"p": 1}, {"q": 1})
+
+
 def test_contrato_de_regras_versionado_esta_atualizado() -> None:
     versionado = json.loads(CONTRATO_DE_REGRAS.read_text(encoding="utf8"))
-    assert versionado == _contrato_de_regras_em_json(), (
+    assert _iguais_com_tolerancia(versionado, _contrato_de_regras_em_json()), (
         "contratos/regras.json está desatualizado; rode "
         "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
     )
