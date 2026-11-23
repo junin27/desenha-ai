@@ -1,9 +1,18 @@
 """Requisito "Imagem 28×28 para a CNN" — spec pre-processamento-de-desenho."""
 
 import numpy as np
+from numpy.typing import NDArray
 
 from desenha_ml.desenho import Desenho
-from desenha_ml.rasterizacao import ESPESSURA_PADRAO, LADO_DA_IMAGEM, rasterizar
+from desenha_ml.geometria import distancias_ao_segmento
+from desenha_ml.rasterizacao import (
+    ESPESSURA_PADRAO,
+    LADO_DA_IMAGEM,
+    SUBAMOSTRAS,
+    _segmentos,
+    _tracos_em_pixels,
+    rasterizar,
+)
 
 DEZESSEIS_AVOS = 16
 
@@ -64,3 +73,23 @@ def test_desenho_alto_fica_centralizado_na_horizontal() -> None:
     vertical = Desenho.de_arrays([np.array([[0.0, 0.0], [0.0, 255.0]])])
     imagem = rasterizar(vertical)
     np.testing.assert_allclose(imagem[3:25, 13:15], 12 / 16)
+
+
+def _rasterizar_referencia(desenho: Desenho, espessura: float = ESPESSURA_PADRAO) -> NDArray[np.float64]:
+    """Implementação direta e lenta da spec (todo subponto contra todo segmento), só para conferência."""
+    centros = (np.arange(LADO_DA_IMAGEM * SUBAMOSTRAS) + 0.5) / SUBAMOSTRAS
+    xs, ys = np.meshgrid(centros, centros)
+    pontos = np.stack([xs.ravel(), ys.ravel()], axis=1)
+    dentro = np.zeros(len(pontos), dtype=bool)
+    for traco in _tracos_em_pixels(desenho):
+        for inicio, fim in _segmentos(traco):
+            dentro |= distancias_ao_segmento(pontos, inicio, fim) <= espessura / 2
+    blocos = dentro.reshape(LADO_DA_IMAGEM, SUBAMOSTRAS, LADO_DA_IMAGEM, SUBAMOSTRAS)
+    return np.asarray(blocos.mean(axis=(1, 3)), dtype=np.float64)
+
+
+def test_rasterizacao_otimizada_igual_a_referencia_em_desenhos_reais(
+    desenhos_da_amostra: list[tuple[str, Desenho]],
+) -> None:
+    for _, desenho in desenhos_da_amostra:
+        np.testing.assert_array_equal(rasterizar(desenho), _rasterizar_referencia(desenho))

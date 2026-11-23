@@ -11,12 +11,12 @@ Exemplo:
 """
 
 import itertools
+import math
 
 import numpy as np
 from numpy.typing import NDArray
 
 from desenha_ml.desenho import Desenho
-from desenha_ml.geometria import distancias_ao_segmento
 from desenha_ml.normalizacao import ESCALA_MAXIMA, normalizar
 
 LADO_DA_IMAGEM = 28
@@ -55,23 +55,27 @@ def _segmentos(traco: NDArray[np.float64]) -> list[tuple[NDArray[np.float64], ND
 def _pintar_segmento(
     mascara: NDArray[np.bool_], inicio: NDArray[np.float64], fim: NDArray[np.float64], raio: float
 ) -> None:
-    """Marca os subpontos a até `raio` do segmento, avaliando só a caixa ao redor dele."""
-    colunas = _indices_na_faixa(min(inicio[0], fim[0]) - raio, max(inicio[0], fim[0]) + raio)
-    linhas = _indices_na_faixa(min(inicio[1], fim[1]) - raio, max(inicio[1], fim[1]) + raio)
-    if colunas.size == 0 or linhas.size == 0:
+    """Marca os subpontos a até `raio` do segmento, avaliando só a caixa ao redor dele.
+
+    Compara distâncias ao quadrado (sem raiz) e usa broadcasting linha × coluna: é a parte mais
+    quente do pré-processamento do dataset. O TypeScript usa a mesma comparação.
+    """
+    ax, ay, bx, by = float(inicio[0]), float(inicio[1]), float(fim[0]), float(fim[1])
+    colunas = _faixa_de_indices(min(ax, bx) - raio, max(ax, bx) + raio)
+    linhas = _faixa_de_indices(min(ay, by) - raio, max(ay, by) + raio)
+    if colunas is None or linhas is None:
         return
-    xs, ys = np.meshgrid(_centros(colunas), _centros(linhas))
-    pontos = np.stack([xs.ravel(), ys.ravel()], axis=1)
-    dentro = (distancias_ao_segmento(pontos, inicio, fim) <= raio).reshape(xs.shape)
-    mascara[linhas[0] : linhas[-1] + 1, colunas[0] : colunas[-1] + 1] |= dentro
+    xs = (np.arange(colunas[0], colunas[1] + 1) + 0.5) / SUBAMOSTRAS - ax
+    ys = ((np.arange(linhas[0], linhas[1] + 1) + 0.5) / SUBAMOSTRAS - ay)[:, None]
+    dx, dy = bx - ax, by - ay
+    comprimento2 = dx * dx + dy * dy
+    t = np.clip((xs * dx + ys * dy) / comprimento2, 0.0, 1.0) if comprimento2 > 0 else 0.0
+    distancia2 = (xs - t * dx) ** 2 + (ys - t * dy) ** 2
+    mascara[linhas[0] : linhas[1] + 1, colunas[0] : colunas[1] + 1] |= distancia2 <= raio * raio
 
 
-def _indices_na_faixa(minimo: float, maximo: float) -> NDArray[np.int64]:
-    """Índices de subpontos cujo centro (u + 0,5) / 4 cai em [minimo, maximo]."""
-    primeiro = max(int(np.ceil(minimo * SUBAMOSTRAS - 0.5)), 0)
-    ultimo = min(int(np.floor(maximo * SUBAMOSTRAS - 0.5)), _LADO_DA_MASCARA - 1)
-    return np.arange(primeiro, ultimo + 1, dtype=np.int64)
-
-
-def _centros(indices: NDArray[np.int64]) -> NDArray[np.float64]:
-    return (indices + 0.5) / SUBAMOSTRAS
+def _faixa_de_indices(minimo: float, maximo: float) -> tuple[int, int] | None:
+    """Primeiro e último índice de subponto cujo centro (u + 0,5) / 4 cai em [minimo, maximo]."""
+    primeiro = max(math.ceil(minimo * SUBAMOSTRAS - 0.5), 0)
+    ultimo = min(math.floor(maximo * SUBAMOSTRAS - 0.5), _LADO_DA_MASCARA - 1)
+    return (primeiro, ultimo) if primeiro <= ultimo else None

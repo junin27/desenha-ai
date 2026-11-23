@@ -42,6 +42,16 @@ O Python é a referência (o treino usa ele). O comando `python -m desenha_ml.co
 - Python: `pyproject.toml` com hatchling, `pytest`, `mypy --strict`, `ruff` (lint e format). Ambiente local em `ml/.venv` (Python 3.15).
 - TypeScript: Vite, `typescript` em modo `strict` com `noUncheckedIndexedAccess`, Vitest, ESLint (typescript-eslint) e Prettier. Nesta change, só a camada `domain` e a configuração do projeto; o teste de arquitetura de camadas entra junto, já valendo para as próximas changes.
 
+### D7 — Medição do rasterizador (tarefa 2.7, 23/11/2026)
+90 desenhos reais da amostra (média de 47 pontos e 42 segmentos, máximo de 148 pontos), 12 repetições, nesta máquina (CPU, Python 3.15, numpy 2.5):
+
+| Versão | Mediana | p95 |
+|---|---|---|
+| 1ª (meshgrid + `hypot` por segmento) | 2,88 ms | 6,38 ms |
+| Otimizada (broadcasting linha × coluna, distância ao quadrado) | **1,42 ms** | 3,03 ms |
+
+A versão otimizada é conferida **pixel a pixel** contra uma implementação de referência direta (todo subponto contra todo segmento) nos 90 desenhos (`test_rasterizacao_otimizada_igual_a_referencia_em_desenhos_reais`). A sequência stroke-3 leva 0,05 ms. Estimativa no Colab (2 núcleos, ~480 mil rasterizações entre completas e parciais): cerca de 6 a 9 minutos.
+
 ## Risks / Trade-offs
 
 - [Rasterização em Python lenta para 540 mil imagens] → vetorizar por segmento e usar `multiprocessing` no Colab; medir no notebook e, se passar de 15 min, guardar os arrays no Drive para reaproveitar.
