@@ -22,7 +22,7 @@ TAMANHO_DO_PLACAR = 10
 TAMANHO_MAXIMO_DO_NOME = 16
 
 # Conjunto explícito de espaços: str.split() e o \s do JavaScript não concordam em todos os caracteres.
-_ESPACOS = re.compile("[ \t\n\r ]+")
+_ESPACOS = re.compile("[ \t\n\r\u00a0]+")
 
 
 @dataclass(frozen=True)

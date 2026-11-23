@@ -38,7 +38,7 @@ def test_nome_limpo() -> None:
 
 
 def test_nome_com_tabulacao_e_espaco_inseparavel() -> None:
-    assert limpar_nome("Ana\t Maria") == Ok("Ana Maria")
+    assert limpar_nome("Ana\t\u00a0Maria") == Ok("Ana Maria")
 
 
 def test_emoji_conta_como_um_caractere() -> None:

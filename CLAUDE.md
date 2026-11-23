@@ -54,4 +54,5 @@ Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe
 - `mypy` rodado da raiz não acha `ml/pyproject.toml` e roda **sem** `--strict` sem avisar: sempre passe `--config-file ml/pyproject.toml`.
 - O Python local é 3.15: não há `onnxruntime` para ele. A conferência do ONNX roda no Colab (Python do Colab) e no navegador (`onnxruntime-web`).
 - Sem GPU NVIDIA nesta máquina: treino só no Colab (T4). A demo roda em CPU.
+- As ferramentas de escrita/edição do agente convertem escapes como ` ` em caracteres reais e invisíveis. Para caracteres especiais em código, gere o texto com `chr()` num script ou use escapes que não sejam `\uXXXX` (ex.: `\xa0` em regex JS); confira com `grep -rl $'\xc2\xa0' ml app/src app/tests`.
 - O Claude Code carrega também o CLAUDE.md da pasta pai: não coloque regras de outros projetos em `n3sandro/` (as antigas estão em `n3sandro/_referencia_regras_terram/`).

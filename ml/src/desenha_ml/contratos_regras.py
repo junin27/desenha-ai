@@ -148,7 +148,16 @@ def _casos_de_pontos() -> list[Json]:
     return [{"veredito": v, "segundos_restantes": s, "pontos": pontos_da_rodada(v, s)} for v, s in entradas]
 
 
-_NOMES = ["  Zé   da  Roça ", "Ana\t Maria", "🤠" * 16, "🤠" * 17, "", "    ", "a" * 17, "Gilberto Aparecid"]
+_NOMES = [
+    "  Zé   da  Roça ",
+    "Ana\t\u00a0Maria",
+    "🤠" * 16,
+    "🤠" * 17,
+    "",
+    "    ",
+    "a" * 17,
+    "Gilberto Aparecid",
+]
 
 
 def _casos_de_placar() -> list[Json]:
