@@ -31,7 +31,7 @@
 
 ## 6. Verificação final
 
-- [ ] 6.1 `bash scripts/verificar.sh` verde (ruff, mypy --strict, pytest com doctests, tsc, eslint, prettier, vitest, `openspec validate --all --strict`)
+- [x] 6.1 `bash scripts/verificar.sh` verde (ruff, mypy --strict, pytest com doctests, tsc, eslint, prettier, vitest, `openspec validate --all --strict`)
 
 ## Workflow follow-up
 
