@@ -49,6 +49,10 @@ Os renderizadores recebem o estado e devolvem/atualizam elementos; são testados
 ### D8 — Decisões tomadas na implementação
 - **Nível da charada por rodada:** rodada 1 fácil, 2 médio, 3 difícil (a spec pede "uma charada", sem nível). A partida fica mais desafiadora e usa os três níveis do dataset.
 - **Botão "Desenhar" entre a charada e o desenho:** o visitante lê a charada no tempo dele; o comando `desenhar()` só funciona depois que a charada chegou (do Zé ou da reserva).
+- **"Desenho concluído" na entrada VEREDITO:** 100% quando a rodada acaba pelo Pronto ou pelo tempo; na vitória antecipada, a fração dos 20 s já usada (aos 6 s, 30%). É a forma mais próxima do "prefixo do desenho" usado no dataset, que o jogo não tem como medir.
+- **Palpites na entrada VEREDITO:** top-5 de cada rede, como no dataset do Zé.
+- **Rodada sem traço:** vale ERROU e usa a narração-modelo direto, sem chamar o Zé (não há palpites para ele narrar).
+- **Discordância do Zé:** só conta quando a fala está no formato e traz outro veredito; fala fora do formato ou falha do narrador usam a narração-modelo sem marcar discordância.
 
 ## Risks / Trade-offs
 

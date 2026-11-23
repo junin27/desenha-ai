@@ -6,11 +6,15 @@ import type { LeituraParcial } from "../domain/ze/conversa";
 import { nivelDaRodada, obterCharada } from "./charada-da-rodada";
 import {
   esperaEsgotada,
+  fracaoDoTempo,
   INTERVALO_DO_CRONOMETRO_MS,
   segundosDecorridos,
   segundosRestantes,
 } from "./cronometro";
+import { julgarRodada } from "./julgamento-da-rodada";
 import { montarPalpite } from "./palpite";
+
+const DESENHO_COMPLETO = 1;
 import { ESTADO_INICIAL, type EstadoDaPartida } from "./estado-da-partida";
 import type {
   Cancelamento,
@@ -110,7 +114,8 @@ export class Partida {
     const palpite = montarPalpite(probabilidades.valor, this.configuracao.pesoDaCnn);
     if (palpite === undefined) return;
     this.mudar({ palpite });
-    if (this.venceuAntes(palpite.ensemble)) await this.encerrarDesenho();
+    // Na vitória antecipada o Zé fica sabendo que as redes viram só parte do desenho (D8 do design).
+    if (this.venceuAntes(palpite.ensemble)) await this.encerrarDesenho(this.fracaoDoTempoUsado());
   }
 
   /** Botão "Limpar": apaga o palpite, mas o cronômetro segue (spec `interface-do-jogo`). */
@@ -163,19 +168,37 @@ export class Partida {
   }
 
   /** Sai do desenho uma vez só, venha o fim do tempo, a vitória antecipada ou o "Pronto". */
-  private encerrarDesenho(): Promise<void> {
+  private encerrarDesenho(fracaoDoDesenho = DESENHO_COMPLETO): Promise<void> {
     if (this.estadoAtual.etapa !== "desenhando") return this.julgamento;
     this.pararCronometro();
     const agora = this.dependencias.relogio.agora();
     const restantes = this.primeiroTracoMs === undefined ? 0 : segundosRestantes(this.primeiroTracoMs, agora);
     this.mudar({ etapa: "julgando", segundosRestantes: restantes });
-    this.julgamento = this.julgar();
+    this.julgamento = this.julgar(fracaoDoDesenho);
     return this.julgamento;
   }
 
-  private async julgar(): Promise<void> {
-    await Promise.resolve();
-    this.mudar({ etapa: "resultado" });
+  private async julgar(fracaoDoDesenho: number): Promise<void> {
+    const { estadoAtual } = this;
+    const rodada = {
+      categoria: this.categoriaDaRodada(),
+      nomesDasCategorias: this.configuracao.categorias,
+      palpite: estadoAtual.palpite,
+      segundosRestantes: estadoAtual.segundosRestantes,
+      fracaoDoDesenho,
+    };
+    const { narrador, reserva } = this.dependencias;
+    const resultado = await julgarRodada(narrador, reserva, rodada, this.mostrarFala);
+    this.mudar({
+      etapa: "resultado",
+      falaAoVivo: undefined,
+      resultados: [...estadoAtual.resultados, resultado],
+    });
+  }
+
+  private fracaoDoTempoUsado(): number {
+    const agora = this.dependencias.relogio.agora();
+    return this.primeiroTracoMs === undefined ? DESENHO_COMPLETO : fracaoDoTempo(this.primeiroTracoMs, agora);
   }
 
   private estaDesenhando(): boolean {

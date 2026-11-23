@@ -24,3 +24,8 @@ export function segundosDecorridos(primeiroTracoMs: number, agoraMs: number): nu
 export function esperaEsgotada(inicioDaEtapaMs: number, agoraMs: number): boolean {
   return agoraMs - inicioDaEtapaMs >= LIMITE_DA_RODADA_MS;
 }
+
+/** Parte dos 20 s já usada (0 a 1). */
+export function fracaoDoTempo(primeiroTracoMs: number, agoraMs: number): number {
+  return Math.min(1, segundosDecorridos(primeiroTracoMs, agoraMs) / SEGUNDOS_DA_RODADA);
+}
