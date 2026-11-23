@@ -3,7 +3,7 @@ import { pontosDaRodada } from "../domain/rodada/pontuacao";
 import { veredito as vereditoDaRegra, type Veredito } from "../domain/rodada/veredito";
 import { entradaVeredito, lerFala, lerVeredito, type Palpites } from "../domain/ze/conversa";
 import type { PalpiteDaRodada, ResultadoDaRodada } from "./estado-da-partida";
-import type { NarradorDoJogo, OuvinteDaFala, ReservaDoZe } from "./portas";
+import type { ModeloDoZe, NarradorDoJogo, OuvinteDaFala, ReservaDoZe } from "./portas";
 
 /** Mesmo número de palpites por rede das entradas VEREDITO do dataset do Zé. */
 const PALPITES_POR_REDE = 5;
@@ -22,6 +22,7 @@ interface Narracao {
   readonly texto: string;
   readonly origem: "ze" | "reserva";
   readonly discordanciaDoZe: boolean;
+  readonly modelo?: ModeloDoZe | undefined;
 }
 
 /**
@@ -49,6 +50,7 @@ export async function julgarRodada(
     segundosRestantes: rodada.segundosRestantes,
     narracao: narracao.texto,
     origemDaNarracao: narracao.origem,
+    modeloDaNarracao: narracao.modelo,
     discordanciaDoZe: narracao.discordanciaDoZe,
   };
 }
@@ -73,7 +75,8 @@ async function narracaoDoZe(
   if (!doZe.ok) return narracaoDeReserva(reserva, rodada, veredito, false);
   const [vereditoDoZe, texto] = doZe.valor;
   if (vereditoDoZe !== veredito) return narracaoDeReserva(reserva, rodada, veredito, true);
-  return { texto, origem: "ze", discordanciaDoZe: false };
+  const modelo = resposta.ok ? resposta.valor.modelo : undefined;
+  return { texto, origem: "ze", discordanciaDoZe: false, modelo };
 }
 
 function narracaoDeReserva(

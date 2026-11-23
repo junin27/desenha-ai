@@ -35,6 +35,8 @@ export interface FalaFinal {
   readonly texto: string;
   readonly tokens: number;
   readonly tokensPorSegundo: number;
+  /** Quem gerou a fala, quando o narrador alterna modelos (bancada-do-ze). */
+  readonly modelo?: ModeloDoZe;
 }
 
 export interface ErroDoNarrador {

@@ -1,7 +1,7 @@
 import { vaza } from "../domain/rodada/vazamento";
 import { entradaCharada, lerCharada, lerFala, NIVEIS, type Nivel } from "../domain/ze/conversa";
 import type { CharadaDaRodada } from "./estado-da-partida";
-import type { NarradorDoJogo, OuvinteDaFala, ReservaDoZe } from "./portas";
+import type { ModeloDoZe, NarradorDoJogo, OuvinteDaFala, ReservaDoZe } from "./portas";
 
 /** Rodada 1 fácil, 2 médio, 3 difícil: a partida fica mais desafiadora (decisão no design.md). */
 export function nivelDaRodada(rodada: number): Nivel {
@@ -23,7 +23,7 @@ export async function obterCharada(
   aoLer: OuvinteDaFala,
 ): Promise<CharadaDaRodada> {
   const doZe = await charadaDoZe(narrador, categoria, nivel, aoLer);
-  if (doZe !== undefined) return { texto: doZe, origem: "ze" };
+  if (doZe !== undefined) return { texto: doZe.texto, origem: "ze", modelo: doZe.modelo };
   return { texto: reserva.charada(categoria), origem: "reserva" };
 }
 
@@ -32,7 +32,7 @@ async function charadaDoZe(
   categoria: string,
   nivel: Nivel,
   aoLer: OuvinteDaFala,
-): Promise<string | undefined> {
+): Promise<{ texto: string; modelo: ModeloDoZe | undefined } | undefined> {
   const entrada = entradaCharada(categoria, nivel);
   if (!entrada.ok) return undefined;
   const resposta = await narrador.falar(entrada.valor, aoLer);
@@ -40,5 +40,5 @@ async function charadaDoZe(
   const fala = lerFala(resposta.valor.texto);
   const charada = fala.ok ? lerCharada(fala.valor.resposta) : fala;
   if (!charada.ok || vaza(categoria, charada.valor)) return undefined;
-  return charada.valor;
+  return { texto: charada.valor, modelo: resposta.valor.modelo };
 }

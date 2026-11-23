@@ -2,6 +2,7 @@ import type { ErroDeRegra } from "../domain/rodada/erros";
 import { SEGUNDOS_DA_RODADA } from "../domain/rodada/pontuacao";
 import type { Veredito } from "../domain/rodada/veredito";
 import type { LeituraParcial } from "../domain/ze/conversa";
+import type { ModeloDoZe } from "./portas";
 
 /** Etapas da spec `partida`, na ordem em que acontecem. */
 export type Etapa = "inicio" | "charada" | "desenhando" | "julgando" | "resultado" | "fim";
@@ -12,6 +13,8 @@ export type OrigemDaFala = "ze" | "reserva";
 export interface CharadaDaRodada {
   readonly texto: string;
   readonly origem: OrigemDaFala;
+  /** Modelo que gerou a charada (só quando a origem é o Zé), para o selo da tela. */
+  readonly modelo?: ModeloDoZe | undefined;
 }
 
 /** Probabilidades das 30 categorias por rede e do ensemble, na ordem de `classes.json`. */
@@ -28,6 +31,8 @@ export interface ResultadoDaRodada {
   readonly segundosRestantes: number;
   readonly narracao: string;
   readonly origemDaNarracao: OrigemDaFala;
+  /** Modelo que gerou a narração (só quando a origem é o Zé). */
+  readonly modeloDaNarracao?: ModeloDoZe | undefined;
   /** O Zé respondeu no formato, mas com um veredito diferente do da regra (métrica do SLM, D-08). */
   readonly discordanciaDoZe: boolean;
 }
