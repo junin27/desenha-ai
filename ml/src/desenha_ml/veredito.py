@@ -6,12 +6,13 @@ Exemplo:
 """
 
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, TypeVar
 
 from desenha_ml.ensemble import top_k
 from desenha_ml.resultado import Erro, Ok, Resultado
 
 Veredito = Literal["ACERTOU", "QUASE", "ERROU"]
+T = TypeVar("T")
 
 POSICOES_DO_QUASE = 3
 PROBABILIDADE_DE_VITORIA_ANTECIPADA = 0.80
@@ -25,10 +26,14 @@ def veredito(alvo: int, probabilidades: Sequence[float]) -> Resultado[Veredito]:
     palpites = top_k(probabilidades, k=min(POSICOES_DO_QUASE, len(probabilidades)))
     if isinstance(palpites, Erro):
         return palpites
-    posicoes = [indice for indice, _ in palpites.valor]
-    if posicoes[0] == alvo:
-        return Ok("ACERTOU")
-    return Ok("QUASE" if alvo in posicoes else "ERROU")
+    return Ok(veredito_por_posicoes(alvo, [indice for indice, _ in palpites.valor]))
+
+
+def veredito_por_posicoes(alvo: T, palpites_em_ordem: Sequence[T]) -> Veredito:
+    """A regra em si, sobre palpites já ordenados (índices ou nomes): 1º = alvo, alvo no top-3, ou erro."""
+    if palpites_em_ordem and palpites_em_ordem[0] == alvo:
+        return "ACERTOU"
+    return "QUASE" if alvo in palpites_em_ordem[:POSICOES_DO_QUASE] else "ERROU"
 
 
 def deve_encerrar_antes(

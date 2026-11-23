@@ -39,8 +39,8 @@ Corta do fim do texto qualquer prefixo de tag ainda incompleto (`<`, `</pen`, `<
 `Teacher.gerar(prompt: str, temperatura: float) -> dict | None`, que devolve o JSON já interpretado ou `None` após esgotar as tentativas. O relógio e a espera são injetados (`dormir`), para os testes de nova tentativa não esperarem de verdade. Os adaptadores usam `response_mime_type="application/json"` (Gemini) e `response_format={"type": "json_object"}` (Groq).
 - **Alternativa descartada:** LangChain (dependência pesada para duas chamadas HTTP).
 
-### D5 — Regra do veredito na curadoria
-O caso de VEREDITO traz o top-5 do ensemble já ordenado. A regra esperada é aplicada com `veredito.veredito(alvo, probabilidades)` sobre a distribuição reconstruída a partir do top-5 (as categorias fora do top-5 recebem 0). Assim a regra é exatamente a da spec `julgamento-do-desenho`, sem uma terceira implementação.
+### D5 — Regra do veredito na curadoria (revisada na implementação)
+O caso de VEREDITO traz o top-5 do ensemble já ordenado. A primeira ideia era reconstruir a distribuição a partir do top-5 e chamar `veredito.veredito()`, mas probabilidades empatadas no top-5 (ex.: dois "0%") seriam reordenadas pelo índice e poderiam mudar o resultado. A regra foi extraída para `veredito.veredito_por_posicoes(alvo, palpites_em_ordem)`, que o próprio `veredito()` passa a usar; a curadoria chama a mesma função sobre a lista ordenada. Continua sendo uma única implementação da regra da spec `julgamento-do-desenho`.
 
 ### D6 — Execução
 O notebook 2 roda no Colab, com a chave em *Secrets*, ou localmente com `GEMINI_API_KEY` no ambiente. São cerca de 110 chamadas de 5 a 6 exemplos cada, com intervalo de 4,5 s (15 RPM do *free tier*): de 10 a 20 min. Modelo padrão: `gemini-3.5-flash-lite` (o mesmo que funcionou na atividade N2), configurável.
