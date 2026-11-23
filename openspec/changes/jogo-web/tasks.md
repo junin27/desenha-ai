@@ -13,7 +13,7 @@
 
 - [x] 2.1 `PlacarLocalStorage`: testes de persistência, dados corrompidos e zerar → implementar
 - [x] 2.2 `ReservaDeArquivo` + narrações-modelo (D6): testes de coerência com o veredito → implementar
-- [ ] 2.3 `NarradorLlamaServer`: testes com `fetch` falso (corpo do pedido, SSE em pedaços, leitura progressiva, servidor desligado, 25 s, tokens/s) → implementar
+- [x] 2.3 `NarradorLlamaServer`: testes com `fetch` falso (corpo do pedido, SSE em pedaços, leitura progressiva, servidor desligado, 25 s, tokens/s) → implementar
 - [ ] 2.4 Instalar `onnxruntime-web` (e `onnxruntime-node` só para testes); `ClassificadorOnnx` com sessões injetadas: teste de paridade com `teste_paridade_redes.json` do ensaio local (pulado sem os modelos) → implementar
 - [ ] 2.5 Palpite mais recente vence e limite de 250 ms durante o traço: testes → implementar
 
