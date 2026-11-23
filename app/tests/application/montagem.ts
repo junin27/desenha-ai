@@ -1,4 +1,5 @@
 import {
+  ClassificadorControlado,
   ClassificadorFalso,
   NarradorFalso,
   PlacarEmMemoria,
@@ -19,6 +20,7 @@ export const PESO_DA_CNN = 0.6;
 export interface PartidaDeTeste {
   readonly partida: Partida;
   readonly classificador: ClassificadorFalso;
+  readonly classificadorControlado: ClassificadorControlado;
   readonly narrador: NarradorFalso;
   readonly placar: PlacarEmMemoria;
   readonly relogio: RelogioFalso;
@@ -26,20 +28,30 @@ export interface PartidaDeTeste {
 }
 
 /** Partida com dublês; as categorias saem na ordem 0, 1, 2 (vaca, cavalo, porco) salvo outra ordem. */
-export function montarPartida(ordemDoSorteio: readonly number[] = [0, 1, 2]): PartidaDeTeste {
+export function montarPartida(
+  ordemDoSorteio: readonly number[] = [0, 1, 2],
+  comClassificadorControlado = false,
+): PartidaDeTeste {
+  const classificadorControlado = new ClassificadorControlado();
+  const classificador = new ClassificadorFalso();
   const dubles = {
-    classificador: new ClassificadorFalso(),
+    classificador,
     narrador: new NarradorFalso(),
     placar: new PlacarEmMemoria(),
     relogio: new RelogioFalso(),
   };
   const partida = new Partida(
-    { ...dubles, sorteador: new SorteadorFixo(ordemDoSorteio), reserva: new ReservaFalsa() },
+    {
+      ...dubles,
+      classificador: comClassificadorControlado ? classificadorControlado : classificador,
+      sorteador: new SorteadorFixo(ordemDoSorteio),
+      reserva: new ReservaFalsa(),
+    },
     { categorias: CATEGORIAS, pesoDaCnn: PESO_DA_CNN },
   );
   const etapas: Etapa[] = [partida.estado.etapa];
   partida.aoMudar((estado) => {
     if (etapas.at(-1) !== estado.etapa) etapas.push(estado.etapa);
   });
-  return { partida, ...dubles, etapas };
+  return { partida, ...dubles, classificadorControlado, etapas };
 }

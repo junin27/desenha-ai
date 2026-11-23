@@ -16,6 +16,7 @@ import {
   segundosDecorridos,
   segundosRestantes,
 } from "./cronometro";
+import { FilaDePalpites } from "./fila-de-palpites";
 import { julgarRodada } from "./julgamento-da-rodada";
 import { montarPalpite } from "./palpite";
 
@@ -64,11 +65,14 @@ export class Partida {
   private primeiroTracoMs: number | undefined;
   private pararCronometro: Cancelamento = () => undefined;
   private julgamento: Promise<void> = Promise.resolve();
+  private readonly filaDePalpites: FilaDePalpites;
 
   constructor(
     private readonly dependencias: DependenciasDaPartida,
     private readonly configuracao: ConfiguracaoDaPartida,
-  ) {}
+  ) {
+    this.filaDePalpites = new FilaDePalpites(dependencias.relogio);
+  }
 
   get estado(): EstadoDaPartida {
     return this.estadoAtual;
@@ -101,21 +105,27 @@ export class Partida {
     if (this.estadoAtual.etapa !== "charada" || this.estadoAtual.charada === undefined) return;
     this.inicioDaEtapaMs = this.dependencias.relogio.agora();
     this.primeiroTracoMs = undefined;
+    this.filaDePalpites.descartarPendentes();
     this.mudar({ etapa: "desenhando", segundosRestantes: SEGUNDOS_DA_RODADA, palpite: undefined });
     this.pararCronometro = this.dependencias.relogio.aCada(INTERVALO_DO_CRONOMETRO_MS, () => {
       this.conferirTempo();
     });
   }
 
-  /** Recebe o desenho inteiro capturado até agora e atualiza o palpite das redes. */
-  async registrarTraco(desenho: Desenho): Promise<void> {
+  /**
+   * Recebe o desenho inteiro capturado até agora e atualiza o palpite das redes. Durante o traço
+   * (`tracoTerminado` falso) os pedidos são limitados; só o palpite mais recente vale (D3).
+   */
+  async registrarTraco(desenho: Desenho, tracoTerminado = true): Promise<void> {
     if (this.estadoAtual.etapa !== "desenhando") return;
     this.primeiroTracoMs ??= this.dependencias.relogio.agora();
+    const geracao = this.filaDePalpites.pedir(tracoTerminado);
+    if (geracao === undefined) return;
     const probabilidades = await this.dependencias.classificador.classificar(
       prepararDesenhoCapturado(desenho),
     );
-    // A etapa pode ter mudado enquanto as redes calculavam (tempo esgotado, "Pronto").
-    if (!this.estaDesenhando() || !probabilidades.ok) return;
+    // A etapa pode ter mudado enquanto as redes calculavam (tempo esgotado, "Pronto", novo traço).
+    if (!this.estaDesenhando() || !this.filaDePalpites.aindaVale(geracao) || !probabilidades.ok) return;
     const palpite = montarPalpite(probabilidades.valor, this.configuracao.pesoDaCnn);
     if (palpite === undefined) return;
     this.mudar({ palpite });
@@ -125,7 +135,9 @@ export class Partida {
 
   /** Botão "Limpar": apaga o palpite, mas o cronômetro segue (spec `interface-do-jogo`). */
   limparDesenho(): void {
-    if (this.estadoAtual.etapa === "desenhando") this.mudar({ palpite: undefined });
+    if (this.estadoAtual.etapa !== "desenhando") return;
+    this.filaDePalpites.descartarPendentes();
+    this.mudar({ palpite: undefined });
   }
 
   async pronto(): Promise<void> {
