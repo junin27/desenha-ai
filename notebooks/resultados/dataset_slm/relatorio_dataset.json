@@ -1,0 +1,51 @@
+{
+ "pedidos": 501,
+ "respostas": 411,
+ "rejeicoes": {
+  "vazia": 90,
+  "formato_invalido": 71,
+  "vazou": 1,
+  "recusa": 1,
+  "veredito_errado": 12,
+  "numero_alucinado": 1
+ },
+ "reparos": {},
+ "origem_das_perguntas": {
+  "seed": 12,
+  "in_depth": 34,
+  "in_breadth": 35
+ },
+ "origem_dos_vereditos": {
+  "real": 218,
+  "sintetico": 22
+ },
+ "uso_da_api": {
+  "chamadas": 98,
+  "falhas": 1
+ },
+ "aprovadas": 325,
+ "aprovadas_por_tarefa": {
+  "CHARADA": 107,
+  "VEREDITO": 173,
+  "PERGUNTA": 45
+ },
+ "conjuntos": {
+  "treino": 261,
+  "val": 32,
+  "teste": 32
+ },
+ "suficiente": false,
+ "motivos_de_insuficiencia": [
+  "PERGUNTA: 45 amostras < 60"
+ ],
+ "categorias_sem_charada": [
+  "cavalo",
+  "peixe",
+  "borboleta",
+  "chapéu",
+  "avião",
+  "fogueira",
+  "xícara de café",
+  "óculos"
+ ]
+}
