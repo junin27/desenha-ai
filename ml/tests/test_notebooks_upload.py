@@ -3,6 +3,7 @@
 import importlib.util
 import json
 import re
+import subprocess
 import sys
 import types
 from collections.abc import Callable
@@ -276,3 +277,28 @@ def test_checagem_de_gpu_mostra_o_diagnostico_do_nvidia_smi() -> None:
 
     assert "nvidia-smi" in conferencia and "subprocess" in conferencia
     assert "cota" in conferencia  # cita a cota diária como causa provável
+
+
+def test_checagem_de_gpu_nao_quebra_quando_o_nvidia_smi_nao_existe(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Achado no Colab (24/11): sem GPU o nvidia-smi nem existe e o subprocess levantava FileNotFoundError."""
+
+    def sem_nvidia_smi(*_argumentos: object, **_opcoes: object) -> None:
+        raise FileNotFoundError(2, "No such file or directory", "nvidia-smi")
+
+    monkeypatch.setattr(subprocess, "run", sem_nvidia_smi)
+    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    conferencia = next(c for c in celulas if "torch.cuda.is_available()" in c)
+    saida: list[str] = []
+
+    class FalsoTorch:
+        class cuda:  # noqa: N801 - imita o módulo torch.cuda
+            @staticmethod
+            def is_available() -> bool:
+                return False
+
+    monkeypatch.setitem(sys.modules, "torch", types.SimpleNamespace(cuda=FalsoTorch.cuda))
+    espaco: dict[str, object] = {"print": lambda *args: saida.append(" ".join(map(str, args)))}
+    with pytest.raises(RuntimeError, match="Sem GPU"):
+        exec(compile(conferencia, "celula", "exec"), espaco)
+
+    assert any("nvidia-smi" in linha and "não encontrado" in linha for linha in saida)

@@ -33,8 +33,12 @@ import subprocess
 import torch
 
 if not torch.cuda.is_available():
-    placa = subprocess.run(["nvidia-smi"], capture_output=True, text=True, check=False)
-    print("nvidia-smi:", (placa.stdout or placa.stderr or "comando não encontrado").strip()[:600])
+    try:
+        placa = subprocess.run(["nvidia-smi"], capture_output=True, text=True, check=False)
+        diagnostico = (placa.stdout or placa.stderr or "sem saída").strip()[:600]
+    except FileNotFoundError:  # sem GPU o Colab nem instala o nvidia-smi
+        diagnostico = "nvidia-smi: não encontrado (o Colab não alocou GPU)"
+    print(diagnostico)
     raise RuntimeError(
         "Sem GPU neste ambiente (veja o nvidia-smi acima: 'não encontrado' = o Colab não alocou GPU). "
         "Causas comuns: (1) você aceitou 'usar sem acelerador' no aviso de falta de GPU; (2) a cota de GPU do dia "
