@@ -1,0 +1,326 @@
+[
+ {
+  "texto": "Como a IA sabe o que eu desenhei?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é uma rede neural?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Você está conectado na internet?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é um Small Language Model?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é quantização?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Quem fez esse projeto?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é destilação de conhecimento?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Enquanto eu desenhava o trator naqueles 20 segundos, como o Zé do Rabisco e as redes neurais conseguiram adivinhar o que era?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Professor de computação, como as redes neurais por trás do Desenha Aí, Sô! processam o meu traço para saber o que eu desenhei?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é uma rede neural, explicando com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí de duas redes neurais adivinharem meu desenho na hora não é mágica não, né?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a acurácia da CNN (92,4%) e da LSTM (92,8%) diferem, e como a média ponderada do ensemble melhora o resultado final?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Avó, a senhora sabe me explicar o que faz a CNN e a LSTM serem tão diferentes na hora de olhar o meu desenho?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho, explicando em uma frase?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Estudante de medicina, como a LSTM consegue ler o desenho ponto a ponto e ter memória para adivinhar antes de eu acabar?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto eu desenhava o trator ali na mesa e o sistema respondia na hora, ele estava puxando dados da internet?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Professor, como esse sistema de inteligência artificial consegue rodar sem precisar de cabo de rede ou Wi-Fi aqui na feira?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quando o Zé do Rabisco inventou aquela charada sobre a fruta da roça, como um modelo pequeno conseguiu gerar isso sem travar?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí de o robozinho criar charadas e entender o desenho na hora não é mágica não, tem truque humano por trás?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto eu rabiscava correndo contra o cronômetro de 20 segundos, como vocês ensinaram a IA a adivinhar o traço ponto a ponto?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Menino, como foi que vocês ensinaram esse robozinho Zé do Rabisco a falar e inventar essas charadas da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Na hora que eu terminei de desenhar o chapéu e o placar deu o veredito instantâneo, como vocês reduziram o tamanho do modelo pra caber no notebook?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que significa dizer que a CNN enxerga o desenho em 28 por 28 pixels enquanto a LSTM lê a sequência dos traços?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador confunde vaca e cavalo, explicando como se eu tivesse 8 anos?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo, meu neto?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem fez esse projeto, respondendo em apenas uma frase?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Quem foi o criador deste projeto, colega professor de computação?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento, usando um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí de ensinar um modelo menor com um maior não é mágica não?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O Zé do Rabisco que gerou a minha charada de trator é igualzinho ao ChatGPT?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT, vovó?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto meus 20 segundos desenhando o trator esgotavam, como a CNN e a LSTM conseguiram adivinhar o rabisco em tempo real?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Netinho, enquanto eu desenhava o trator naqueles 20 segundos, como esse tal de Zé do Rabisco adivinhou o que era?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Agora há pouco, enquanto eu traçava o trator nos 20 segundos, como a CNN processou a imagem 28 por 28 e a LSTM leu ponto a ponto?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí de o sistema adivinhar meu trator antes mesmo de eu terminar o desenho nos 20 segundos não é mágica não, né?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto eu penava naquelas 20 segundos desenhando um trator da roça, como o ensemble tirou a média das probabilidades para acertar?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Ocê me garante que esse troço adivinhando o meu trator em 20 segundos é tecnologia e não feitiçaria lá da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a acurácia do ensemble de 94,7% supera a CNN de 92,4% e a LSTM de 92,8% na hora de dar o veredito?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Ô meu neto engenheiro, me explique como essas duas redes neurais adivinharam meu desenho na hora sem usar internet no notebook.",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Isso aí não é mágica não, né? Como duas redes neurais diferentes — uma que olha pixels e outra que lê traços passo a passo — conseguem combinar as probabilidades para acertar 94,7% sem trapacear?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a LSTM consegue adivinhar antes do desenho terminar, explicando com um exemplo prático da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí não é mágica não, né? Como é que a LSTM adivinha o que estou desenhando antes mesmo de eu soltar o lápis, se ela só lê a sequência ponto a ponto?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Do ponto de vista da arquitetura de redes recorrentes, como as portas de esquecer, entrada e saída da LSTM processam a ordem cronológica dos traços para antecipar o palpite antes do fim do desenho?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Estudante de medicina, como a destilação usando um modelo professor (Teacher) que gerou exemplos com raciocínio passo a passo permitiu que o Zé do Rabisco aprendesse imitá-lo?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto o sistema adivinhava meu traço, como a CNN de 28x28 pixels processa a imagem em comparação com a LSTM que lê a sequência ponto a ponto?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como produtor rural, fiquei curioso: essa IA que adivinha trator e frutas da roça usa dados da internet ou roda direto no navegador do notebook?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Professor, como esse modelo de IA roda sem internet aqui na feira? Explica usando um exemplo bem simples da roça.",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como a CNN e a LSTM combinam suas probabilidades através do ensemble para atingir aquela taxa de acerto de 94,7%?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como o Zé do Rabisco conseguiu criar a charada da fruta sem travar, usando quantização de 4 bits? Explica como se eu tivesse 8 anos.",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como estudante de medicina, quero entender: como o modelo Qwen3 de 1,7 bilhão de parâmetros foi destilado para rodar leve sem placa de vídeo?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como o ajuste com QLoRA e Unsloth altera apenas menos de 2% dos parâmetros, e por que isso difere de treinar o modelo inteiro do zero?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Vovó quer saber: como esse robozinho que cria charadas aprendeu a desenhar com o Google Quick, Draw! sem precisar de ajuda humana o tempo todo?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a LSTM consegue adivinhar o desenho antes de terminar usando memória ponto a ponto, enquanto a CNN precisa da imagem pronta em 28 por 28?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como a rede CNN processa as 30 categorias da base Google Quick, Draw! usando filtros convolucionais e blocos residuais?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Enquanto eu tentava adivinhar a charada do Zé do Rabisco no tempo de 20 segundos, como o modelo Qwen3 de 1,7 bilhão de parâmetros foi treinado para falar essas coisas da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como foi feita a destilação de conhecimento onde o modelo professor gerou exemplos passo a passo para o Zé aprender?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Explica como se eu tivesse 8 anos: como a quantização de 16 para 4 bits fez o modelo encolher de 3,4 GB para 1,1 GB para rodar no notebook?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí não é mágica não, né? Como os pesos do Zé do Rabisco foram espremidos para 4 bits em GGUF para rodar sem placa de vídeo?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Qual a diferença exata de arquitetura entre a CNN, que usa 680.062 parâmetros para imagens de 28x28 pixels, e a LSTM, com 666.238 parâmetros lendo sequências?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí não é mágica não, né? Como uma CNN consegue enxergar um desenho em 28 por 28 pixels e ainda acertar 92,4% das vezes?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador confunde vaca e cavalo, explicando como se eu tivesse 8 anos e com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que a LSTM consegue adivinhar o desenho antes dele terminar, explicando como se eu tivesse 8 anos?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo, meu neto, com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí de adivinhar o desenho na hora não é mágica não, meu neto?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem fez esse projeto, explicando qual é a diferença entre a CNN e a LSTM?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Esse jogo adivinha sozinho ou tem algum truque por trás, porque mágica não é, né?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem foi o criador deste projeto, já que acabei de ver o Zé do Rabisco criar uma charada aqui?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Quantos parâmetros tem a CNN e quantos tem a LSTM que rodam no navegador?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como o Zé do Rabisco aprendeu a imitar o modelo professor para gerar a charada de trator que acabei de desenhar?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Professor de computação, pode me explicar tecnicamente como funciona essa destilação de conhecimento usada no modelo do Zé do Rabisco?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como que esse modelo menor do Zé do Rabisco aprendeu tanto com o grandão só olhando os exemplos da charada que acabei de desenhar?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Professor de computação, como o modelo menor absorve o raciocínio do modelo professor por meio da destilação?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Explica em uma frase se o Zé do Rabisco, que inventou a minha charada de trator, é igualzinho ao ChatGPT.",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Esse Zé do Rabisco que inventou a minha charada de trator é tipo o ChatGPT ou tem gato nessas linhas de código?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Explica com um exemplo da roça se isso aí é o ChatGPT ou se roda direto no navegador.",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Essa LSTM que lê o desenho ponto a ponto funciona igualzinho ao ChatGPT?",
+  "evolucao": "in_breadth"
+ }
+]
