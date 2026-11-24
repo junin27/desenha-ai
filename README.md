@@ -71,6 +71,21 @@ ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epo
 3. Confira a linha **CRITÉRIO DE APROVAÇÃO** (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o Qwen3 base).
 4. Baixe do Drive (`desenha_ai_so/`) o `zedorabisco-1.7b-Q4_K_M.gguf` e o `metricas_slm.json`.
 
+## Como rodar a demo (estande, offline)
+
+**Antes do evento, com internet** (uma vez):
+
+```bash
+bash scripts/copiar_modelos.sh                 # redes e charadas de reserva para o jogo (ensaio ou zip do Colab)
+ml/.venv/Scripts/python scripts/preparar_demo.py --gguf-do-ze caminho/zedorabisco-1.7b-Q4_K_M.gguf
+```
+
+Sem `--gguf-do-ze` a demo entra no **modo ensaio** (o Qwen3 base ocupa a vaga do Zé; a janela avisa). O comando baixa o `llama-server` (llama.cpp `b12651`, ~25 MB) e o Qwen3-1.7B Q4_K_M (~1,1 GB), monta `demo/` e grava o `demo/manifesto.json` com tamanho e SHA-256 de cada arquivo. Repetir o comando não baixa de novo o que já está íntegro.
+
+**No evento, sem internet:** dê dois cliques em `Iniciar Desenha Aí.bat`. Ele sobe o Zé destilado na porta 8080 (que também serve o jogo), o Qwen3 base na 8081 se houver memória, espera os dois ficarem saudáveis e abre o jogo em tela cheia. Fechar a janela do terminal (ou Ctrl+C) encerra os servidores.
+
+**Antes de abrir o estande:** `Conferir Desenha Aí.bat` confere arquivos, portas, memória, voz pt-BR e uma fala real do Zé, e termina com "Pronto para o evento" ou "Não pronto". O que não dá para automatizar está em [`docs/checklist_evento.md`](docs/checklist_evento.md).
+
 ## Créditos e licenças
 
 - Desenhos: [Quick, Draw! Dataset](https://github.com/googlecreativelab/quickdraw-dataset), Google, licença [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Uma amostra de 90 desenhos está em `ml/tests/amostras/`.
