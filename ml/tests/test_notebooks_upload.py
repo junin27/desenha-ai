@@ -252,3 +252,18 @@ def test_notebook_3_importa_o_unsloth_antes_de_trl_e_transformers() -> None:
 
     assert celula.index("from unsloth import") < celula.index("from trl import")
     assert celula.index("from unsloth import") < celula.index("from datasets import")
+
+
+def test_notebook_3_ja_vem_configurado_para_a_rodada_completa() -> None:
+    """O ensaio foi feito em 24/11; o padrão agora é a rodada completa, que gera o GGUF do Zé."""
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+
+    assert re.search(r"^MODO_ENSAIO = False\b", codigo, flags=re.MULTILINE)
+
+
+def test_notebook_3_diz_no_fim_onde_estao_o_gguf_e_o_que_fazer_com_ele() -> None:
+    ultima = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")[-1]
+
+    assert "zedorabisco-1.7b-Q4_K_M.gguf" in ultima
+    assert "notebooks" in ultima and "resultados" in ultima  # onde colocar os arquivos baixados do Drive
+    assert "criterio.aprovado" in ultima  # avisa se o critério reprovou, para não seguir com um Zé fraco

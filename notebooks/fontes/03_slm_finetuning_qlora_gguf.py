@@ -19,9 +19,10 @@
 # (`prompt_qwen`, `avaliacao_do_ze`, `quantizacao`), testados e especificados no OpenSpec (`modelo-do-ze`). O prompt é o
 # **mesmo** que o jogo envia ao `llama-server` (contrato Python ↔ TypeScript).
 #
-# > **Antes de rodar:** GPU **T4**; envie ao painel *Arquivos* o `desenha_ml-*.whl`, o `dataset_slm.zip` (Parte 2) e o
-# > `modelos_redes.zip` (Parte 1). Rode **primeiro com `MODO_ENSAIO = True`** (≈ 10 min, testa todas as etapas) e só depois
-# > com `False` (≈ 40–60 min). Resultados do ensaio não valem para o critério de aprovação.
+# > **Antes de rodar:** GPU **T4** (ou L4). A célula de instalação abre um menu de upload para o `desenha_ml-*.whl`, o
+# > `dataset_slm.zip` (Parte 2) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
+# > (rodada completa, ≈ 40–60 min, gera o GGUF do Zé). O ensaio (`True`, ≈ 10 min) só testa as etapas e não vale para o
+# > critério de aprovação.
 
 # %% [markdown]
 # ## 0. Instalação e configuração
@@ -132,7 +133,7 @@ from desenha_ml.ficha_tecnica import montar_ficha
 from desenha_ml.prompt_qwen import INICIO_DA_RESPOSTA, PARADA, prompt_de_inferencia, texto_de_treino
 from desenha_ml.quantizacao import tabela_de_quantizacao
 
-MODO_ENSAIO = True                   # ← troque para False na rodada completa
+MODO_ENSAIO = False                  # False = rodada completa (gera o GGUF); True = só testa as etapas (~10 min)
 MODELO_BASE = "unsloth/Qwen3-1.7B"   # plano B mais rápido em CPU: "unsloth/Qwen3-0.6B" (D3 do design)
 MODELO_ORIGINAL = "Qwen/Qwen3-1.7B"  # para contar os parâmetros reais (o 4-bit empacota 2 pesos por byte)
 MAX_SEQ, TOKENS_NOVOS = 1024, 300
@@ -327,3 +328,18 @@ for nome in ("metricas_slm.json", "saidas_teste_base_vs_destilado.csv", "curvas_
     shutil.copy(SAIDA / nome, PASTA / (("ensaio_" if MODO_ENSAIO else "") + nome))
 print("Copiado para", PASTA, "→ baixe o .gguf pelo Drive (o download de > 1 GB pelo navegador costuma falhar).")
 baixar_com_menu(SAIDA / "metricas_slm.json")
+
+# %% [markdown]
+# ## 8. Próximos passos (fora do Colab)
+# 1. No Google Drive, pasta `desenha_ai_so/`, baixe `zedorabisco-1.7b-Q4_K_M.gguf` e `metricas_slm.json`
+#    (clique direito → Fazer download; o download direto de mais de 1 GB pelo notebook costuma falhar).
+# 2. Coloque os dois em `notebooks/resultados/` do projeto.
+# 3. Só siga para a demo se o critério acima disser **APROVADO**.
+
+# %%
+print("Rodada completa" if not MODO_ENSAIO else "ENSAIO (não gera o GGUF final)")
+print("Critério de aprovação:", "APROVADO" if criterio.aprovado else ("ENSAIO" if criterio.aprovado is None else "REPROVADO"), criterio.motivos)
+print("No Drive:", PASTA, "→ zedorabisco-1.7b-Q4_K_M.gguf e metricas_slm.json")
+print("Coloque os dois em notebooks/resultados/ do projeto e me avise.")
+if criterio.aprovado is False:
+    print("ATENÇÃO: critério REPROVADO. Não use este GGUF na demo; mande esta saída para ajustar o treino.")
