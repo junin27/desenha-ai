@@ -36,3 +36,6 @@ notebooks/resultados/**/*.gguf
 # Cópia do Drive do Colab: só o bruto do Teacher (artefatos/) é versionado; o resto já está em notebooks/resultados
 drive/dataset_ze/*
 !drive/dataset_ze/artefatos/
+
+# Pasta de conveniência para subir no Kaggle (cópias; fora do Git)
+kaggle_upload/
