@@ -28,12 +28,19 @@
 # ## 0. Instalação e configuração
 
 # %%
+import subprocess
+
 import torch
 
 if not torch.cuda.is_available():
+    placa = subprocess.run(["nvidia-smi"], capture_output=True, text=True, check=False)
+    print("nvidia-smi:", (placa.stdout or placa.stderr or "comando não encontrado").strip()[:600])
     raise RuntimeError(
-        "Sem GPU neste ambiente. Use Ambiente de execução → Alterar o tipo → T4 (ou L4) → Salvar, "
-        "e rode de novo. Não escolha 'sem acelerador': o fine-tuning precisa de GPU."
+        "Sem GPU neste ambiente (veja o nvidia-smi acima: 'não encontrado' = o Colab não alocou GPU). "
+        "Causas comuns: (1) você aceitou 'usar sem acelerador' no aviso de falta de GPU; (2) a cota de GPU do dia "
+        "acabou (volta em até 24 h); (3) alta demanda: tente em alguns minutos. Para tentar de novo: Ambiente de "
+        "execução → Desconectar e excluir ambiente de execução → Alterar o tipo → T4 (ou L4) → Salvar → Conectar, "
+        "e confira o T4/L4 no canto superior direito antes de rodar."
     )
 print("GPU:", torch.cuda.get_device_name(0))
 

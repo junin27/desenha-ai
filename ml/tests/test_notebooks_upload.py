@@ -267,3 +267,12 @@ def test_notebook_3_diz_no_fim_onde_estao_o_gguf_e_o_que_fazer_com_ele() -> None
     assert "zedorabisco-1.7b-Q4_K_M.gguf" in ultima
     assert "notebooks" in ultima and "resultados" in ultima  # onde colocar os arquivos baixados do Drive
     assert "criterio.aprovado" in ultima  # avisa se o critério reprovou, para não seguir com um Zé fraco
+
+
+def test_checagem_de_gpu_mostra_o_diagnostico_do_nvidia_smi() -> None:
+    """Sem GPU, o erro precisa mostrar o que o Colab realmente alocou (e não só mandar trocar o tipo)."""
+    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    conferencia = next(c for c in celulas if "torch.cuda.is_available()" in c)
+
+    assert "nvidia-smi" in conferencia and "subprocess" in conferencia
+    assert "cota" in conferencia  # cita a cota diária como causa provável
