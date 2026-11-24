@@ -302,3 +302,13 @@ def test_checagem_de_gpu_nao_quebra_quando_o_nvidia_smi_nao_existe(monkeypatch: 
         exec(compile(conferencia, "celula", "exec"), espaco)
 
     assert any("nvidia-smi" in linha and "não encontrado" in linha for linha in saida)
+
+
+def test_notebook_3_instala_o_wheel_sem_mexer_no_torch_e_confere_o_import() -> None:
+    """Achado no Colab (24/11, noite): `No module named 'desenha_ml'`; o `-q` escondia o motivo."""
+    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    instalacao = next(c for c in celulas if "desenha_ml-*.whl" in c and "RODA" in c)
+
+    assert "--no-deps" in instalacao  # só precisa do numpy; o pip não deve mexer no torch do Unsloth
+    assert "-q " not in instalacao  # o erro do pip tem de aparecer
+    assert 'import_module("desenha_ml")' in instalacao  # falha aqui, com mensagem clara

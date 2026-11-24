@@ -121,7 +121,19 @@ def baixar_com_menu(caminho):
 # %%
 exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip")
 RODA = glob.glob("/content/desenha_ml-*.whl")
-%pip install -q "{RODA[0]}"
+# --no-deps: o desenha_ml só precisa do numpy (já instalado); assim o pip não mexe no torch que o Unsloth instalou.
+%pip install --no-deps --force-reinstall "{RODA[0]}"
+
+import importlib
+
+importlib.invalidate_caches()
+try:
+    importlib.import_module("desenha_ml")
+except ModuleNotFoundError as erro:
+    raise RuntimeError(
+        "O desenha_ml não foi instalado (veja a saída do pip acima). Rode esta célula de novo; se persistir, "
+        "Ambiente de execução → Reiniciar sessão e rode o notebook desde a célula 'Instalação'."
+    ) from erro
 
 # %%
 from unsloth import FastLanguageModel  # antes de trl, transformers e peft, ou perde otimizações
