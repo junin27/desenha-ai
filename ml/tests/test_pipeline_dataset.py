@@ -1,9 +1,10 @@
 """Pipeline do dataset de ponta a ponta com o Teacher de ensaio (sem rede)."""
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
-from desenha_ml.pipeline_dataset import gerar_dataset
+from desenha_ml.pipeline_dataset import gerar_dataset, gerar_dataset_ate_suficiente
 from desenha_ml.teacher_de_ensaio import TeacherDeEnsaio
 
 
@@ -61,3 +62,57 @@ def test_teacher_de_ensaio_le_os_nomes_do_top5_sem_virgula() -> None:
     assert isinstance(resposta, dict)
     # o 1º item é errado de propósito (ERRO_A_CADA); o 2º tem de seguir a regra: cavalo em 2º lugar = QUASE
     assert "VEREDITO: QUASE" in resposta["exemplos"][1]
+
+
+@dataclass
+class TeacherInstavel(TeacherDeEnsaio):
+    """Falha em todos os lotes enquanto `falhando`; a evolução das perguntas ("Original:") sempre responde."""
+
+    falhando: bool = True
+
+    def gerar(self, prompt: str, temperatura: float) -> object | None:
+        if self.falhando and "Original:" not in prompt:
+            self.chamadas += 1
+            return None
+        return super().gerar(prompt, temperatura)
+
+
+def test_teacher_instavel_na_primeira_passada_e_refeito_na_segunda(tmp_path: Path) -> None:
+    """Achado no Colab: lotes sem resposta ficavam vazios para sempre; agora a 2ª passada os refaz."""
+    teacher = TeacherInstavel()
+    passadas_iniciadas = 0
+
+    def registrar(mensagem: str) -> None:
+        nonlocal passadas_iniciadas
+        if "lotes" in mensagem and "pedidos" in mensagem:
+            passadas_iniciadas += 1
+            teacher.falhando = passadas_iniciadas == 1
+
+    resultado = gerar_dataset_ate_suficiente(
+        teacher=teacher, predicoes=PREDICOES, metricas_redes=None, pasta=tmp_path, registrar=registrar
+    )
+
+    assert resultado.passadas == 2
+    aprovadas = resultado.relatorio["aprovadas"]
+    assert isinstance(aprovadas, int) and aprovadas > 0
+
+
+def test_sem_lote_incompleto_a_geracao_para_na_primeira_passada(tmp_path: Path) -> None:
+    teacher = TeacherDeEnsaio()
+
+    resultado = gerar_dataset_ate_suficiente(
+        teacher=teacher, predicoes=PREDICOES, metricas_redes=None, pasta=tmp_path, registrar=lambda _: None
+    )
+
+    assert resultado.relatorio["suficiente"] is False  # o Teacher de ensaio usa modelos fixos
+    assert resultado.passadas == 1
+
+
+def test_teacher_que_nunca_responde_nao_gira_em_falso(tmp_path: Path) -> None:
+    teacher = TeacherInstavel()
+
+    resultado = gerar_dataset_ate_suficiente(
+        teacher=teacher, predicoes=PREDICOES, metricas_redes=None, pasta=tmp_path, registrar=lambda _: None
+    )
+
+    assert resultado.passadas == 2  # a 2ª passada não aumentou as aprovadas (0 → 0): para sem gastar as 3

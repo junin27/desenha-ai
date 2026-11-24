@@ -112,7 +112,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from google.colab import drive, userdata
 
-from desenha_ml.pipeline_dataset import gerar_dataset
+try:
+    from desenha_ml.pipeline_dataset import gerar_dataset_ate_suficiente
+except ImportError as erro:  # wheel antigo ainda carregado na memória do Colab
+    raise RuntimeError("Pacote antigo carregado: use Ambiente de execução → Reiniciar sessão e rode a célula 0 de novo.") from erro
 from desenha_ml.teacher import TeacherComCuidados
 from desenha_ml.teacher_apis import chamada_gemini, chamada_groq
 
@@ -137,12 +140,13 @@ print(len(predicoes), "predições reais das redes · acurácias de teste:", {k:
 
 # %% [markdown]
 # ## 2. Geração, curadoria e exportação
-# O *checkpoint* fica no Drive: se a sessão cair, rodar esta célula de novo continua de onde parou, sem refazer chamadas.
+# O *checkpoint* fica no Drive: se a sessão cair, rodar esta célula de novo continua de onde parou, sem refazer chamadas. Lotes que
+# voltaram vazios são pedidos de novo (até 3 passadas, parando se não houver progresso).
 
 # %%
 drive.mount("/content/drive")
 PASTA = Path("/content/drive/MyDrive/desenha_ai_so/dataset_ze")
-resultado = gerar_dataset(teacher=teacher, predicoes=predicoes, metricas_redes=metricas, pasta=PASTA)
+resultado = gerar_dataset_ate_suficiente(teacher=teacher, predicoes=predicoes, metricas_redes=metricas, pasta=PASTA)
 relatorio = resultado.relatorio
 print(json.dumps({k: relatorio[k] for k in ("pedidos", "respostas", "aprovadas", "aprovadas_por_tarefa", "suficiente",
                   "motivos_de_insuficiencia", "categorias_sem_charada", "uso_da_api")}, ensure_ascii=False, indent=1))

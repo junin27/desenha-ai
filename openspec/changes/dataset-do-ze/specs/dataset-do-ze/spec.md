@@ -38,6 +38,17 @@ Ao retomar a geração, um lote com alguma amostra sem saída (falha total ou re
 - **WHEN** a geração termina com 3 lotes, o segundo sem saída, e é executada de novo
 - **THEN** só o segundo lote é pedido ao Teacher, seus registros vazios são substituídos pelos novos e o checkpoint não tem linhas duplicadas
 
+### Requirement: Passadas até o dataset ficar suficiente
+A geração SHALL poder repetir a passada completa (pedir de novo só os lotes incompletos e curar outra vez) até o dataset ficar suficiente, no máximo 3 passadas, e SHALL parar antes se não houver lote incompleto a refazer ou se uma passada não aumentar o número de amostras aprovadas.
+
+#### Scenario: Teacher instável na primeira passada
+- **WHEN** o Teacher falha em todos os lotes da 1ª passada e responde na 2ª
+- **THEN** a 2ª passada refaz os lotes, aprova amostras e a geração para ali, por não haver mais lote incompleto
+
+#### Scenario: Nada a refazer
+- **WHEN** a 1ª passada não deixa nenhum lote incompleto, mas o dataset segue insuficiente
+- **THEN** a geração para na 1ª passada, sem chamar o Teacher de novo
+
 ### Requirement: Filtros comuns da curadoria
 Toda amostra SHALL ser rejeitada, com o primeiro código aplicável, se: não tiver saída (`vazia`); falhar na leitura da fala da spec `conversa-com-o-ze` (`formato_invalido`); contiver recusa do tipo "como uma IA" ou "não posso" (`recusa`); ou tiver o pensamento fora de 12 a 90 palavras (`tamanho_pensamento`).
 

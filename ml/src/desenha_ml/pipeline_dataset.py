@@ -26,6 +26,7 @@ from desenha_ml.geracao_dataset import (
 from desenha_ml.teacher import Lote, RegistroBruto, Teacher, executar_lotes
 
 GERACOES_DE_EVOLUCAO = 2
+PASSADAS_MAXIMAS = 3
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class ResultadoDoDataset:
     relatorio: dict[str, Json]
     curadoria: ResultadoDaCuradoria
     brutos: list[RegistroBruto]
+    passadas: int = 1
 
 
 def gerar_dataset(  # noqa: PLR0913 - entradas do pipeline, todas nomeadas
@@ -57,6 +59,39 @@ def gerar_dataset(  # noqa: PLR0913 - entradas do pipeline, todas nomeadas
     relatorio = exportar_dataset(curadoria.aprovadas, pasta, semente, base)
     registrar(f"aprovadas: {relatorio['aprovadas']} | suficiente: {relatorio['suficiente']}")
     return ResultadoDoDataset(relatorio, curadoria, brutos)
+
+
+def gerar_dataset_ate_suficiente(  # noqa: PLR0913 - mesmas entradas de gerar_dataset, todas nomeadas
+    *,
+    teacher: Teacher,
+    predicoes: Sequence[Mapping[str, object]],
+    metricas_redes: Mapping[str, object] | None,
+    pasta: Path,
+    semente: int = 42,
+    registrar: Callable[[str], None] = print,
+    passadas_maximas: int = PASSADAS_MAXIMAS,
+) -> ResultadoDoDataset:
+    """Repete `gerar_dataset` (que só refaz lotes incompletos) até o dataset ficar suficiente.
+
+    Para antes se não houver lote incompleto (nada a refazer) ou se a passada não aumentou as aprovadas.
+    """
+    anterior = -1
+    for passada in range(1, passadas_maximas + 1):
+        resultado = gerar_dataset(
+            teacher=teacher,
+            predicoes=predicoes,
+            metricas_redes=metricas_redes,
+            pasta=pasta,
+            semente=semente,
+            registrar=registrar,
+        )
+        aprovadas = len(resultado.curadoria.aprovadas)
+        incompletos = any(registro["saida"] is None for registro in resultado.brutos)
+        if resultado.relatorio["suficiente"] or not incompletos or aprovadas <= anterior:
+            return ResultadoDoDataset(resultado.relatorio, resultado.curadoria, resultado.brutos, passada)
+        registrar(f"passada {passada}: ainda insuficiente; refazendo os lotes incompletos")
+        anterior = aprovadas
+    return ResultadoDoDataset(resultado.relatorio, resultado.curadoria, resultado.brutos, passadas_maximas)
 
 
 def _perguntas(teacher: Teacher, ficha: str, semente: int, pasta: Path) -> list[Pergunta]:
