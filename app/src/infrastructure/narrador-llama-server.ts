@@ -20,7 +20,9 @@ export interface ConfiguracaoDoNarrador {
 
 const CONFIGURACAO_PADRAO: ConfiguracaoDoNarrador = { endereco: "http://127.0.0.1:8080", limiteMs: 25_000 };
 const MAXIMO_DE_TOKENS_NOVOS = 300;
-const TEMPERATURA = 0.7;
+// Medido com o Zé treinado (design D8): 0,3 + penalidade 1,1 evita o laço da geração gulosa e erra menos o veredito.
+const TEMPERATURA = 0.3;
+const PENALIDADE_DE_REPETICAO = 1.1;
 
 /**
  * Zé rodando no `llama-server` (D5 do design): pedido com *streaming*, leitura parcial a cada pedaço e
@@ -92,6 +94,7 @@ function corpoDoPedido(entrada: string): Record<string, unknown> {
     stop: [PARADA],
     stream: true,
     temperature: TEMPERATURA,
+    repeat_penalty: PENALIDADE_DE_REPETICAO,
     // Reaproveita o prefixo do system prompt entre pedidos: menos latência em CPU (D5).
     cache_prompt: true,
   };

@@ -61,7 +61,8 @@ CHAVES_DE_VOZES = (
     r"SOFTWARE\Microsoft\Speech_OneCore\Voices\Tokens",
     r"SOFTWARE\Microsoft\Speech\Voices\Tokens",
 )
-TEMPERATURA_DA_CHARADA = 0.7  # a mesma do jogo (narrador-llama-server.ts)
+TEMPERATURA_DA_CHARADA = 0.3  # a mesma do jogo (narrador-llama-server.ts)
+PENALIDADE_DE_REPETICAO = 1.1  # idem
 ACAO_REFAZER = "rode a preparação de novo"
 SEGUNDOS_MAXIMOS_DO_PEDIDO = 60
 SEGUNDOS_DA_CONEXAO = 0.5
@@ -122,6 +123,7 @@ def corpo_do_pedido_da_charada() -> str:
             "stop": [PARADA],
             "stream": False,
             "temperature": TEMPERATURA_DA_CHARADA,
+            "repeat_penalty": PENALIDADE_DE_REPETICAO,
         }
     )
 

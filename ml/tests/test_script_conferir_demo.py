@@ -92,6 +92,14 @@ def test_pedido_da_charada_usa_o_prompt_do_qwen_e_a_parada() -> None:
     assert corpo["n_predict"] == 300
 
 
+def test_pedido_da_charada_gera_como_o_jogo() -> None:
+    """A fala real do checklist usa a mesma geração do jogo (jogo-web D8: 0,3 e penalidade 1,1)."""
+    corpo = json.loads(_carregar_script().corpo_do_pedido_da_charada())
+
+    assert corpo["temperature"] == 0.3
+    assert corpo["repeat_penalty"] == 1.1
+
+
 def test_pedir_charada_sem_servidor_devolve_none(tmp_path: Path) -> None:
     script = _carregar_script()
 
