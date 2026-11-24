@@ -19,7 +19,7 @@
 
 ## 4. Notebook 3
 
-- [x] 4.1 Reescrever `notebooks/fontes/03_slm_finetuning_zedorabisco_v4.py` só orquestrando (modo ensaio, Unsloth, conferência do *loss masking*, avaliação base × destilado, perplexidade, GGUF, tabela, artefatos no Drive) e regenerar o `.ipynb`; nenhuma função de regra nas células
+- [x] 4.1 Reescrever `notebooks/fontes/03_slm_finetuning_zedorabisco_v5.py` só orquestrando (modo ensaio, Unsloth, conferência do *loss masking*, avaliação base × destilado, perplexidade, GGUF, tabela, artefatos no Drive) e regenerar o `.ipynb`; nenhuma função de regra nas células
 - [x] 4.2 Regenerar o wheel e documentar no README o passo a passo do notebook 3 (modo ensaio primeiro)
 
 ## 5. Verificação final

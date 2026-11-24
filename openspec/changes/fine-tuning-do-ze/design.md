@@ -2,7 +2,7 @@
 
 ## Context
 
-O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v4.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
+O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v5.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
 
 ## Goals / Non-Goals
 
@@ -40,7 +40,7 @@ A tabela de quantização usa o total de parâmetros medido, e não um número e
 `gerar_respostas` (laço de geração em lote na GPU) é a única função definida no notebook 3: é infraestrutura de inferência com o modelo do Unsloth, sem regra; toda decisão (formato, tarefa, critério, quantização) vem do pacote.
 
 ### D5 — Exportação
-`save_pretrained_gguf(..., quantization_method=["q4_k_m", "q8_0"])`, copiado para o Drive (`MyDrive/desenha_ai_so/`), porque o download direto de mais de 1 GB pelo navegador costuma falhar. O Q8_0 serve só para a tabela (comparação real de tamanho); o evento usa o Q4_K_M.
+`save_pretrained_gguf(..., quantization_method=["q4_k_m", "q8_0"])`. Entrega por download, sem Drive (pedido do usuário em 24/11/2026): os resultados pequenos num `resultados_ze.zip` e o GGUF numa célula própria, que pode ser repetida se o navegador interromper o download de ~1,1 GB. O Q8_0 serve só para a tabela (comparação real de tamanho); o evento usa o Q4_K_M.
 
 ## Risks / Trade-offs
 

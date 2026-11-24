@@ -329,17 +329,16 @@ quantizacao = tabela_de_quantizacao(N_PARAMETROS, tamanhos)
 display(pd.DataFrame([vars(linha) for linha in quantizacao]).style.format(precision=3, na_rep="—"))
 
 # %% [markdown]
-# ## 7. Artefatos no Drive
+# ## 7. Downloads (sem Drive)
+#
+# Os resultados pequenos saem num zip só; o GGUF (~1,1 GB) sai na célula seguinte, sozinho, para você poder rodar
+# só ela de novo se o navegador interromper o download (o arquivo fica no Colab enquanto a sessão estiver aberta).
 
 # %%
-from google.colab import drive, files
-
-drive.mount("/content/drive")
-PASTA = Path("/content/drive/MyDrive/desenha_ai_so")
-PASTA.mkdir(parents=True, exist_ok=True)
 q4 = next(g for g in arquivos_gguf if "Q4_K_M" in Path(g).name.upper())
+GGUF_DO_ZE = SAIDA / "zedorabisco-1.7b-Q4_K_M.gguf"
 if not MODO_ENSAIO:
-    shutil.copy(q4, PASTA / "zedorabisco-1.7b-Q4_K_M.gguf")
+    shutil.copy(q4, GGUF_DO_ZE)
 metricas = {
     "ensaio": MODO_ENSAIO, "modelo_base": MODELO_BASE, "parametros": N_PARAMETROS,
     "lora": {"r": 16, "alpha": 16, "treinaveis": TREINAVEIS, "percentual": 100 * TREINAVEIS / N_PARAMETROS},
@@ -354,22 +353,30 @@ pd.DataFrame({"tarefa": [e["tarefa"] for e in exemplos_de_teste], "entrada": [e[
               "base": respostas_base, "destilado": respostas_destilado,
               "base_ok": [a.tarefa_ok for a in avaliadas_base], "destilado_ok": [a.tarefa_ok for a in avaliadas_destilado]}
              ).to_csv(SAIDA / "saidas_teste_base_vs_destilado.csv", index=False)
-for nome in ("metricas_slm.json", "saidas_teste_base_vs_destilado.csv", "curvas_sft.png", "base_vs_destilado.png"):
-    shutil.copy(SAIDA / nome, PASTA / (("ensaio_" if MODO_ENSAIO else "") + nome))
-print("Copiado para", PASTA, "→ baixe o .gguf pelo Drive (o download de > 1 GB pelo navegador costuma falhar).")
-baixar_com_menu(SAIDA / "metricas_slm.json")
+ZIP_DOS_RESULTADOS = SAIDA / ("ensaio_resultados_ze.zip" if MODO_ENSAIO else "resultados_ze.zip")
+with zipfile.ZipFile(ZIP_DOS_RESULTADOS, "w", zipfile.ZIP_DEFLATED) as arquivo_zip:
+    for nome in ("metricas_slm.json", "saidas_teste_base_vs_destilado.csv", "curvas_sft.png", "base_vs_destilado.png"):
+        arquivo_zip.write(SAIDA / nome, nome)
+baixar_com_menu(ZIP_DOS_RESULTADOS)
+
+# %%
+# Download do GGUF do Zé (~1,1 GB, alguns minutos). Se falhar, rode só esta célula de novo.
+if MODO_ENSAIO:
+    print("Ensaio: o GGUF não é baixado (só a rodada completa gera o Zé final).")
+else:
+    baixar_com_menu(GGUF_DO_ZE)
 
 # %% [markdown]
 # ## 8. Próximos passos (fora do Colab)
-# 1. No Google Drive, pasta `desenha_ai_so/`, baixe `zedorabisco-1.7b-Q4_K_M.gguf` e `metricas_slm.json`
-#    (clique direito → Fazer download; o download direto de mais de 1 GB pelo notebook costuma falhar).
-# 2. Coloque os dois em `notebooks/resultados/` do projeto.
+# 1. Baixe também este notebook já rodado (*Arquivo → Fazer download → .ipynb*).
+# 2. Crie uma pasta em `notebooks/resultados/` do projeto e coloque nela o `resultados_ze.zip`, o
+#    `zedorabisco-1.7b-Q4_K_M.gguf` e o notebook rodado.
 # 3. Só siga para a demo se o critério acima disser **APROVADO**.
 
 # %%
 print("Rodada completa" if not MODO_ENSAIO else "ENSAIO (não gera o GGUF final)")
 print("Critério de aprovação:", "APROVADO" if criterio.aprovado else ("ENSAIO" if criterio.aprovado is None else "REPROVADO"), criterio.motivos)
-print("No Drive:", PASTA, "→ zedorabisco-1.7b-Q4_K_M.gguf e metricas_slm.json")
-print("Coloque os dois em notebooks/resultados/ do projeto e me avise.")
+print("Baixados: resultados_ze.zip e zedorabisco-1.7b-Q4_K_M.gguf (mais o notebook: Arquivo → Fazer download).")
+print("Coloque os três numa pasta em notebooks/resultados/ do projeto e me avise.")
 if criterio.aprovado is False:
     print("ATENÇÃO: critério REPROVADO. Não use este GGUF na demo; mande esta saída para ajustar o treino.")

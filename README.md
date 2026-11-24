@@ -69,7 +69,7 @@ ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epo
 1. (Opcional, já feito em 24/11) `MODO_ENSAIO = True` (≈ 10 min): testa todas as etapas, inclusive a exportação GGUF.
 2. O notebook já vem em `MODO_ENSAIO = False`: rode a rodada completa (≈ 40–60 min).
 3. Confira a linha **CRITÉRIO DE APROVAÇÃO** (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o Qwen3 base).
-4. Baixe do Drive (`desenha_ai_so/`) o `zedorabisco-1.7b-Q4_K_M.gguf` e o `metricas_slm.json`.
+4. O notebook baixa o `resultados_ze.zip` (métricas, saídas do teste e gráficos) e o `zedorabisco-1.7b-Q4_K_M.gguf`; se o download do GGUF falhar, rode de novo só a célula dele.
 
 ## Como rodar a demo (estande, offline)
 
