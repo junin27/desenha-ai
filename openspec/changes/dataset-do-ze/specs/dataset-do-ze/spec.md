@@ -25,11 +25,14 @@ A geração SHALL pedir ao Teacher: para CHARADA, as 30 categorias × 3 níveis 
 - **THEN** há 12 sementes, 24 perguntas da 1ª geração e 48 da 2ª, cada uma marcada como `seed`, `in_depth` ou `in_breadth`
 
 ### Requirement: Chamadas ao Teacher com checkpoint
-Cada lote SHALL ser gravado num arquivo de *checkpoint* assim que responder; ao reiniciar, lotes já gravados SHALL ser pulados. Chamadas SHALL respeitar um intervalo mínimo entre elas e tentar de novo com espera crescente (até 5 tentativas). Um lote que falhar em todas as tentativas SHALL ser gravado sem saída, e suas amostras são rejeitadas como `vazia` na curadoria. Ao retomar, um lote com alguma amostra sem saída (falha total ou resposta com menos exemplos que o pedido) SHALL ser pedido de novo e seus registros antigos substituídos, sem duplicar os lotes completos.
+Cada lote SHALL ser gravado num arquivo de *checkpoint* assim que responder; ao reiniciar, lotes já gravados SHALL ser pulados. Chamadas SHALL respeitar um intervalo mínimo entre elas e tentar de novo com espera crescente (até 5 tentativas). Um lote que falhar em todas as tentativas SHALL ser gravado sem saída, e suas amostras são rejeitadas como `vazia` na curadoria.
 
 #### Scenario: Retomada sem repetir chamadas
 - **WHEN** a geração é interrompida depois de 30 lotes e executada de novo
 - **THEN** os 30 lotes gravados não são pedidos de novo ao Teacher
+
+### Requirement: Retomada refaz lotes incompletos
+Ao retomar a geração, um lote com alguma amostra sem saída (falha total ou resposta com menos exemplos que o pedido) SHALL ser pedido de novo e seus registros antigos substituídos, sem duplicar os lotes completos.
 
 #### Scenario: Retomada refaz o que ficou vazio
 - **WHEN** a geração termina com 3 lotes, o segundo sem saída, e é executada de novo
