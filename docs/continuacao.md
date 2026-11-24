@@ -1,6 +1,6 @@
 # Continuação do trabalho (handoff entre sessões do Claude Code)
 
-Atualizado em 23/11/2026, ao fim da sessão que implementou a `demo-offline` (depois da `jogo-web` e da `bancada-do-ze`). Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
+Atualizado em 24/11/2026 (tarde), ao fim da sessão que implementou a `demo-offline` e rodou os notebooks 1 e 2 e o ensaio do 3 no Colab. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
 
 ## Quem é o usuário e o que ele espera (antes só na memória local do Claude)
 
@@ -8,7 +8,9 @@ Atualizado em 23/11/2026, ao fim da sessão que implementou a `demo-offline` (de
 - Também é **projeto de portfólio** (LinkedIn): precisa parecer profissional. Ele quer nota alta nas duas matérias, principalmente em SLM.
 - Exige: **SDD com OpenSpec** (spec aprovada por ele antes do código), **TDD** (teste falhando antes do código), arquitetura **hexagonal** no app e **núcleo funcional** testado no Python, contratos Python ↔ TypeScript e commits pequenos com o porquê no corpo. Ele interrompeu uma sessão que foi direto ao código sem spec, então **nunca pule a aprovação**.
 - Antes de implementar, confirme o entendimento em 2 a 3 linhas. Converse em **português**.
-- Remoto: `https://github.com/junin27/desenha-ai` (branch `main`). **Push só quando ele pedir.**
+- Remoto: `https://github.com/junin27/desenha-ai` (branch `main`). **Ele pediu que o GitHub fique sempre atualizado:** depois de cada commit com `bash scripts/verificar.sh` verde, `git push origin main`, sem `--force`. **Nunca encadeie commit e push depois de um `verificar.sh` que falhou** (aconteceu duas vezes nesta sessão e foi corrigido).
+- **Só o Colab** para treinar (ele descartou o Kaggle depois de eu adaptar o notebook; a adaptação foi revertida em `0065517`). Baixar arquivos exige o OK dele antes (nome, origem e tamanho).
+- Ele fala pouco e direto; espera que eu faça de ponta a ponta, teste de verdade (navegador, servidores reais) e diga com franqueza o que não consegui provar.
 
 ## Estado das changes (OpenSpec)
 
@@ -29,8 +31,9 @@ Para retomar, a próxima sessão deve: ler os arquivos acima, rodar `git log --o
 ```bash
 git clone https://github.com/junin27/desenha-ai.git && cd desenha-ai
 python -m venv ml/.venv            # Python >= 3.11
-ml/.venv/Scripts/python -m pip install -e "ml[dev]"        # Linux/macOS: ml/.venv/bin/python
-npm --prefix app install
+ml/.venv/Scripts/python -m pip install -e "ml[dev,treino]"  # o mypy precisa do torch/onnx do extra treino; Linux/macOS: ml/.venv/bin/python
+cd app && npm install && cd ..       # `npm --prefix app` falha no Git Bash do Windows
+git config core.autocrlf false        # o Git for Windows vem com true e o Prettier reprova CRLF
 npm install -g @fission-ai/openspec   # CLI do OpenSpec (openspec validate/list/instructions)
 bash scripts/verificar.sh             # tem de terminar com "OK: verificação completa passou."
 ```
@@ -69,3 +72,19 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - **Versionado** (para recomeçar em outra máquina): código, specs, notebooks (`.ipynb` já com menu de upload, botão "Salvar como", checagem de GPU e correção do `warmup_ratio`), `notebooks/resultados/` (redes ONNX treinadas, `modelos_redes.zip`, `dataset_slm.zip`, métricas, figuras) e o bruto do Teacher em `drive/dataset_ze/artefatos/`.
 - **Fora do Git** (refazer ou baixar): `ml/dist/*.whl` (`ml/.venv/Scripts/python -m build --wheel ml`), `demo/` (`scripts/preparar_demo.py`), `saida/`, `ml/.venv`, `app/node_modules` e qualquer `*.gguf`. O GGUF do Zé treinado ainda não existe: sai da rodada completa do notebook 3, no Drive.
 - Notebook 1 e 2 estão concluídos; falta só a rodada completa do notebook 3, depois a demo com o Zé treinado, o banner e o pitch (`docs/banner.md` e `docs/pitch.md` ainda não existem).
+
+## Estado ao fim de 24/11/2026 (tarde) e o que falta
+
+- **Concluído:** `jogo-web`, `bancada-do-ze`, `demo-offline` (11/11) e notebooks 1 e 2 (redes 94,7%; dataset suficiente com 455 amostras). O ensaio do notebook 3 passou (10 passos).
+- **Bloqueio atual:** a **rodada completa do notebook 3** precisa de GPU, e o Colab não alocou T4/L4 (cota diária ou demanda: "Nenhum back-end com GPU disponível"; o `nvidia-smi` nem existe). Tentar de manhã cedo, ou Colab Pro. **Não aceitar "usar sem acelerador".** O notebook já vem em `MODO_ENSAIO = False`, abre menu de upload (`.whl`, `modelos_redes.zip`, `dataset_slm.zip`), confere a GPU na primeira célula e termina com o critério de aprovação (APROVADO/REPROVADO) e onde pegar o GGUF no Drive (`desenha_ai_so/`). Os arquivos de entrada estão no Git: `ml/dist` (gerar com `python -m build --wheel ml`), `notebooks/resultados/modelos_redes/modelos_redes.zip` e `notebooks/resultados/dataset_slm/dataset_slm.zip`.
+- **Depois do GGUF** (colocar em `notebooks/resultados/` com o `metricas_slm.json`): `bash scripts/copiar_modelos.sh notebooks/resultados/modelos_redes ...`, `ml/.venv/Scripts/python scripts/preparar_demo.py --gguf-do-ze <gguf>`, ensaio real da demo (portas 8080/8081; um Apache do EDB PEM ocupa a 8080 na máquina dele, ver `docs/checklist_evento.md`), voltar a exigir o formato do Zé (✗ fora do modo ensaio), conferir o limite de 25 s por fala, arquivar as 6 changes (`/openspec-archive-change`).
+- **Sem GPU também dá para:** escrever `docs/banner.md`, `docs/pitch.md` (não existem) e o texto do cadastro do título/escopo (**até 27/11**). Ensaio geral da demo em 29/11; evento em 30/11.
+- **Opcional:** portas configuráveis da demo (muda a spec), capturas a 1366×768 da demo.
+
+## Armadilhas novas (24/11/2026)
+
+- `verificar.sh` falha no `openspec validate` se um requisito tiver mais de 500 caracteres: separe em requisitos menores.
+- Um `sed -i 'Ns/.*/.../'` por número de linha já trocou a linha errada (derrubou uma asserção); prefira substituição por texto exato e rode os testes.
+- O ruff formata depois de você editar: releia o trecho antes de uma substituição por texto.
+- O Colab novo removeu `warmup_ratio` do `SFTConfig` (o notebook escolhe `warmup_ratio` ou `warmup_steps` pelos campos) e o Unsloth quer ser importado antes de trl/transformers/peft.
+- `git status` pode listar centenas de arquivos como modificados por *cache* de `stat` depois de normalizar fim de linha; confirme com `git diff --stat` e `git diff --ignore-cr-at-eol`.
