@@ -2,7 +2,7 @@
 
 ## Context
 
-O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v3.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
+O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v4.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
 
 ## Goals / Non-Goals
 
@@ -29,7 +29,8 @@ A curadoria já decide, para uma fala, o primeiro código de rejeição. A avali
 - **Alternativa descartada:** métricas próprias no notebook (era o rascunho; divergiria da curadoria).
 
 ### D3 — Configuração do treino (sem busca)
-Qwen3-1.7B (`unsloth/Qwen3-1.7B`) em 4 bits NF4; LoRA r = 16, α = 16, dropout 0 em `q,k,v,o,gate,up,down`; 3 épocas; lr 2e-4 cosseno com 5% de aquecimento; lote efetivo 16 (4 × 4 de acumulação); `adamw_8bit`; avaliação na validação a cada 10 passos. Geração da avaliação: gulosa (`do_sample=False`), até 300 tokens novos. Modo ensaio: `max_steps=10` e 15 exemplos de teste.
+Qwen3-1.7B (`unsloth/Qwen3-1.7B`) em 4 bits NF4; LoRA r = 16, α = 16, dropout 0 em `q,k,v,o,gate,up,down`; 5 épocas (eram 3; ver abaixo); `packing=False`; lr 2e-4 cosseno com 5% de aquecimento; lote efetivo 16 (4 × 4 de acumulação); `adamw_8bit`; avaliação na validação a cada 10 passos. Geração da avaliação: gulosa (`do_sample=False`), até 300 tokens novos. Modo ensaio: `max_steps=10` e 15 exemplos de teste.
+- **Rodadas de 24/11/2026:** com o *packing* que o Unsloth liga por padrão, 363 conversas viravam 110 linhas e o Zé não aprendia a parar (formato 33%); com `packing=False` (rodada v3, 69 passos) a perplexidade foi a 5,38 e o teste guloso deu formato 87%, CHARADA 50%, VEREDITO 86%, PERGUNTA 100%, ainda reprovado. As falhas: laço "o que é, o que é…" e palavra vazada na charada, e QUASE trocado por ACERTOU/ERROU no veredito. Como a perplexidade de validação ainda caía no fim, a próxima rodada passa a **5 épocas** (uma variável por vez, decisão do usuário).
 - **Alternativa descartada:** Qwen3-0.6B. É mais rápido em CPU, mas tem menos capacidade de seguir o formato; fica como plano B se a latência no evento for ruim (troca só uma constante).
 
 ### D4 — Número de parâmetros medido, não fixado (revisado na implementação)

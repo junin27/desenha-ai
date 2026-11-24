@@ -248,7 +248,7 @@ AQUECIMENTO = {CHAVE_DO_AQUECIMENTO: 0.05}
 trainer = SFTTrainer(
     model=model, tokenizer=tokenizer, train_dataset=ds_treino, eval_dataset=ds_validacao,
     args=SFTConfig(dataset_text_field="text", per_device_train_batch_size=4, gradient_accumulation_steps=4,
-                   num_train_epochs=3, max_steps=10 if MODO_ENSAIO else -1, learning_rate=2e-4, **AQUECIMENTO,
+                   num_train_epochs=5, max_steps=10 if MODO_ENSAIO else -1, learning_rate=2e-4, **AQUECIMENTO,
                    packing=False, lr_scheduler_type="cosine", optim="adamw_8bit", weight_decay=0.01, logging_steps=5,
                    eval_strategy="steps", eval_steps=5 if MODO_ENSAIO else 10, save_strategy="no", seed=3407,
                    output_dir=str(SAIDA / "treino"), report_to="none"))

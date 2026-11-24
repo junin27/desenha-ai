@@ -19,7 +19,7 @@ O visitante resolve uma charada, desenha a resposta em 20 segundos e duas redes 
 ## 3. Dados e treinamento
 - **Redes:** Google Quick, Draw! (CC BY 4.0), 30 categorias, 9.000 desenhos reconhecidos por categoria (210 mil para treino, 30 mil para validação e 30 mil para teste). Metade de cada lote usa desenhos incompletos (30 a 90% dos traços) para ensinar a adivinhar cedo.
 - **Dataset destilado do Zé:** Teacher Gemini com Chain-of-Thought (`<pensamento>`/`<resposta>`) e Evol-Instruct (12 perguntas-semente → 81 perguntas). Foram 501 pedidos e **455 amostras aprovadas** por curadoria verificável: 161 charadas, 218 vereditos (feitos sobre as saídas **reais** das redes) e 76 respostas a visitantes. As rejeições foram 26 por formato, 15 por veredito errado, 3 charadas que entregavam a resposta, 1 recusa e 1 número inventado.
-- **Fine-tuning:** QLoRA no Unsloth (4 bits NF4), perda só na resposta, 3 épocas. **[PENDENTE: dados da rodada completa]**
+- **Fine-tuning:** QLoRA no Unsloth (4 bits NF4), perda só na resposta, 5 épocas. **[PENDENTE: dados da rodada completa]**
 
 ## 4. Resultados
 **Redes (conjunto de teste, 30 mil desenhos):**
