@@ -225,6 +225,7 @@ print("Exemplo do base:\n", respostas_base[0][:500])
 # %% [markdown]
 # ## 4. Treinamento (SFT com *loss masking*)
 # `train_on_responses_only` zera a perda dos tokens de *system* e *user*. A célula confere isso num exemplo antes de treinar.
+# `packing=False`: o Unsloth novo empacota várias conversas numa linha por padrão; com isso o modelo não aprende a parar no `<|im_end|>` e entra em loop (rodada de 24/11 reprovada).
 
 # %%
 FastLanguageModel.for_training(model)
@@ -236,7 +237,7 @@ trainer = SFTTrainer(
     model=model, tokenizer=tokenizer, train_dataset=ds_treino, eval_dataset=ds_validacao,
     args=SFTConfig(dataset_text_field="text", per_device_train_batch_size=4, gradient_accumulation_steps=4,
                    num_train_epochs=3, max_steps=10 if MODO_ENSAIO else -1, learning_rate=2e-4, **AQUECIMENTO,
-                   lr_scheduler_type="cosine", optim="adamw_8bit", weight_decay=0.01, logging_steps=5,
+                   packing=False, lr_scheduler_type="cosine", optim="adamw_8bit", weight_decay=0.01, logging_steps=5,
                    eval_strategy="steps", eval_steps=5 if MODO_ENSAIO else 10, save_strategy="no", seed=3407,
                    output_dir=str(SAIDA / "treino"), report_to="none"))
 trainer = train_on_responses_only(trainer, instruction_part="<|im_start|>user\n", response_part=INICIO_DA_RESPOSTA)
