@@ -242,7 +242,8 @@ def test_notebook_3_nao_passa_warmup_ratio_direto_ao_sftconfig() -> None:
     codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
 
     assert "warmup_ratio=" not in codigo
-    assert "dataclasses.fields(SFTConfig)" in codigo  # escolhe `warmup_ratio` ou `warmup_steps` conforme a versão
+    # escolhe `warmup_ratio` ou `warmup_steps` conforme a versão instalada
+    assert "dataclasses.fields(SFTConfig)" in codigo
 
 
 def test_notebook_3_importa_o_unsloth_antes_de_trl_e_transformers() -> None:
