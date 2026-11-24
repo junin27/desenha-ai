@@ -82,6 +82,18 @@ Antes dos filtros, marcação Markdown (`**`, `__`, títulos `#`, marcadores de 
 - **WHEN** a resposta contém "**Ô trem bão!**"
 - **THEN** a amostra segue para os filtros com "Ô trem bão!" e o reparo `markdown` é contado
 
+### Requirement: Reparo de erros mecânicos de marcação
+Antes dos filtros, o erro mecânico de marcação do Teacher SHALL ser reparado e contado no relatório: pensamento fechado com `</resposta>` (`tags_trocadas`), tag de resposta duplicada (`tag_duplicada`) e `
+` literal entre `VEREDITO:` e `NARRAÇÃO:` (`quebra_literal`); respostas truncadas, sem `<resposta>`, NÃO são reparadas e seguem como `formato_invalido`.
+
+#### Scenario: Pensamento fechado com a tag errada
+- **WHEN** a resposta é `<pensamento>…</resposta><resposta>Charada: …</resposta>`
+- **THEN** o texto vira `<pensamento>…</pensamento><resposta>Charada: …</resposta>`, segue para os filtros e o reparo `tags_trocadas` é contado
+
+#### Scenario: Resposta truncada
+- **WHEN** a resposta termina em `</pensamento>` sem nenhum `<resposta>`
+- **THEN** nada é reparado e a amostra é rejeitada como `formato_invalido`
+
 ### Requirement: Separação e exportação
 As amostras aprovadas SHALL ser separadas por tarefa em 80% treino, 10% validação e 10% teste (no mínimo 3 por tarefa em validação e em teste), com sorteio determinístico pela semente, e exportadas em ShareGPT (`conversations` com `system`, `human`, `gpt`) e ChatML (`messages` com `system`, `user`, `assistant`), uma conversa por linha, levando também a tarefa e os metadados.
 

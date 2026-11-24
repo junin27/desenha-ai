@@ -32,6 +32,11 @@ _RECUSA = re.compile(
     r"como (uma|um) (ia|modelo)|n[ãa]o posso|sou apenas um|as an ai|i cannot", flags=re.IGNORECASE
 )
 _NUMERO = re.compile(r"\d+(?:[.,]\d+)?")
+_RESPOSTA_ANTES_DE_FECHAR_PENSAMENTO = re.compile(r"</resposta>(\s*</pensamento>)")
+_PENSAMENTO_FECHADO_COM_RESPOSTA = re.compile(r"</resposta>(\s*<resposta>)")
+_ABRE_RESPOSTA_DUPLICADA = re.compile(r"<resposta>\s*<resposta>")
+_FECHA_RESPOSTA_DUPLICADA = re.compile(r"</resposta>\s*</resposta>")
+_BARRA_N_LITERAL = "\\n"  # duas letras: barra invertida e n, como o Teacher às vezes escreve
 
 
 @dataclass
@@ -46,7 +51,7 @@ class ResultadoDaCuradoria:
 
 
 def reparar(saida: str) -> tuple[str, list[str]]:
-    """Remove Markdown e emojis; devolve o texto e os reparos aplicados."""
+    """Remove Markdown e emojis e conserta erros mecânicos de marcação; devolve o texto e os reparos."""
     reparos = []
     sem_markdown = _MARKDOWN.sub("", saida)
     if sem_markdown != saida:
@@ -54,7 +59,40 @@ def reparar(saida: str) -> tuple[str, list[str]]:
     sem_emoji = _EMOJI.sub("", sem_markdown)
     if sem_emoji != sem_markdown:
         reparos.append("emoji")
-    return re.sub(r"[ \t]{2,}", " ", sem_emoji), reparos
+    texto = re.sub(r"[ \t]{2,}", " ", sem_emoji)
+    for nome, conserto in _CONSERTOS_DE_MARCACAO:
+        consertado = conserto(texto)
+        if consertado != texto:
+            reparos.append(nome)
+            texto = consertado
+    return texto, reparos
+
+
+def _pensamento_fechado_com_tag_de_resposta(texto: str) -> str:
+    """O Teacher às vezes fecha o pensamento com `</resposta>` (achado no Colab: ~50 amostras)."""
+    if _RESPOSTA_ANTES_DE_FECHAR_PENSAMENTO.search(texto):
+        return _RESPOSTA_ANTES_DE_FECHAR_PENSAMENTO.sub(r"\1", texto, count=1)
+    if "</pensamento>" in texto or texto.count("<pensamento>") != 1:
+        return texto
+    return _PENSAMENTO_FECHADO_COM_RESPOSTA.sub(r"</pensamento>\1", texto, count=1)
+
+
+def _tag_de_resposta_duplicada(texto: str) -> str:
+    return _FECHA_RESPOSTA_DUPLICADA.sub("</resposta>", _ABRE_RESPOSTA_DUPLICADA.sub("<resposta>", texto))
+
+
+def _quebra_de_linha_literal_no_veredito(texto: str) -> str:
+    """`VEREDITO: X\\nNARRAÇÃO:` com barra-n literal não é lido pela regra do veredito; só mexe nesse caso."""
+    if "VEREDITO:" in texto and "NARRAÇÃO:" in texto:
+        return texto.replace(_BARRA_N_LITERAL, "\n")
+    return texto
+
+
+_CONSERTOS_DE_MARCACAO = (
+    ("tags_trocadas", _pensamento_fechado_com_tag_de_resposta),
+    ("tag_duplicada", _tag_de_resposta_duplicada),
+    ("quebra_literal", _quebra_de_linha_literal_no_veredito),
+)
 
 
 def curar(registros: Sequence[RegistroBruto], ficha: str) -> ResultadoDaCuradoria:

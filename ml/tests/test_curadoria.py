@@ -116,6 +116,71 @@ def test_reparos_sao_contados() -> None:
     assert saida is not None and "**" not in saida
 
 
+def test_pensamento_fechado_com_tag_de_resposta_e_reparado() -> None:
+    """Achado no Colab (24/11): 50 amostras saíram com `</resposta>` onde devia ser `</pensamento>`."""
+    bruto = f"<pensamento>{PENSAMENTO}</resposta><resposta>{CHARADA_BOA}</resposta>"
+
+    texto, reparos = reparar(bruto)
+
+    assert texto == f"<pensamento>{PENSAMENTO}</pensamento><resposta>{CHARADA_BOA}</resposta>"
+    assert reparos == ["tags_trocadas"]
+
+
+def test_tag_de_resposta_duplicada_e_reparada() -> None:
+    bruto = (
+        f"<pensamento>{PENSAMENTO}</pensamento><resposta><resposta>Charada: Malhada.</resposta></resposta>"
+    )
+
+    texto, reparos = reparar(bruto)
+
+    assert texto == _fala("Charada: Malhada.")
+    assert reparos == ["tag_duplicada"]
+
+
+def test_resposta_fechada_antes_do_fim_do_pensamento_e_reparada() -> None:
+    bruto = f"<pensamento>{PENSAMENTO}</resposta></pensamento><resposta>Charada: Malhada.</resposta>"
+
+    texto, reparos = reparar(bruto)
+
+    assert texto == _fala("Charada: Malhada.")
+    assert reparos == ["tags_trocadas"]
+
+
+def test_quebra_de_linha_literal_no_veredito_e_reparada() -> None:
+    texto, reparos = reparar(
+        _fala("VEREDITO: ERROU" + chr(92) + "nNARRAÇÃO: Ô loco, que solzão bonito, uai!")
+    )
+
+    assert "VEREDITO: ERROU" + chr(10) + "NARRAÇÃO: Ô loco" in texto
+    assert reparos == ["quebra_literal"]
+
+
+def test_barra_n_fora_do_veredito_nao_e_mexida() -> None:
+    texto, reparos = reparar(_fala("Charada: use a barra " + chr(92) + "n para quebrar linha."))
+
+    assert chr(92) + "n" in texto and reparos == []
+
+
+def test_texto_correto_nao_recebe_reparo_nenhum() -> None:
+    assert reparar(_fala("Charada: Malhada e mansa.")) == (_fala("Charada: Malhada e mansa."), [])
+
+
+def test_resposta_truncada_sem_tag_de_resposta_continua_invalida() -> None:
+    truncada = f"<pensamento>{PENSAMENTO}</pensamento>"
+
+    assert reparar(truncada) == (truncada, [])
+    assert _codigo(_registro("PERGUNTA", truncada)) == "formato_invalido"
+
+
+def test_amostra_reparada_e_aprovada_e_o_reparo_entra_na_contagem() -> None:
+    bruto = f"<pensamento>{PENSAMENTO}</resposta><resposta>{CHARADA_BOA}</resposta>"
+
+    resultado = curar([_registro("CHARADA", bruto, palavra="vaca")], FICHA)
+
+    assert resultado.rejeicoes_por_amostra == [None]
+    assert resultado.reparos == {"tags_trocadas": 1}
+
+
 def test_jaccard_de_trigramas() -> None:
     assert jaccard_de_trigramas("a b c d", "a b c d") == 1.0
     assert jaccard_de_trigramas("a b c d", "x y z w") == 0.0

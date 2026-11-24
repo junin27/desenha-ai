@@ -16,7 +16,7 @@ Atualizado em 23/11/2026, ao fim da sessão que implementou a `demo-offline` (de
 |---|---|---|
 | pre-processamento-de-tracos, regras-da-rodada | arquivadas (specs vivas em `openspec/specs/`) | — |
 | treino-das-redes | 17/17, **notebook 1 rodado no Colab em 24/11/2026**: CNN 92,4%, LSTM 92,8%, Ensemble 94,7% (top-3 99,3%), critério mínimo aprovado; resultados em `notebooks/resultados/modelos_redes/` | arquivar (critério batido) |
-| dataset-do-ze | 18/18 | rodar o notebook 2 com `GEMINI_API_KEY`; arquivar quando o volume for suficiente |
+| dataset-do-ze | 18/18, **notebook 2 rodado em 24/11/2026**: 455 amostras aprovadas (CHARADA 161, VEREDITO 218, PERGUNTA 76), `suficiente: true` depois do reparo de marcação do Teacher (recuradoria offline do bruto do Drive, sem novas chamadas); resultado em `notebooks/resultados/dataset_slm/` (cavalo sem charada de reserva) | rodar o notebook 3; arquivar |
 | fine-tuning-do-ze | 11/11 | rodar o notebook 3 (ensaio, depois completo); arquivar quando bater o critério |
 | jogo-web | **18/18**, conferida no navegador e com o `llama-server` real (ensaio 23/11) | arquivar depois do ensaio com o Zé treinado |
 | bancada-do-ze | **17/17**, conferida no navegador e com os dois `llama-server` | arquivar depois do ensaio com o Zé treinado |
