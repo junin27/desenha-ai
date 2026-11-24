@@ -17,7 +17,7 @@ Atualizado em 23/11/2026, ao fim da sessão que implementou a `demo-offline` (de
 | pre-processamento-de-tracos, regras-da-rodada | arquivadas (specs vivas em `openspec/specs/`) | — |
 | treino-das-redes | 17/17, **notebook 1 rodado no Colab em 24/11/2026**: CNN 92,4%, LSTM 92,8%, Ensemble 94,7% (top-3 99,3%), critério mínimo aprovado; resultados em `notebooks/resultados/modelos_redes/` | arquivar (critério batido) |
 | dataset-do-ze | 18/18, **notebook 2 rodado em 24/11/2026**: 455 amostras aprovadas (CHARADA 161, VEREDITO 218, PERGUNTA 76), `suficiente: true` depois do reparo de marcação do Teacher (recuradoria offline do bruto do Drive, sem novas chamadas); resultado em `notebooks/resultados/dataset_slm/` (cavalo sem charada de reserva) | rodar o notebook 3; arquivar |
-| fine-tuning-do-ze | 11/11 | rodar o notebook 3 (ensaio, depois completo); arquivar quando bater o critério |
+| fine-tuning-do-ze | 11/11, **ensaio do notebook 3 rodado em 24/11/2026** (pipeline e exportação GGUF ok: Q4_K_M real 1,107 GB; perplexidade 88,4 → 14,2; métricas em `notebooks/resultados/ensaio_metricas_slm.json`) | **rodar a rodada completa** (`MODO_ENSAIO = False`, T4, 40–60 min), baixar o GGUF do Drive (`desenha_ai_so/`), `preparar_demo.py --gguf-do-ze`; arquivar quando bater o critério |
 | jogo-web | **18/18**, conferida no navegador e com o `llama-server` real (ensaio 23/11) | arquivar depois do ensaio com o Zé treinado |
 | bancada-do-ze | **17/17**, conferida no navegador e com os dois `llama-server` | arquivar depois do ensaio com o Zé treinado |
 | **demo-offline** | **11/11**, aprovada e implementada; ensaio real com o Qwen3 base (modo ensaio), ver `docs/capturas/README.md` | repetir o ensaio com o GGUF do Zé treinado (`preparar_demo.py --gguf-do-ze`), voltar o formato do Zé a ✗ e arquivar |
@@ -63,3 +63,9 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - O mypy precisa de `--config-file ml/pyproject.toml`.
 - Não nomeie funções do pacote começando com "teste" (o pytest coleta como teste).
 - Heredoc do bash com `\n` dentro de strings Python vira quebra de linha real: prefira escrever o script num arquivo.
+
+## O que está no GitHub e o que não está (24/11/2026)
+
+- **Versionado** (para recomeçar em outra máquina): código, specs, notebooks (`.ipynb` já com menu de upload, botão "Salvar como", checagem de GPU e correção do `warmup_ratio`), `notebooks/resultados/` (redes ONNX treinadas, `modelos_redes.zip`, `dataset_slm.zip`, métricas, figuras) e o bruto do Teacher em `drive/dataset_ze/artefatos/`.
+- **Fora do Git** (refazer ou baixar): `ml/dist/*.whl` (`ml/.venv/Scripts/python -m build --wheel ml`), `demo/` (`scripts/preparar_demo.py`), `saida/`, `ml/.venv`, `app/node_modules` e qualquer `*.gguf`. O GGUF do Zé treinado ainda não existe: sai da rodada completa do notebook 3, no Drive.
+- Notebook 1 e 2 estão concluídos; falta só a rodada completa do notebook 3, depois a demo com o Zé treinado, o banner e o pitch (`docs/banner.md` e `docs/pitch.md` ainda não existem).

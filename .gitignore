@@ -31,7 +31,6 @@ Thumbs.db
 demo/
 
 # Resultados dos notebooks do Colab: binarios pesados ficam fora; metricas e figuras entram
-notebooks/resultados/**/*.onnx
 notebooks/resultados/**/*.gguf
 
 # Cópia do Drive do Colab: só o bruto do Teacher (artefatos/) é versionado; o resto já está em notebooks/resultados
