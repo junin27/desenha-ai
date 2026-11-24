@@ -23,11 +23,20 @@
 # > `dataset_slm.zip` (Parte 2) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
 # > (rodada completa, ≈ 40–60 min, gera o GGUF do Zé). O ensaio (`True`, ≈ 10 min) só testa as etapas e não vale para o
 # > critério de aprovação.
+#
+# > **Plano B no Kaggle** (se o Colab não der GPU): *File → Import Notebook*; em *Settings*, **Accelerator: GPU T4 x2**
+# > (não use P100) e **Internet: On** (exige conta verificada por telefone); crie um *Dataset* com o `.whl`, o
+# > `modelos_redes.zip` e o `dataset_slm.zip` e adicione-o em *+ Add Input*. Rode tudo; os resultados saem na aba *Output*.
 
 # %% [markdown]
 # ## 0. Instalação e configuração
 
 # %%
+import os
+
+# O Kaggle dá 2 GPUs T4; o Unsloth usa uma só (evita erro de multi-GPU). Inofensivo no Colab. Tem de vir antes do torch.
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
+
 import subprocess
 
 import torch
@@ -37,14 +46,14 @@ if not torch.cuda.is_available():
         placa = subprocess.run(["nvidia-smi"], capture_output=True, text=True, check=False)
         diagnostico = (placa.stdout or placa.stderr or "sem saída").strip()[:600]
     except FileNotFoundError:  # sem GPU o Colab nem instala o nvidia-smi
-        diagnostico = "nvidia-smi: não encontrado (o Colab não alocou GPU)"
+        diagnostico = "nvidia-smi: não encontrado (o ambiente não alocou GPU)"
     print(diagnostico)
     raise RuntimeError(
-        "Sem GPU neste ambiente (veja o nvidia-smi acima: 'não encontrado' = o Colab não alocou GPU). "
-        "Causas comuns: (1) você aceitou 'usar sem acelerador' no aviso de falta de GPU; (2) a cota de GPU do dia "
-        "acabou (volta em até 24 h); (3) alta demanda: tente em alguns minutos. Para tentar de novo: Ambiente de "
-        "execução → Desconectar e excluir ambiente de execução → Alterar o tipo → T4 (ou L4) → Salvar → Conectar, "
-        "e confira o T4/L4 no canto superior direito antes de rodar."
+        "Sem GPU neste ambiente (nvidia-smi acima). COLAB: causas comuns são aceitar 'usar sem acelerador', cota "
+        "diária esgotada (volta em até 24 h) ou alta demanda; tente Ambiente de execução → Desconectar e excluir → "
+        "Alterar o tipo → T4 (ou L4) → Salvar → Conectar e confira o T4/L4 no canto da tela. KAGGLE: em Settings, "
+        "Accelerator → GPU T4 x2 (não use P100: o Unsloth não a suporta) e Internet → On (exige conta verificada "
+        "por telefone)."
     )
 print("GPU:", torch.cuda.get_device_name(0))
 
@@ -56,19 +65,43 @@ print("GPU:", torch.cuda.get_device_name(0))
 import base64
 import glob
 import os
+import shutil
 from pathlib import Path
 
-from google.colab import files
 from IPython.display import HTML, display
 
-PASTA_DOS_ARQUIVOS = "/content"
+# No Kaggle não há `google.colab`: os arquivos vêm de um Dataset (/kaggle/input) e tudo sai em /kaggle/working.
+NO_KAGGLE = "KAGGLE_KERNEL_RUN_TYPE" in os.environ or os.path.isdir("/kaggle/working")
+PASTA_DOS_ARQUIVOS = "/kaggle/working" if NO_KAGGLE else "/content"
+PASTA_DE_ENTRADA_DO_KAGGLE = "/kaggle/input"
 LIMITE_DO_BOTAO_EM_BYTES = 40 * 1024 * 1024  # o arquivo vai dentro do botão; acima disso usa o download normal
+if not NO_KAGGLE:
+    from google.colab import files
+
+
+def _faltando(padroes):
+    return [p for p in padroes if not glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, p))]
+
+
+def _copiar_do_dataset_do_kaggle(padroes):
+    for padrao in padroes:
+        achados = glob.glob(os.path.join(PASTA_DE_ENTRADA_DO_KAGGLE, "**", padrao), recursive=True)
+        if achados:
+            shutil.copy(achados[0], PASTA_DOS_ARQUIVOS)
 
 
 def exigir_arquivos(*padroes):
-    """Abre o menu de upload do Colab enquanto faltar algum arquivo (eles caem em /content)."""
+    """Colab: abre o menu de upload até os arquivos chegarem. Kaggle: copia do Dataset de entrada, sem menu."""
     os.chdir(PASTA_DOS_ARQUIVOS)
-    while faltando := [p for p in padroes if not glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, p))]:
+    if NO_KAGGLE:
+        _copiar_do_dataset_do_kaggle(_faltando(padroes))
+        if faltando := _faltando(padroes):
+            raise FileNotFoundError(
+                "Faltam: " + ", ".join(faltando) + ". No Kaggle não há menu de upload: no painel da direita clique em "
+                "+ Add Input → Upload, envie esses arquivos como um Dataset, adicione-o ao notebook e rode de novo."
+            )
+        return
+    while faltando := _faltando(padroes):
         print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
         if not files.upload():
             raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
@@ -108,6 +141,9 @@ def baixar_com_menu(caminho):
     baixa pelo método normal. Arquivos grandes demais para ir dentro do botão usam o download normal.
     """
     caminho = Path(caminho)
+    if NO_KAGGLE:
+        print(f"No Kaggle, baixe {caminho.name} na aba Output (painel direito → Output → ⋮ → Download).")
+        return
     tamanho = caminho.stat().st_size
     if tamanho > LIMITE_DO_BOTAO_EM_BYTES:
         print(f"{caminho.name} é grande ({tamanho / 1e6:.0f} MB): download normal.")
@@ -120,7 +156,7 @@ def baixar_com_menu(caminho):
 
 # %%
 exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip")
-RODA = glob.glob("/content/desenha_ml-*.whl")
+RODA = glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, "desenha_ml-*.whl"))
 %pip install -q "{RODA[0]}"
 
 # %%
@@ -149,8 +185,8 @@ MODELO_BASE = "unsloth/Qwen3-1.7B"   # plano B mais rápido em CPU: "unsloth/Qwe
 MODELO_ORIGINAL = "Qwen/Qwen3-1.7B"  # para contar os parâmetros reais (o 4-bit empacota 2 pesos por byte)
 MAX_SEQ, TOKENS_NOVOS = 1024, 300
 EXEMPLOS_DE_TESTE = 15 if MODO_ENSAIO else None
-SAIDA = Path("/content/zedorabisco")
-SAIDA.mkdir(exist_ok=True)
+SAIDA = Path(PASTA_DOS_ARQUIVOS) / "zedorabisco"
+SAIDA.mkdir(parents=True, exist_ok=True)
 print(torch.cuda.get_device_name(0), "| VRAM", round(torch.cuda.get_device_properties(0).total_memory / 1e9, 1), "GB",
       "| MODO_ENSAIO =", MODO_ENSAIO)
 
@@ -159,11 +195,11 @@ print(torch.cuda.get_device_name(0), "| VRAM", round(torch.cuda.get_device_prope
 
 # %%
 exigir_arquivos("dataset_slm.zip", "modelos_redes.zip")
-with zipfile.ZipFile("/content/dataset_slm.zip") as arquivo_zip:
-    arquivo_zip.extractall("/content/dataset_slm")
-with zipfile.ZipFile("/content/modelos_redes.zip") as arquivo_zip:
+with zipfile.ZipFile(f"{PASTA_DOS_ARQUIVOS}/dataset_slm.zip") as arquivo_zip:
+    arquivo_zip.extractall(f"{PASTA_DOS_ARQUIVOS}/dataset_slm")
+with zipfile.ZipFile(f"{PASTA_DOS_ARQUIVOS}/modelos_redes.zip") as arquivo_zip:
     FICHA = montar_ficha(json.loads(arquivo_zip.read("metricas_redes.json")))
-ler = lambda nome: pd.read_json(f"/content/dataset_slm/zedorabisco_{nome}_chatml.jsonl", lines=True)  # noqa: E731
+ler = lambda nome: pd.read_json(f"{PASTA_DOS_ARQUIVOS}/dataset_slm/zedorabisco_{nome}_chatml.jsonl", lines=True)  # noqa: E731
 treino, validacao, teste = ler("treino"), ler("val"), ler("teste")
 if EXEMPLOS_DE_TESTE:
     teste = teste.groupby("tarefa").head(EXEMPLOS_DE_TESTE // 3)
@@ -303,20 +339,23 @@ for tarefa in ("CHARADA", "VEREDITO", "PERGUNTA"):
 inicio = time.time()
 model.save_pretrained_gguf(str(SAIDA / "gguf"), tokenizer, quantization_method=["q4_k_m", "q8_0"])
 print(f"GGUF exportado em {(time.time() - inicio) / 60:.1f} min")
-arquivos_gguf = sorted(glob.glob(str(SAIDA / "**" / "*.gguf"), recursive=True) + glob.glob("/content/*.gguf"))
+arquivos_gguf = sorted(glob.glob(str(SAIDA / "**" / "*.gguf"), recursive=True) + glob.glob(f"{PASTA_DOS_ARQUIVOS}/*.gguf"))
 tamanhos = {("INT4" if "Q4_K_M" in Path(g).name.upper() else "INT8"): Path(g).stat().st_size / 1e9
             for g in arquivos_gguf if any(q in Path(g).name.upper() for q in ("Q4_K_M", "Q8_0"))}
 quantizacao = tabela_de_quantizacao(N_PARAMETROS, tamanhos)
 display(pd.DataFrame([vars(linha) for linha in quantizacao]).style.format(precision=3, na_rep="—"))
 
 # %% [markdown]
-# ## 7. Artefatos no Drive
+# ## 7. Artefatos (Drive no Colab; aba Output no Kaggle)
 
 # %%
-from google.colab import drive, files
+if NO_KAGGLE:
+    PASTA = Path(PASTA_DOS_ARQUIVOS) / "desenha_ai_so"  # sem Drive: fica em /kaggle/working (aba Output)
+else:
+    from google.colab import drive
 
-drive.mount("/content/drive")
-PASTA = Path("/content/drive/MyDrive/desenha_ai_so")
+    drive.mount(f"{PASTA_DOS_ARQUIVOS}/drive")
+    PASTA = Path(PASTA_DOS_ARQUIVOS) / "drive" / "MyDrive" / "desenha_ai_so"
 PASTA.mkdir(parents=True, exist_ok=True)
 q4 = next(g for g in arquivos_gguf if "Q4_K_M" in Path(g).name.upper())
 if not MODO_ENSAIO:
@@ -337,20 +376,21 @@ pd.DataFrame({"tarefa": [e["tarefa"] for e in exemplos_de_teste], "entrada": [e[
              ).to_csv(SAIDA / "saidas_teste_base_vs_destilado.csv", index=False)
 for nome in ("metricas_slm.json", "saidas_teste_base_vs_destilado.csv", "curvas_sft.png", "base_vs_destilado.png"):
     shutil.copy(SAIDA / nome, PASTA / (("ensaio_" if MODO_ENSAIO else "") + nome))
-print("Copiado para", PASTA, "→ baixe o .gguf pelo Drive (o download de > 1 GB pelo navegador costuma falhar).")
+print("Copiado para", PASTA, "→ baixe o .gguf pelo Drive ou pela aba Output (o download de > 1 GB pelo notebook costuma falhar).")
 baixar_com_menu(SAIDA / "metricas_slm.json")
 
 # %% [markdown]
 # ## 8. Próximos passos (fora do Colab)
-# 1. No Google Drive, pasta `desenha_ai_so/`, baixe `zedorabisco-1.7b-Q4_K_M.gguf` e `metricas_slm.json`
-#    (clique direito → Fazer download; o download direto de mais de 1 GB pelo notebook costuma falhar).
+# 1. Colab: no Google Drive, pasta `desenha_ai_so/`, baixe `zedorabisco-1.7b-Q4_K_M.gguf` e `metricas_slm.json`
+#    (clique direito → Fazer download). Kaggle: aba Output (painel direito), pasta `desenha_ai_so/`, mesmos arquivos.
+#    O download direto de mais de 1 GB pelo notebook costuma falhar.
 # 2. Coloque os dois em `notebooks/resultados/` do projeto.
 # 3. Só siga para a demo se o critério acima disser **APROVADO**.
 
 # %%
 print("Rodada completa" if not MODO_ENSAIO else "ENSAIO (não gera o GGUF final)")
 print("Critério de aprovação:", "APROVADO" if criterio.aprovado else ("ENSAIO" if criterio.aprovado is None else "REPROVADO"), criterio.motivos)
-print("No Drive:", PASTA, "→ zedorabisco-1.7b-Q4_K_M.gguf e metricas_slm.json")
+print("Arquivos em:", PASTA, "→ zedorabisco-1.7b-Q4_K_M.gguf e metricas_slm.json")
 print("Coloque os dois em notebooks/resultados/ do projeto e me avise.")
 if criterio.aprovado is False:
     print("ATENÇÃO: critério REPROVADO. Não use este GGUF na demo; mande esta saída para ajustar o treino.")
