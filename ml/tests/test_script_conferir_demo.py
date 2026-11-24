@@ -108,3 +108,21 @@ def test_saida_em_cp1252_passa_a_imprimir_os_simbolos_do_checklist(monkeypatch: 
     sys.stdout.flush()
 
     assert bytes_da_saida.getvalue().decode("utf8").strip() == "✓ ✗ ⚠ →"
+
+
+def test_porta_do_destilado_ocupada_por_outro_programa_pula_a_fala_sem_subir_servidor() -> None:
+    """Achado no ensaio: um Apache na 8080 fazia o servidor temporário falhar com um erro confuso."""
+    script = _carregar_script()
+
+    item = script.item_da_fala_pulada({8080: "outro", 8081: "livre"}, divergencias=[])
+
+    assert item is not None and item.situacao == "falha"
+    assert "8080" in item.detalhe and "não testada" in item.detalhe
+
+
+def test_fala_so_e_testada_com_arquivos_integros_e_portas_livres_ou_da_demo() -> None:
+    script = _carregar_script()
+
+    assert script.item_da_fala_pulada({8080: "livre", 8081: "da_demo"}, divergencias=[]) is None
+    pulada = script.item_da_fala_pulada({8080: "livre"}, divergencias=[object()])
+    assert pulada is not None and "arquivos" in pulada.detalhe

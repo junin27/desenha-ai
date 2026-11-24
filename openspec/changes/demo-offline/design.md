@@ -41,7 +41,7 @@ O perfil próprio isola o placar do evento do navegador pessoal e evita extensõ
 Ambos com `-m <gguf> --host 127.0.0.1 --port <p> -c 2048 -n 300 --threads 8 --parallel 1`. O destilado acrescenta `--path demo/jogo`, que serve o jogo na mesma origem (sem CORS para a porta 8080). O base, na 8081, é chamado de outra origem: o `llama-server` responde CORS aberto, o que é conferido no ensaio (tarefa 3.1). No modo ensaio, a vaga do destilado usa o GGUF base.
 
 ### D5 — Memória
-A memória livre vem de `GlobalMemoryStatusEx` (ctypes). Cada servidor precisa do tamanho do GGUF mais 0,3 GB (contexto de 2048 e *buffers*). O base sobe se, descontado o destilado, sobrarem pelo menos 1,5 GB. A função pura recebe os números e devolve a decisão e o aviso.
+A memória livre vem de `GlobalMemoryStatusEx` (ctypes). Cada servidor precisa do tamanho do GGUF mais 0,9 GB (contexto de 2048, *buffers* e runtime). *Calibrado na tarefa 3.1:* o ensaio real mediu 1,75-1,96 GiB por servidor para um GGUF de 1,03 GiB; a estimativa inicial era 0,3 GB. O base sobe se, descontado o destilado, sobrarem pelo menos 1,5 GB. A função pura recebe os números e devolve a decisão e o aviso.
 
 ### D6 — Encerramento sem órfãos: Job Object
 Os `llama-server` são criados dentro de um *Job Object* do Windows com `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`. Se o Python sair por qualquer motivo (Ctrl+C, janela fechada, erro), o Windows encerra os filhos. O Ctrl+C também chama `terminate()` antes, para sair limpo.

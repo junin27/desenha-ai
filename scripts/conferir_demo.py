@@ -10,6 +10,7 @@ import socket
 import sys
 import time
 import urllib.request
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -61,6 +62,7 @@ CHAVES_DE_VOZES = (
     r"SOFTWARE\Microsoft\Speech\Voices\Tokens",
 )
 TEMPERATURA_DA_CHARADA = 0.7  # a mesma do jogo (narrador-llama-server.ts)
+ACAO_REFAZER = "rode a preparação de novo"
 SEGUNDOS_MAXIMOS_DO_PEDIDO = 60
 SEGUNDOS_DA_CONEXAO = 0.5
 
@@ -227,18 +229,32 @@ def conferir() -> list[ItemDoChecklist]:
         )
     )
     itens.append(
-        _fala_do_ze(manifesto.valor, demo_no_ar) if not divergencias else _fala_pulada()
+        item_da_fala_pulada(ocupacao, divergencias)
+        or _fala_do_ze(manifesto.valor, demo_no_ar)
     )
     return itens
 
 
-def _fala_pulada() -> ItemDoChecklist:
-    return ItemDoChecklist(
-        "Fala real do Zé",
-        "falha",
-        "não testada: os arquivos não conferem",
-        "rode a preparação de novo",
-    )
+def item_da_fala_pulada(
+    ocupacao: Mapping[int, OcupacaoDaPorta], divergencias: Sequence[object]
+) -> ItemDoChecklist | None:
+    """A fala real só roda com arquivos íntegros e a 8080 livre ou da demo; senão o erro seria confuso."""
+    titulo = "Fala real do Zé"
+    if divergencias:
+        return ItemDoChecklist(
+            titulo, "falha", "não testada: os arquivos não conferem", ACAO_REFAZER
+        )
+    if ocupacao.get(PORTA_DO_DESTILADO) == "outro":
+        detalhe = (
+            f"não testada: a porta {PORTA_DO_DESTILADO} está ocupada por outro programa"
+        )
+        return ItemDoChecklist(
+            titulo,
+            "falha",
+            detalhe,
+            "libere a porta (veja o item Portas) e confira de novo",
+        )
+    return None
 
 
 def main() -> int:

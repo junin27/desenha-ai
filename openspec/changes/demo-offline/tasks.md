@@ -16,9 +16,9 @@
 
 ## 3. Ensaio real e verificação
 
-- [ ] 3.1 Preparação de verdade (download do llama.cpp e do Qwen3 base) e demo no modo ensaio: jogo servido pela porta 8080, charada e veredito gerados pelo modelo real por *streaming*, CORS da porta 8081 conferido, tokens/s no painel; **medir a memória real com os dois servidores de pé** e registrar se o base sobe junto (limiar de 1,5 GB da D5 confirmado ou ajustado); capturas a 1366×768 em `docs/capturas/`
-- [ ] 3.2 `Conferir Desenha Aí.bat` nesta máquina: resultado registrado em `docs/capturas/README.md` (incluindo o aviso da voz, se continuar sem pt-BR)
-- [ ] 3.3 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build) e `openspec validate --all --strict`
+- [x] 3.1 Preparação de verdade (download do llama.cpp e do Qwen3 base) e demo no modo ensaio: jogo servido pela porta 8080, charada e veredito gerados pelo modelo real por *streaming*, CORS da porta 8081 conferido, tokens/s no painel; **medir a memória real com os dois servidores de pé** e registrar se o base sobe junto (limiar de 1,5 GB da D5 confirmado ou ajustado); capturas a 1366×768 em `docs/capturas/`
+- [x] 3.2 `Conferir Desenha Aí.bat` nesta máquina: resultado registrado em `docs/capturas/README.md` (incluindo o aviso da voz, se continuar sem pt-BR)
+- [x] 3.3 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build) e `openspec validate --all --strict`
 
 ## Workflow follow-up
 

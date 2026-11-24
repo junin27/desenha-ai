@@ -23,6 +23,7 @@ from demo_comum import (
     PASTA_DA_DEMO,
     RAIZ_DO_PROJETO,
     DiscoReal,
+    configurar_saida_em_utf8,
     sha256_do_arquivo,
 )
 from desenha_ml.demo.manifesto import (
@@ -248,6 +249,7 @@ def preparar(pasta_da_demo: Path, gguf_do_ze: Path | None) -> Resultado[Manifest
 
 
 def main() -> int:
+    configurar_saida_em_utf8()
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument(
         "--gguf-do-ze",
