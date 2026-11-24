@@ -26,6 +26,8 @@ CodigoDeErro = Literal[
     "formato_invalido",
     "servidor_sem_resposta",
     "navegador_ausente",
+    "download_incompleto",
+    "arquivo_ausente",
 ]
 
 

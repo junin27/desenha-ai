@@ -26,3 +26,6 @@ saida/
 .DS_Store
 Thumbs.db
 .env
+
+# Demo preparada para o estande (gerada por scripts/preparar_demo.py)
+demo/
