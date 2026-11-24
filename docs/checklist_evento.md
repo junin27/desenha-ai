@@ -16,6 +16,7 @@ O que **não dá para conferir por programa**. O que dá está em `Conferir Dese
 - [ ] **Brilho** no máximo e **escala da tela em 100%** (Configurações → Sistema → Tela). Com outra escala o canvas muda de tamanho.
 - [ ] **Mouse e caneta** funcionando (se houver mesa digitalizadora, desenhe uma rodada de teste).
 - [ ] **Som** do notebook ligado e no volume do ambiente; o Zé fala a cada veredito.
+- [ ] **Portas 8080 e 8081 livres**: serviços como Apache/XAMPP/EDB PEM usam a 8080 (no ensaio, um `httpd.exe` do EDB PEM ocupava). Pare o serviço antes (`services.msc`); o `Conferir Desenha Aí.bat` avisa se a porta estiver tomada.
 - [ ] **Outros programas fechados** (navegador pessoal, Teams, Spotify): o Qwen3 base só sobe com memória sobrando.
 - [ ] `Conferir Desenha Aí.bat` terminou com **Pronto para o evento**.
 - [ ] `Iniciar Desenha Aí.bat` aberto, jogo em tela cheia.

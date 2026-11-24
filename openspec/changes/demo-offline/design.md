@@ -41,7 +41,7 @@ O perfil próprio isola o placar do evento do navegador pessoal e evita extensõ
 Ambos com `-m <gguf> --host 127.0.0.1 --port <p> -c 2048 -n 300 --threads 8 --parallel 1`. O destilado acrescenta `--path demo/jogo`, que serve o jogo na mesma origem (sem CORS para a porta 8080). O base, na 8081, é chamado de outra origem: o `llama-server` responde CORS aberto, o que é conferido no ensaio (tarefa 3.1). No modo ensaio, a vaga do destilado usa o GGUF base.
 
 ### D5 — Memória
-A memória livre vem de `GlobalMemoryStatusEx` (ctypes). Cada servidor precisa do tamanho do GGUF mais 0,9 GB (contexto de 2048, *buffers* e runtime). *Calibrado na tarefa 3.1:* o ensaio real mediu 1,75-1,96 GiB por servidor para um GGUF de 1,03 GiB; a estimativa inicial era 0,3 GB. O base sobe se, descontado o destilado, sobrarem pelo menos 1,5 GB. A função pura recebe os números e devolve a decisão e o aviso.
+A memória livre vem de `GlobalMemoryStatusEx` (ctypes). Cada servidor precisa do tamanho do GGUF mais 0,9 GB (contexto de 2048, *buffers* e runtime). *Calibrado na tarefa 3.1:* o ensaio real mediu 1,75-1,96 GiB por servidor para um GGUF de 1,03 GiB; a estimativa inicial era 0,3 GB. O base sobe se, descontado o destilado, sobrarem pelo menos 2 GB (o base também ocupa cerca de 1,9 GiB, medido na 3.1). A função pura recebe os números e devolve a decisão e o aviso.
 
 ### D6 — Encerramento sem órfãos: Job Object
 Os `llama-server` são criados dentro de um *Job Object* do Windows com `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`. Se o Python sair por qualquer motivo (Ctrl+C, janela fechada, erro), o Windows encerra os filhos. O Ctrl+C também chama `terminate()` antes, para sair limpo.
@@ -53,6 +53,7 @@ Procura o Chrome em `Program Files`, `Program Files (x86)` e `%LOCALAPPDATA%`; s
 ### D8 — Checklist
 - Voz: lê as vozes de `HKLM\SOFTWARE\Microsoft\Speech_OneCore\Voices\Tokens` e `...\Speech\Voices\Tokens` (as locais que o Chrome e o Edge usam) e procura idioma `416` (pt-BR). Sem voz, o item é aviso, porque o jogo funciona mudo.
 - Fala real: monta a entrada CHARADA com `desenha_ml.conversa`, o prompt com `desenha_ml.prompt_qwen` e lê a resposta com `ler_fala`/`ler_charada`, a mesma regra do jogo. Se a demo não estiver rodando, sobe um servidor temporário do destilado e o encerra no fim.
+- Em modo ensaio o Qwen3 base ocupa a vaga do Zé e nunca terá o formato `<pensamento>`/`Charada:`: aí a fala fora do formato é aviso (⚠), não ✗. Falta de resposta ou demora acima de 25 s continuam ✗ (o servidor em si falhou).
 - Base desligado por memória ou ausência do GGUF do Zé (modo ensaio): aviso.
 
 ### D9 — Arquivos de um clique

@@ -20,12 +20,16 @@ Conferir, antes de abrir o estande, tudo o que pode falhar na frente do público
 ### Requirement: Fala real do Zé
 A conferência SHALL pedir uma charada ao Zé destilado (subindo um servidor temporário, se a demo não estiver rodando) e exigir resposta no formato `<pensamento>`/`<resposta>` em até 25 s, mostrando os tokens/s medidos.
 
+#### Scenario: Fala fora do formato no modo ensaio
+- **WHEN** o manifesto está no modo ensaio e o Qwen3 base responde fora do formato `<pensamento>`/`<resposta>` ou sem o prefixo "Charada:"
+- **THEN** o item do Zé aparece com ⚠ explicando que é esperado sem o fine-tuning, e o resultado final não é "Não pronto" por causa dele
+
 #### Scenario: Zé respondendo
 - **WHEN** o Zé devolve a charada no formato em 6 s
 - **THEN** o item do Zé aparece com ✓ e os tokens/s medidos
 
 ### Requirement: Resultado final
-Ao fim, a conferência SHALL dizer "Pronto para o evento" se não houver nenhum ✗ e, se houver, "Não pronto", listando os itens com ✗. O código de saída SHALL ser 0 só no primeiro caso. Itens que não impedem o jogo (voz e base × destilado) SHALL aparecer como aviso (⚠) e não impedir o "Pronto para o evento".
+Ao fim, a conferência SHALL dizer "Pronto para o evento" se não houver nenhum ✗ e, se houver, "Não pronto", listando os itens com ✗. O código de saída SHALL ser 0 só no primeiro caso. Itens que não impedem o jogo (voz, base × destilado e, no modo ensaio, o formato da fala) SHALL aparecer como aviso (⚠) e não impedir o "Pronto para o evento".
 
 #### Scenario: Só avisos
 - **WHEN** todos os itens passam, exceto a voz pt-BR

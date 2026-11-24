@@ -144,3 +144,25 @@ def test_item_impresso_com_simbolo_e_a_acao_so_quando_nao_passou() -> None:
     assert formatar_item(passou) == "✓ Arquivos: 12 conferidos"
     assert formatar_item(falhou) == "✗ Arquivos: faltou x\n    → rode a preparação"
     assert formatar_item(avisou).startswith("⚠ Voz: sem pt-BR\n    → instale")
+
+
+def test_fala_fora_do_formato_no_modo_ensaio_e_aviso_e_nao_impede_o_pronto() -> None:
+    """Achado no ensaio real: o Qwen3 base nunca terá o formato do Zé."""
+    item = item_do_ze("<pensamento>x</pensamento><resposta>sem prefixo</resposta>", 5.0, 50, modo_ensaio=True)
+
+    assert item.situacao == "aviso"
+    assert "fine-tuning" in item.detalhe
+    assert resultado_final([item]).codigo_de_saida == 0
+
+
+def test_no_modo_ensaio_sem_resposta_ou_lento_continua_falha() -> None:
+    assert item_do_ze(None, 0.0, 0, modo_ensaio=True).situacao == "falha"
+    assert item_do_ze(FALA_VALIDA, 30.0, 100, modo_ensaio=True).situacao == "falha"
+
+
+def test_no_modo_ensaio_a_fala_no_formato_certo_ainda_passa() -> None:
+    assert item_do_ze(FALA_VALIDA, 6.0, 100, modo_ensaio=True).situacao == "ok"
+
+
+def test_fora_do_modo_ensaio_o_formato_errado_continua_falha() -> None:
+    assert item_do_ze("Oi", 3.0, 10, modo_ensaio=False).situacao == "falha"

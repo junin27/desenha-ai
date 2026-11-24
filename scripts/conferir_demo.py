@@ -160,7 +160,9 @@ def ocupacao_da_porta(porta: int) -> OcupacaoDaPorta:
 def _fala_do_ze(manifesto: Manifesto, demo_no_ar: bool) -> ItemDoChecklist:
     if demo_no_ar:
         resposta = pedir_charada(PORTA_DO_DESTILADO)
-        return item_do_ze(*(resposta or (None, 0.0, 0)))
+        return item_do_ze(
+            *(resposta or (None, 0.0, 0)), modo_ensaio=manifesto.modo_ensaio
+        )
     plano = planejar_servidores(_entradas(manifesto))
     destilado = plano.servidores[0]
     job = criar_job_que_encerra_os_filhos()
@@ -189,7 +191,9 @@ def _fala_do_ze(manifesto: Manifesto, demo_no_ar: bool) -> ItemDoChecklist:
                 "confira o registro em demo/registros",
             )
         resposta = pedir_charada(destilado.porta)
-        return item_do_ze(*(resposta or (None, 0.0, 0)))
+        return item_do_ze(
+            *(resposta or (None, 0.0, 0)), modo_ensaio=manifesto.modo_ensaio
+        )
     finally:
         encerrar([processo], SEGUNDOS_PARA_ENCERRAR)
         job.fechar()

@@ -18,10 +18,10 @@ O arquivo `Iniciar Desenha Aí.bat` SHALL iniciar a demo a partir da pasta `demo
 - **THEN** a porta 8080 é servida com o GGUF base e a janela avisa "Modo ensaio: Zé sem fine-tuning"
 
 ### Requirement: Modelo base conforme a memória
-O Qwen3 base SHALL subir só se, depois de reservar a memória do destilado, sobrarem pelo menos 1,5 GB livres. Se não sobrarem, a demo SHALL seguir só com o destilado e avisar que a comparação base × destilado vai usar a reserva.
+O Qwen3 base SHALL subir só se, depois de reservar a memória do destilado, sobrarem pelo menos 2 GB livres. Se não sobrarem, a demo SHALL seguir só com o destilado e avisar que a comparação base × destilado vai usar a reserva.
 
 #### Scenario: Memória curta
-- **WHEN** há 2,2 GB livres e o destilado precisa de 1,4 GB
+- **WHEN** há 2,2 GB livres e o destilado precisa de 2,0 GB (GGUF mais a reserva de contexto)
 - **THEN** só o destilado sobe e a janela avisa que o base ficou desligado por falta de memória
 
 ### Requirement: Espera por saúde antes do navegador

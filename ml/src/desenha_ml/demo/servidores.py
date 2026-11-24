@@ -18,7 +18,7 @@ THREADS = 8  # os 8 núcleos do Ryzen 7 5700U do estande
 # Medido no ensaio real (tarefa 3.1): cada llama-server ocupou 1,75-1,96 GiB para um GGUF de 1,03 GiB,
 # ou seja, ~0,9 GiB além do arquivo (contexto de 2048, buffers e o runtime). O design previa 0,3 GiB.
 RESERVA_DE_CONTEXTO_E_BUFFERS = int(0.9 * GIB)
-SOBRA_MINIMA_PARA_O_BASE = int(1.5 * GIB)
+SOBRA_MINIMA_PARA_O_BASE = 2 * GIB  # o base também ocupa ~1,9 GiB (medido na tarefa 3.1)
 MENSAGEM_DO_MODO_ENSAIO = "Modo ensaio: Zé sem fine-tuning"
 AVISO_BASE_SEM_MEMORIA = (
     "Qwen3 base desligado por falta de memória: a comparação base × destilado vai usar a reserva."

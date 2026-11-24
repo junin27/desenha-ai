@@ -92,3 +92,8 @@ def test_base_nao_sobe_um_byte_abaixo_do_minimo() -> None:
 
 def _valor(linha: tuple[str, ...], opcao: str) -> str:
     return linha[linha.index(opcao) + 1]
+
+
+def test_base_exige_2_gib_livres_depois_do_destilado_porque_ocupa_cerca_de_1_9_gib() -> None:
+    """Medido no ensaio real (3.1): o base ocupou 1,75-1,96 GiB; o mínimo antigo (1,5) não cobria."""
+    assert SOBRA_MINIMA_PARA_O_BASE == 2 * GIB

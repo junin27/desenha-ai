@@ -111,20 +111,25 @@ def item_dos_modelos(*, modo_ensaio: bool, base_sobe: bool) -> ItemDoChecklist:
     return ItemDoChecklist("Zé destilado × base", "ok", "os dois modelos sobem juntos", "")
 
 
-def item_do_ze(resposta: str | None, segundos: float, tokens: int) -> ItemDoChecklist:
-    """`None` = o servidor não respondeu. A charada passa pela mesma leitura que o jogo usa."""
+def item_do_ze(resposta: str | None, segundos: float, tokens: int, *, modo_ensaio: bool = False) -> ItemDoChecklist:
+    """`None` = o servidor não respondeu. A charada passa pela mesma leitura que o jogo usa.
+
+    No modo ensaio o Qwen3 base ocupa a vaga do Zé e nunca terá o formato dele: fala fora do formato
+    vira aviso (esperado sem o fine-tuning); servidor mudo ou lento continua sendo falha.
+    """
     titulo = "Fala real do Zé"
     if resposta is None:
-        return ItemDoChecklist(
-            titulo, "falha", "sem resposta do servidor", "suba a demo e confira o registro"
-        )
-    problema = _problema_da_charada(resposta)
-    if problema is not None:
-        detalhe = f"{problema}; recebido {resposta[:80]!r}"
-        return ItemDoChecklist(titulo, "falha", detalhe, "confira se o GGUF certo está na porta 8080")
+        return ItemDoChecklist(titulo, "falha", "sem resposta do servidor", "suba a demo e confira o registro")
     if segundos > SEGUNDOS_MAXIMOS_DA_FALA:
         detalhe = f"charada em {segundos:.1f} s; o limite é {SEGUNDOS_MAXIMOS_DA_FALA:.0f} s"
         return ItemDoChecklist(titulo, "falha", detalhe, "feche outros programas; a CPU está lenta demais")
+    problema = _problema_da_charada(resposta)
+    if problema is not None and modo_ensaio:
+        detalhe = f"{problema}; esperado no modo ensaio, sem o fine-tuning do Zé"
+        return ItemDoChecklist(titulo, "aviso", detalhe, "rode o notebook 3 e a preparação com o GGUF do Zé")
+    if problema is not None:
+        detalhe = f"{problema}; recebido {resposta[:80]!r}"
+        return ItemDoChecklist(titulo, "falha", detalhe, "confira se o GGUF certo está na porta 8080")
     velocidade = f"{tokens / segundos:.1f}".replace(".", ",") if segundos > 0 else "?"
     return ItemDoChecklist(titulo, "ok", f"charada em {segundos:.1f} s, {velocidade} tokens/s", "")
 
