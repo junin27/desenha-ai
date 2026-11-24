@@ -1,6 +1,6 @@
 # Continuação do trabalho (handoff entre sessões do Claude Code)
 
-Atualizado em 24/11/2026 (tarde), ao fim da sessão que implementou a `demo-offline` e rodou os notebooks 1 e 2 e o ensaio do 3 no Colab. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
+Atualizado em 24/11/2026 (noite). Ver primeiro a seção **Estado ao fim de 24/11/2026 (noite)** no fim deste arquivo. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
 
 ## Quem é o usuário e o que ele espera (antes só na memória local do Claude)
 
@@ -88,3 +88,12 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - O ruff formata depois de você editar: releia o trecho antes de uma substituição por texto.
 - O Colab novo removeu `warmup_ratio` do `SFTConfig` (o notebook escolhe `warmup_ratio` ou `warmup_steps` pelos campos) e o Unsloth quer ser importado antes de trl/transformers/peft.
 - `git status` pode listar centenas de arquivos como modificados por *cache* de `stat` depois de normalizar fim de linha; confirme com `git diff --stat` e `git diff --ignore-cr-at-eol`.
+
+## Estado ao fim de 24/11/2026 (noite) — LEIA PRIMEIRO
+
+- **Feito hoje:** `docs/cadastro.md` (texto da planilha, prazo **27/11**), `docs/banner.md` e `docs/pitch.md` (com `[PENDENTE]` só nos números do Zé final). Git configurado só no repositório (`--local`, usuário junin27); nada global.
+- **Colab liberou a T4 e a rodada completa do notebook 3 rodou, mas REPROVOU** (métricas em `notebooks/resultados/rodada1_reprovada/`): o destilado repetia frases até os 300 tokens (formato 32,6% contra 78,3% do base; CHARADA e VEREDITO 0%), embora a perplexidade tenha caído de 88,4 para 10,1. Causa: o Unsloth novo liga *packing* por padrão (363 conversas viraram 110 linhas, 21 passos) e o modelo não aprendeu a parar no `<|im_end|>`. **Corrigido em `a894ed4`** (`packing=False` no `SFTConfig`); ainda não provado.
+- **Próximo passo:** rodar de novo o notebook 3 no Colab (T4, `MODO_ENSAIO = False`, mesmos 3 uploads; ~69 passos, ~12 min de treino + ~10 min de GGUF). Se der **APROVADO**: trazer `zedorabisco-1.7b-Q4_K_M.gguf` (pelo Drive) e `metricas_slm.json` para `notebooks/resultados/` e seguir a lista "Depois do GGUF" acima, mais preencher os `[PENDENTE]` de `docs/banner.md` e `docs/pitch.md` (% do veredito, tempo de treino, tokens/s). Se reprovar de novo: olhar os exemplos da célula de comparação (laço ou não fecha `</resposta>`?) antes de mexer em hiperparâmetros.
+- **Contingência (limite: manhã de 28/11):** demo sem o Zé treinado, usando charadas/narrações de reserva; no banner, dataset + ensaio + quantização.
+- **Com o usuário:** cadastro na planilha até 27/11, template oficial do banner, voz pt-BR (Microsoft Maria) no notebook do evento, impressão, ensaio em 29/11.
+- O GGUF da rodada reprovada ficou no Drive (`desenha_ai_so/`); não usar.
