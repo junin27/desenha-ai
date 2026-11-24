@@ -29,3 +29,7 @@ Thumbs.db
 
 # Demo preparada para o estande (gerada por scripts/preparar_demo.py)
 demo/
+
+# Resultados dos notebooks do Colab: binarios pesados ficam fora; metricas e figuras entram
+notebooks/resultados/**/*.onnx
+notebooks/resultados/**/*.gguf
