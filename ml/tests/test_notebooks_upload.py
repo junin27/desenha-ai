@@ -79,12 +79,22 @@ class ColabFalso:
         return {nome: b"x" for nome in enviados}
 
 
-def _com_colab_falso(monkeypatch: pytest.MonkeyPatch, colab: ColabFalso) -> Callable[..., None]:
-    google = types.ModuleType("google")
-    pacote_colab = types.ModuleType("google.colab")
+def _com_colab_falso(
+    monkeypatch: pytest.MonkeyPatch, colab: ColabFalso, tela: "TelaFalsa | None" = None
+) -> Callable[..., None]:
+    """Instala `google.colab` e `IPython.display` falsos: a célula dos notebooks importa os dois."""
+    tela = tela or TelaFalsa()
+    google, pacote_colab = types.ModuleType("google"), types.ModuleType("google.colab")
     pacote_colab.files = colab  # type: ignore[attr-defined]
-    monkeypatch.setitem(sys.modules, "google", google)
-    monkeypatch.setitem(sys.modules, "google.colab", pacote_colab)
+    ipython, exibicao = types.ModuleType("IPython"), types.ModuleType("IPython.display")
+    exibicao.HTML, exibicao.display = tela.HTML, tela.display  # type: ignore[attr-defined]
+    for nome, modulo in (
+        ("google", google),
+        ("google.colab", pacote_colab),
+        ("IPython", ipython),
+        ("IPython.display", exibicao),
+    ):
+        monkeypatch.setitem(sys.modules, nome, modulo)
     return _carregar_funcao_do_notebook()
 
 
@@ -122,3 +132,96 @@ def test_menu_fechado_sem_enviar_nada_vira_erro_com_o_que_faltou(
 
     with pytest.raises(FileNotFoundError, match=r"modelos_redes\.zip"):
         exigir("modelos_redes.zip")
+
+
+class ColabComDownloadFalso(ColabFalso):
+    def __init__(self, pasta: Path) -> None:
+        super().__init__(pasta, [])
+        self.baixados: list[str] = []
+
+    def download(self, caminho: str) -> None:
+        self.baixados.append(caminho)
+
+
+class TelaFalsa:
+    """`IPython.display` simulado: guarda o HTML que o notebook mostraria."""
+
+    def __init__(self) -> None:
+        self.exibidos: list[str] = []
+
+    def HTML(self, texto: str) -> str:  # noqa: N802 - nome da classe real
+        return texto
+
+    def display(self, objeto: str) -> None:
+        self.exibidos.append(objeto)
+
+
+def _funcao_de_baixar(
+    monkeypatch: pytest.MonkeyPatch, colab: ColabComDownloadFalso, tela: TelaFalsa
+) -> Callable[..., None]:
+    _com_colab_falso(monkeypatch, colab, tela)
+    celula = next(c for c in _celulas_de_codigo(NOTEBOOKS[0]) if "def baixar_com_menu" in c)
+    espaco: dict[str, object] = {}
+    exec(compile(celula, "celula", "exec"), espaco)
+    funcao = espaco["baixar_com_menu"]
+    assert callable(funcao)
+    return funcao
+
+
+def test_arquivo_pequeno_mostra_botao_que_abre_a_janela_de_salvar_como(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    arquivo = tmp_path / "modelos_redes.zip"
+    arquivo.write_bytes(b"conteudo")
+    colab, tela = ColabComDownloadFalso(tmp_path), TelaFalsa()
+
+    _funcao_de_baixar(monkeypatch, colab, tela)(str(arquivo))
+
+    assert len(tela.exibidos) == 1 and colab.baixados == []
+    html = tela.exibidos[0]
+    assert "showSaveFilePicker" in html and "modelos_redes.zip" in html
+    assert "Y29udGV1ZG8=" in html  # base64 de "conteudo": o arquivo vai dentro do botão
+
+
+def test_se_o_navegador_nao_abre_a_janela_o_botao_cai_no_download_normal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    arquivo = tmp_path / "metricas_slm.json"
+    arquivo.write_bytes(b"{}")
+    colab, tela = ColabComDownloadFalso(tmp_path), TelaFalsa()
+
+    _funcao_de_baixar(monkeypatch, colab, tela)(str(arquivo))
+
+    assert "a.download" in tela.exibidos[0]  # plano B no próprio botão
+
+
+def test_arquivo_grande_demais_para_o_botao_usa_o_download_normal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    arquivo = tmp_path / "grande.bin"
+    arquivo.write_bytes(b"0" * 10)
+    colab, tela = ColabComDownloadFalso(tmp_path), TelaFalsa()
+    baixar = _funcao_de_baixar(monkeypatch, colab, tela)
+    baixar.__globals__["LIMITE_DO_BOTAO_EM_BYTES"] = 5
+
+    baixar(str(arquivo))
+
+    assert colab.baixados == [str(arquivo)] and tela.exibidos == []
+
+
+@pytest.mark.parametrize(
+    ("nome", "arquivo"),
+    [
+        ("01_redes_neurais_cnn_lstm", "modelos_redes.zip"),
+        ("02_slm_destilacao_dataset", "dataset_slm.zip"),
+        ("03_slm_finetuning_qlora_gguf", "metricas_slm.json"),
+    ],
+)
+def test_notebook_entrega_o_arquivo_pelo_menu_de_salvar_e_nao_pelo_download_direto(
+    nome: str, arquivo: str
+) -> None:
+    codigo = "\n".join(_celulas_de_codigo(nome))
+
+    assert codigo.count("files.download(") == 1  # só dentro de baixar_com_menu (arquivos grandes)
+    assert re.search(r"^baixar_com_menu\(.*\)$", codigo, flags=re.MULTILINE)
+    assert arquivo in codigo

@@ -31,12 +31,16 @@
 %pip install unsloth
 
 # %%
+import base64
 import glob
 import os
+from pathlib import Path
 
 from google.colab import files
+from IPython.display import HTML, display
 
 PASTA_DOS_ARQUIVOS = "/content"
+LIMITE_DO_BOTAO_EM_BYTES = 40 * 1024 * 1024  # o arquivo vai dentro do botão; acima disso usa o download normal
 
 
 def exigir_arquivos(*padroes):
@@ -46,6 +50,51 @@ def exigir_arquivos(*padroes):
         print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
         if not files.upload():
             raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
+
+
+MODELO_DO_BOTAO = """
+<button id="salvar" style="padding:8px 14px;font-size:14px;cursor:pointer">💾 Salvar __NOME__ (__TAMANHO__ MB) em…</button>
+<span id="aviso" style="margin-left:10px"></span>
+<script>
+const nome = "__NOME__";
+const blob = new Blob([Uint8Array.from(atob("__DADOS__"), c => c.charCodeAt(0))]);
+const aviso = (texto) => { document.getElementById("aviso").textContent = texto; };
+document.getElementById("salvar").onclick = async () => {
+  try {
+    const destino = await window.showSaveFilePicker({suggestedName: nome});
+    const escrita = await destino.createWritable();
+    await escrita.write(blob);
+    await escrita.close();
+    aviso("Salvo.");
+  } catch (erro) {
+    if (erro.name === "AbortError") { aviso("Cancelado."); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nome;
+    a.click();
+    aviso("Seu navegador não abriu a janela de escolha; baixei pelo método normal.");
+  }
+};
+</script>
+"""
+
+
+def baixar_com_menu(caminho):
+    """Mostra um botão que abre a janela "Salvar como" para você escolher onde guardar o arquivo.
+
+    Funciona no Chrome e no Edge; em outro navegador (ou se ele bloquear a janela dentro do Colab) o botão
+    baixa pelo método normal. Arquivos grandes demais para ir dentro do botão usam o download normal.
+    """
+    caminho = Path(caminho)
+    tamanho = caminho.stat().st_size
+    if tamanho > LIMITE_DO_BOTAO_EM_BYTES:
+        print(f"{caminho.name} é grande ({tamanho / 1e6:.0f} MB): download normal.")
+        files.download(str(caminho))
+        return
+    dados = base64.b64encode(caminho.read_bytes()).decode()
+    botao = (MODELO_DO_BOTAO.replace("__NOME__", caminho.name)
+             .replace("__TAMANHO__", f"{tamanho / 1e6:.1f}").replace("__DADOS__", dados))
+    display(HTML(botao))
 
 # %%
 exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip")
@@ -262,4 +311,4 @@ pd.DataFrame({"tarefa": [e["tarefa"] for e in exemplos_de_teste], "entrada": [e[
 for nome in ("metricas_slm.json", "saidas_teste_base_vs_destilado.csv", "curvas_sft.png", "base_vs_destilado.png"):
     shutil.copy(SAIDA / nome, PASTA / (("ensaio_" if MODO_ENSAIO else "") + nome))
 print("Copiado para", PASTA, "→ baixe o .gguf pelo Drive (o download de > 1 GB pelo navegador costuma falhar).")
-files.download(str(SAIDA / "metricas_slm.json"))
+baixar_com_menu(SAIDA / "metricas_slm.json")

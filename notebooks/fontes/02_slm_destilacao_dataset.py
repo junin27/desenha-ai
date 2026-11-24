@@ -34,12 +34,16 @@
 # ## 0. Instalação e configuração do Teacher
 
 # %%
+import base64
 import glob
 import os
+from pathlib import Path
 
 from google.colab import files
+from IPython.display import HTML, display
 
 PASTA_DOS_ARQUIVOS = "/content"
+LIMITE_DO_BOTAO_EM_BYTES = 40 * 1024 * 1024  # o arquivo vai dentro do botão; acima disso usa o download normal
 
 
 def exigir_arquivos(*padroes):
@@ -49,6 +53,51 @@ def exigir_arquivos(*padroes):
         print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
         if not files.upload():
             raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
+
+
+MODELO_DO_BOTAO = """
+<button id="salvar" style="padding:8px 14px;font-size:14px;cursor:pointer">💾 Salvar __NOME__ (__TAMANHO__ MB) em…</button>
+<span id="aviso" style="margin-left:10px"></span>
+<script>
+const nome = "__NOME__";
+const blob = new Blob([Uint8Array.from(atob("__DADOS__"), c => c.charCodeAt(0))]);
+const aviso = (texto) => { document.getElementById("aviso").textContent = texto; };
+document.getElementById("salvar").onclick = async () => {
+  try {
+    const destino = await window.showSaveFilePicker({suggestedName: nome});
+    const escrita = await destino.createWritable();
+    await escrita.write(blob);
+    await escrita.close();
+    aviso("Salvo.");
+  } catch (erro) {
+    if (erro.name === "AbortError") { aviso("Cancelado."); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nome;
+    a.click();
+    aviso("Seu navegador não abriu a janela de escolha; baixei pelo método normal.");
+  }
+};
+</script>
+"""
+
+
+def baixar_com_menu(caminho):
+    """Mostra um botão que abre a janela "Salvar como" para você escolher onde guardar o arquivo.
+
+    Funciona no Chrome e no Edge; em outro navegador (ou se ele bloquear a janela dentro do Colab) o botão
+    baixa pelo método normal. Arquivos grandes demais para ir dentro do botão usam o download normal.
+    """
+    caminho = Path(caminho)
+    tamanho = caminho.stat().st_size
+    if tamanho > LIMITE_DO_BOTAO_EM_BYTES:
+        print(f"{caminho.name} é grande ({tamanho / 1e6:.0f} MB): download normal.")
+        files.download(str(caminho))
+        return
+    dados = base64.b64encode(caminho.read_bytes()).decode()
+    botao = (MODELO_DO_BOTAO.replace("__NOME__", caminho.name)
+             .replace("__TAMANHO__", f"{tamanho / 1e6:.1f}").replace("__DADOS__", dados))
+    display(HTML(botao))
 
 # %%
 exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip")
@@ -134,8 +183,7 @@ with zipfile.ZipFile(caminho_zip, "w", zipfile.ZIP_DEFLATED) as arquivo_zip:
         if caminho.is_file():
             arquivo_zip.write(caminho, caminho.name)
 print(caminho_zip, f"({caminho_zip.stat().st_size / 1e6:.1f} MB)")
-from google.colab import files
-files.download(str(caminho_zip))
+baixar_com_menu(caminho_zip)
 
 # %% [markdown]
 # ## 5. Relatório técnico (preencher com os números obtidos)

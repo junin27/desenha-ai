@@ -50,8 +50,8 @@ O treino roda no Colab com GPU; a lógica vem do pacote `desenha_ml`, já testad
 
 1. Gere o pacote: `ml/.venv/Scripts/python -m build --wheel ml` → `ml/dist/desenha_ml-0.1.0-py3-none-any.whl`.
 2. No Colab, abra `notebooks/01_redes_neurais_cnn_lstm.ipynb` e escolha *Ambiente de execução → Alterar o tipo → T4 GPU*.
-3. Envie o `.whl` para o painel *Arquivos* (pasta `/content`).
-4. *Ambiente de execução → Executar tudo* (≈ 30–40 min). Ao final, o navegador baixa `modelos_redes.zip`, com `cnn.onnx`, `lstm.onnx`, `classes.json`, `metricas_redes.json`, `predicoes_validacao.json`, `teste_paridade_redes.json` e as figuras do banner.
+3. Rode a célula 0: um menu de upload abre para você escolher o `.whl` (o painel *Arquivos* também serve).
+4. *Ambiente de execução → Executar tudo* (≈ 30–40 min). Ao final, um botão **Salvar … em** abre a janela "Salvar como" para `modelos_redes.zip`, com `cnn.onnx`, `lstm.onnx`, `classes.json`, `metricas_redes.json`, `predicoes_validacao.json`, `teste_paridade_redes.json` e as figuras do banner.
 5. Confira no notebook a linha **Critério mínimo**: o treino só vale com o ensemble ≥ 85% e cada rede ≥ 80% de acurácia no teste.
 
 Ensaio local do mesmo pipeline (CPU, amostra pequena, sem critério de qualidade):
@@ -63,9 +63,9 @@ ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epo
 
 ## Dataset destilado e fine-tuning do Zé (Google Colab)
 
-**Notebook 2 — dataset** (sem GPU): envie o `.whl` e o `modelos_redes.zip`; coloque a chave gratuita do Gemini nos *Secrets* do Colab como `GEMINI_API_KEY`; execute tudo (≈ 15–25 min). O *checkpoint* fica no Drive (`desenha_ai_so/dataset_ze`), e rodar de novo continua de onde parou. Confira **suficiente: true** (≥ 300 amostras, ≥ 60 por tarefa) e baixe o `dataset_slm.zip`. Ensaio local sem API: `ml/.venv/Scripts/python scripts/ensaio_dataset_local.py`.
+**Notebook 2 — dataset** (sem GPU): o menu de upload pede o `.whl` e o `modelos_redes.zip`; coloque a chave gratuita do Gemini nos *Secrets* do Colab como `GEMINI_API_KEY`; execute tudo (≈ 15–25 min). O *checkpoint* fica no Drive (`desenha_ai_so/dataset_ze`), e rodar de novo continua de onde parou. Confira **suficiente: true** (≥ 300 amostras, ≥ 60 por tarefa) e baixe o `dataset_slm.zip`. Ensaio local sem API: `ml/.venv/Scripts/python scripts/ensaio_dataset_local.py`.
 
-**Notebook 3 — fine-tuning** (GPU T4): envie o `.whl`, o `dataset_slm.zip` e o `modelos_redes.zip`.
+**Notebook 3 — fine-tuning** (GPU T4): o menu de upload pede o `.whl`, o `dataset_slm.zip` e o `modelos_redes.zip`. Os downloads pequenos saem por um botão "Salvar como" (Chrome/Edge; se o navegador bloquear a janela dentro do Colab, o botão baixa pelo método normal, e ativar *Perguntar onde salvar cada arquivo* em `chrome://settings/downloads` mostra a janela sempre).
 1. Rode com `MODO_ENSAIO = True` (≈ 10 min): testa todas as etapas, inclusive a exportação GGUF.
 2. Troque para `MODO_ENSAIO = False` e rode de novo (≈ 40–60 min).
 3. Confira a linha **CRITÉRIO DE APROVAÇÃO** (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o Qwen3 base).
