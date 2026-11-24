@@ -25,17 +25,32 @@
 # **Dados:** [Google Quick, Draw!](https://github.com/googlecreativelab/quickdraw-dataset) (*simplified*, CC BY 4.0), 30 categorias,
 # 9.000 desenhos reconhecidos por categoria (7.000 treino · 1.000 validação · 1.000 teste).
 #
-# > **Antes de rodar:** *Ambiente de execução → Alterar o tipo → **T4 GPU***. Envie para o painel *Arquivos* o
-# > `desenha_ml-0.1.0-py3-none-any.whl` (pasta `ml/dist/` do projeto). Tempo total ≈ 30–40 min.
+# > **Antes de rodar:** *Ambiente de execução → Alterar o tipo → **T4 GPU***. Rode a célula 0: abre um menu
+# > de upload para o `desenha_ml-0.1.0-py3-none-any.whl` (pasta `ml/dist/` do projeto). Tempo total ≈ 30–40 min.
 
 # %% [markdown]
 # ## 0. Instalação do pacote do projeto
 
 # %%
 import glob
+import os
 
+from google.colab import files
+
+PASTA_DOS_ARQUIVOS = "/content"
+
+
+def exigir_arquivos(*padroes):
+    """Abre o menu de upload do Colab enquanto faltar algum arquivo (eles caem em /content)."""
+    os.chdir(PASTA_DOS_ARQUIVOS)
+    while faltando := [p for p in padroes if not glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, p))]:
+        print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
+        if not files.upload():
+            raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
+
+# %%
+exigir_arquivos("desenha_ml-*.whl")
 RODA = glob.glob("/content/desenha_ml-*.whl")
-assert RODA, "Envie o arquivo desenha_ml-*.whl para o painel Arquivos do Colab (pasta /content)."
 %pip install -q "{RODA[0]}[treino]" onnxscript
 
 # %%

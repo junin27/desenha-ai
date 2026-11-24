@@ -26,7 +26,7 @@
 # curadoria, exportação), com testes e especificação no OpenSpec (`openspec/specs/conversa-com-o-ze`, `dataset-do-ze`).
 # O pipeline foi ensaiado localmente com um Teacher offline (`scripts/ensaio_dataset_local.py`).
 #
-# > **Antes de rodar:** envie ao painel *Arquivos* o `desenha_ml-*.whl` e o `modelos_redes.zip` da Parte 1.
+# > **Antes de rodar:** a célula 0 abre um menu de upload para o `desenha_ml-*.whl` e o `modelos_redes.zip` da Parte 1.
 # > Chave gratuita do Gemini em https://aistudio.google.com → *Secrets* do Colab com o nome `GEMINI_API_KEY`
 # > (alternativa: `GROQ_API_KEY`). Não precisa de GPU. Tempo ≈ 15–25 min (≈ 110 chamadas, dentro do *free tier*).
 
@@ -35,9 +35,24 @@
 
 # %%
 import glob
+import os
 
+from google.colab import files
+
+PASTA_DOS_ARQUIVOS = "/content"
+
+
+def exigir_arquivos(*padroes):
+    """Abre o menu de upload do Colab enquanto faltar algum arquivo (eles caem em /content)."""
+    os.chdir(PASTA_DOS_ARQUIVOS)
+    while faltando := [p for p in padroes if not glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, p))]:
+        print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
+        if not files.upload():
+            raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
+
+# %%
+exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip")
 RODA = glob.glob("/content/desenha_ml-*.whl")
-assert RODA, "Envie o arquivo desenha_ml-*.whl para o painel Arquivos do Colab (pasta /content)."
 %pip install -q "{RODA[0]}[teacher]"
 
 # %%
@@ -65,6 +80,7 @@ print("Teste do Teacher:", teacher.gerar('Responda em JSON {"ok": true, "saudaca
 # ficha técnica (as acurácias reais viram os únicos números que o Zé pode citar).
 
 # %%
+exigir_arquivos("modelos_redes.zip")
 with zipfile.ZipFile("/content/modelos_redes.zip") as arquivo_zip:
     predicoes = json.loads(arquivo_zip.read("predicoes_validacao.json"))
     metricas = json.loads(arquivo_zip.read("metricas_redes.json"))

@@ -32,9 +32,24 @@
 
 # %%
 import glob
+import os
 
+from google.colab import files
+
+PASTA_DOS_ARQUIVOS = "/content"
+
+
+def exigir_arquivos(*padroes):
+    """Abre o menu de upload do Colab enquanto faltar algum arquivo (eles caem em /content)."""
+    os.chdir(PASTA_DOS_ARQUIVOS)
+    while faltando := [p for p in padroes if not glob.glob(os.path.join(PASTA_DOS_ARQUIVOS, p))]:
+        print("Faltam:", ", ".join(faltando), "→ escolha o(s) arquivo(s) na janela de upload que abriu.")
+        if not files.upload():
+            raise FileNotFoundError("Nenhum arquivo enviado; ainda faltam: " + ", ".join(faltando))
+
+# %%
+exigir_arquivos("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip")
 RODA = glob.glob("/content/desenha_ml-*.whl")
-assert RODA, "Envie o arquivo desenha_ml-*.whl para o painel Arquivos do Colab (pasta /content)."
 %pip install -q "{RODA[0]}"
 
 # %%
@@ -70,6 +85,7 @@ print(torch.cuda.get_device_name(0), "| VRAM", round(torch.cuda.get_device_prope
 # ## 1. Dataset destilado (Parte 2) e ficha técnica (Parte 1)
 
 # %%
+exigir_arquivos("dataset_slm.zip", "modelos_redes.zip")
 with zipfile.ZipFile("/content/dataset_slm.zip") as arquivo_zip:
     arquivo_zip.extractall("/content/dataset_slm")
 with zipfile.ZipFile("/content/modelos_redes.zip") as arquivo_zip:
