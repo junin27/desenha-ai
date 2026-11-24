@@ -225,3 +225,13 @@ def test_notebook_entrega_o_arquivo_pelo_menu_de_salvar_e_nao_pelo_download_dire
     assert codigo.count("files.download(") == 1  # só dentro de baixar_com_menu (arquivos grandes)
     assert re.search(r"^baixar_com_menu\(.*\)$", codigo, flags=re.MULTILINE)
     assert arquivo in codigo
+
+
+def test_notebook_3_confere_a_gpu_antes_de_instalar_o_unsloth() -> None:
+    """Achado no Colab (24/11): sem GPU o notebook gastava a instalação e quebrava num erro obscuro."""
+    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    primeira_que_instala = next(i for i, c in enumerate(celulas) if "pip install unsloth" in c)
+    conferencias = [i for i, c in enumerate(celulas) if "torch.cuda.is_available()" in c]
+
+    assert conferencias and conferencias[0] < primeira_que_instala
+    assert "Alterar o tipo" in celulas[conferencias[0]]  # a mensagem diz onde trocar o ambiente

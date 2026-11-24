@@ -27,6 +27,16 @@
 # ## 0. Instalação e configuração
 
 # %%
+import torch
+
+if not torch.cuda.is_available():
+    raise RuntimeError(
+        "Sem GPU neste ambiente. Use Ambiente de execução → Alterar o tipo → T4 (ou L4) → Salvar, "
+        "e rode de novo. Não escolha 'sem acelerador': o fine-tuning precisa de GPU."
+    )
+print("GPU:", torch.cuda.get_device_name(0))
+
+# %%
 %%capture
 %pip install unsloth
 
