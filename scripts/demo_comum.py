@@ -36,7 +36,7 @@ def ler_manifesto(caminho: Path = CAMINHO_DO_MANIFESTO) -> Resultado[Manifesto]:
     if not caminho.is_file():
         return Erro(
             "arquivo_ausente",
-            f"{caminho} não existe; rode `ml.venvScriptspython scriptspreparar_demo.py`",
+            f"{caminho} não existe; rode `python scripts/preparar_demo.py`",
         )
     lido = manifesto_de_json(caminho.read_text(encoding="utf8"))
     return Ok(lido.valor) if isinstance(lido, Ok) else lido
