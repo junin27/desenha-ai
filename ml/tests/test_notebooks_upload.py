@@ -312,3 +312,12 @@ def test_notebook_3_instala_o_wheel_sem_mexer_no_torch_e_confere_o_import() -> N
     assert "--no-deps" in instalacao  # só precisa do numpy; o pip não deve mexer no torch do Unsloth
     assert "-q " not in instalacao  # o erro do pip tem de aparecer
     assert 'import_module("desenha_ml")' in instalacao  # falha aqui, com mensagem clara
+
+
+def test_notebook_3_para_antes_de_treinar_se_o_packing_juntou_conversas() -> None:
+    """Rodada de 24/11 (noite) usou um .ipynb antigo: packing ligado de novo (363 conversas → 110 linhas)."""
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+    trava = codigo.index("len(trainer.train_dataset) == len(ds_treino)")
+
+    assert "packing=False" in codigo
+    assert trava < codigo.index("trainer.train()")

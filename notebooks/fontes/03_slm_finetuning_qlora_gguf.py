@@ -256,6 +256,12 @@ trainer = train_on_responses_only(trainer, instruction_part="<|im_start|>user\n"
 
 com_perda = tokenizer.decode([t for t in trainer.train_dataset[0]["labels"] if t != -100])
 assert "<pensamento>" in com_perda and "TAREFA:" not in com_perda, "loss masking incorreto: a perda inclui a entrada"
+# Trava: se o packing estiver ligado (notebook antigo ou Unsloth ignorando a opção), as conversas viram menos linhas
+# e o Zé não aprende a parar; para aqui em vez de gastar o treino (rodadas de 24/11 reprovadas por isso).
+assert len(trainer.train_dataset) == len(ds_treino), (
+    f"packing ligado: {len(ds_treino)} conversas viraram {len(trainer.train_dataset)} linhas; "
+    "confira se este é o notebook atual (packing=False no SFTConfig)"
+)
 print("Conferência do loss masking OK — trecho com perda:", com_perda[:160])
 
 inicio = time.time()
