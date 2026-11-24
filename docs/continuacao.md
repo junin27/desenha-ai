@@ -1,6 +1,6 @@
 # Continuação do trabalho (handoff entre sessões do Claude Code)
 
-Atualizado em 23/11/2026, ao fim da sessão que implementou a `jogo-web` e a `bancada-do-ze`. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
+Atualizado em 23/11/2026, ao fim da sessão que implementou a `demo-offline` (depois da `jogo-web` e da `bancada-do-ze`). Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
 
 ## Quem é o usuário e o que ele espera (antes só na memória local do Claude)
 
@@ -18,11 +18,11 @@ Atualizado em 23/11/2026, ao fim da sessão que implementou a `jogo-web` e a `ba
 | treino-das-redes | 17/17 | ele roda o notebook 1 no Colab; arquivar quando bater o critério mínimo |
 | dataset-do-ze | 18/18 | rodar o notebook 2 com `GEMINI_API_KEY`; arquivar quando o volume for suficiente |
 | fine-tuning-do-ze | 11/11 | rodar o notebook 3 (ensaio, depois completo); arquivar quando bater o critério |
-| jogo-web | **18/18**, conferida no navegador | testar com o `llama-server` real (vem na demo-offline) e arquivar |
-| bancada-do-ze | **17/17**, conferida no navegador | ouvir a voz real (instalar voz pt-BR) e testar os dois `llama-server`; arquivar |
-| **demo-offline** | **proposta escrita e válida, AGUARDANDO APROVAÇÃO** (0/10) | mostrar a proposta, pedir aprovação e só então implementar com `/openspec-apply-change demo-offline` |
+| jogo-web | **18/18**, conferida no navegador e com o `llama-server` real (ensaio 23/11) | arquivar depois do ensaio com o Zé treinado |
+| bancada-do-ze | **17/17**, conferida no navegador e com os dois `llama-server` | arquivar depois do ensaio com o Zé treinado |
+| **demo-offline** | **11/11**, aprovada e implementada; ensaio real com o Qwen3 base (modo ensaio), ver `docs/capturas/README.md` | repetir o ensaio com o GGUF do Zé treinado (`preparar_demo.py --gguf-do-ze`), voltar o formato do Zé a ✗ e arquivar |
 
-Para retomar, a próxima sessão deve: ler os arquivos acima, rodar `git log --oneline | head -30` e `bash scripts/verificar.sh`, confirmar o estado em 2 a 3 linhas e pedir a aprovação da `demo-offline` (`openspec/changes/demo-offline/`).
+Para retomar, a próxima sessão deve: ler os arquivos acima, rodar `git log --oneline | head -30` e `bash scripts/verificar.sh` e confirmar o estado em 2 a 3 linhas. O que falta: rodar os notebooks 1, 2 e 3 no Colab (os `.ipynb` abrem menu de upload e botão "Salvar como"), preparar a demo com o GGUF do Zé, ensaio final, arquivar as changes, banner e pitch (`docs/banner.md` e `docs/pitch.md` ainda não existem) e cadastro do título até 27/11.
 
 ## Configurar outra máquina
 
