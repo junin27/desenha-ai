@@ -235,3 +235,19 @@ def test_notebook_3_confere_a_gpu_antes_de_instalar_o_unsloth() -> None:
 
     assert conferencias and conferencias[0] < primeira_que_instala
     assert "Alterar o tipo" in celulas[conferencias[0]]  # a mensagem diz onde trocar o ambiente
+
+
+def test_notebook_3_nao_passa_warmup_ratio_direto_ao_sftconfig() -> None:
+    """Achado no Colab (24/11): o transformers novo removeu `warmup_ratio` (TypeError no SFTConfig)."""
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+
+    assert "warmup_ratio=" not in codigo
+    assert "dataclasses.fields(SFTConfig)" in codigo  # escolhe `warmup_ratio` ou `warmup_steps` conforme a versão
+
+
+def test_notebook_3_importa_o_unsloth_antes_de_trl_e_transformers() -> None:
+    """O Unsloth avisa (e perde otimizações) se for importado depois do trl/transformers/peft."""
+    celula = next(c for c in _celulas_de_codigo("03_slm_finetuning_qlora_gguf") if "from trl import" in c)
+
+    assert celula.index("from unsloth import") < celula.index("from trl import")
+    assert celula.index("from unsloth import") < celula.index("from datasets import")

@@ -112,6 +112,10 @@ RODA = glob.glob("/content/desenha_ml-*.whl")
 %pip install -q "{RODA[0]}"
 
 # %%
+from unsloth import FastLanguageModel  # antes de trl, transformers e peft, ou perde otimizações
+from unsloth.chat_templates import train_on_responses_only
+
+import dataclasses
 import json, math, shutil, time, zipfile
 from pathlib import Path
 
@@ -122,8 +126,6 @@ import torch
 from datasets import Dataset
 from huggingface_hub import get_safetensors_metadata
 from trl import SFTConfig, SFTTrainer
-from unsloth import FastLanguageModel
-from unsloth.chat_templates import train_on_responses_only
 
 from desenha_ml.avaliacao_do_ze import avaliar_criterio_do_ze, avaliar_saida, resumir
 from desenha_ml.ficha_tecnica import montar_ficha
@@ -215,10 +217,13 @@ print("Exemplo do base:\n", respostas_base[0][:500])
 # %%
 FastLanguageModel.for_training(model)
 tokenizer.padding_side = "right"
+# o transformers novo trocou `warmup_ratio` por `warmup_steps` (valor < 1 = fração dos passos)
+CHAVE_DO_AQUECIMENTO = "warmup_ratio" if "warmup_ratio" in {c.name for c in dataclasses.fields(SFTConfig)} else "warmup_steps"
+AQUECIMENTO = {CHAVE_DO_AQUECIMENTO: 0.05}
 trainer = SFTTrainer(
     model=model, tokenizer=tokenizer, train_dataset=ds_treino, eval_dataset=ds_validacao,
     args=SFTConfig(dataset_text_field="text", per_device_train_batch_size=4, gradient_accumulation_steps=4,
-                   num_train_epochs=3, max_steps=10 if MODO_ENSAIO else -1, learning_rate=2e-4, warmup_ratio=0.05,
+                   num_train_epochs=3, max_steps=10 if MODO_ENSAIO else -1, learning_rate=2e-4, **AQUECIMENTO,
                    lr_scheduler_type="cosine", optim="adamw_8bit", weight_decay=0.01, logging_steps=5,
                    eval_strategy="steps", eval_steps=5 if MODO_ENSAIO else 10, save_strategy="no", seed=3407,
                    output_dir=str(SAIDA / "treino"), report_to="none"))
