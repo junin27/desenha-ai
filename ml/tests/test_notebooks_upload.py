@@ -12,11 +12,11 @@ from pathlib import Path
 import pytest
 
 RAIZ = Path(__file__).parents[2]
-NOTEBOOKS = ("01_redes_neurais_cnn_lstm", "02_slm_destilacao_dataset", "03_slm_finetuning_qlora_gguf")
+NOTEBOOKS = ("01_redes_neurais_cnn_lstm", "02_slm_destilacao_dataset", "03_slm_finetuning_zedorabisco_v3")
 ARQUIVOS_EXIGIDOS = {
     "01_redes_neurais_cnn_lstm": ("desenha_ml-*.whl",),
     "02_slm_destilacao_dataset": ("desenha_ml-*.whl", "modelos_redes.zip"),
-    "03_slm_finetuning_qlora_gguf": ("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip"),
+    "03_slm_finetuning_zedorabisco_v3": ("desenha_ml-*.whl", "modelos_redes.zip", "dataset_slm.zip"),
 }
 
 
@@ -215,7 +215,7 @@ def test_arquivo_grande_demais_para_o_botao_usa_o_download_normal(
     [
         ("01_redes_neurais_cnn_lstm", "modelos_redes.zip"),
         ("02_slm_destilacao_dataset", "dataset_slm.zip"),
-        ("03_slm_finetuning_qlora_gguf", "metricas_slm.json"),
+        ("03_slm_finetuning_zedorabisco_v3", "metricas_slm.json"),
     ],
 )
 def test_notebook_entrega_o_arquivo_pelo_menu_de_salvar_e_nao_pelo_download_direto(
@@ -230,7 +230,7 @@ def test_notebook_entrega_o_arquivo_pelo_menu_de_salvar_e_nao_pelo_download_dire
 
 def test_notebook_3_confere_a_gpu_antes_de_instalar_o_unsloth() -> None:
     """Achado no Colab (24/11): sem GPU o notebook gastava a instalação e quebrava num erro obscuro."""
-    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    celulas = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3")
     primeira_que_instala = next(i for i, c in enumerate(celulas) if "pip install unsloth" in c)
     conferencias = [i for i, c in enumerate(celulas) if "torch.cuda.is_available()" in c]
 
@@ -240,7 +240,7 @@ def test_notebook_3_confere_a_gpu_antes_de_instalar_o_unsloth() -> None:
 
 def test_notebook_3_nao_passa_warmup_ratio_direto_ao_sftconfig() -> None:
     """Achado no Colab (24/11): o transformers novo removeu `warmup_ratio` (TypeError no SFTConfig)."""
-    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_zedorabisco_v3"))
 
     assert "warmup_ratio=" not in codigo
     # escolhe `warmup_ratio` ou `warmup_steps` conforme a versão instalada
@@ -249,7 +249,7 @@ def test_notebook_3_nao_passa_warmup_ratio_direto_ao_sftconfig() -> None:
 
 def test_notebook_3_importa_o_unsloth_antes_de_trl_e_transformers() -> None:
     """O Unsloth avisa (e perde otimizações) se for importado depois do trl/transformers/peft."""
-    celula = next(c for c in _celulas_de_codigo("03_slm_finetuning_qlora_gguf") if "from trl import" in c)
+    celula = next(c for c in _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3") if "from trl import" in c)
 
     assert celula.index("from unsloth import") < celula.index("from trl import")
     assert celula.index("from unsloth import") < celula.index("from datasets import")
@@ -257,13 +257,13 @@ def test_notebook_3_importa_o_unsloth_antes_de_trl_e_transformers() -> None:
 
 def test_notebook_3_ja_vem_configurado_para_a_rodada_completa() -> None:
     """O ensaio foi feito em 24/11; o padrão agora é a rodada completa, que gera o GGUF do Zé."""
-    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_zedorabisco_v3"))
 
     assert re.search(r"^MODO_ENSAIO = False\b", codigo, flags=re.MULTILINE)
 
 
 def test_notebook_3_diz_no_fim_onde_estao_o_gguf_e_o_que_fazer_com_ele() -> None:
-    ultima = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")[-1]
+    ultima = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3")[-1]
 
     assert "zedorabisco-1.7b-Q4_K_M.gguf" in ultima
     assert "notebooks" in ultima and "resultados" in ultima  # onde colocar os arquivos baixados do Drive
@@ -272,7 +272,7 @@ def test_notebook_3_diz_no_fim_onde_estao_o_gguf_e_o_que_fazer_com_ele() -> None
 
 def test_checagem_de_gpu_mostra_o_diagnostico_do_nvidia_smi() -> None:
     """Sem GPU, o erro precisa mostrar o que o Colab realmente alocou (e não só mandar trocar o tipo)."""
-    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    celulas = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3")
     conferencia = next(c for c in celulas if "torch.cuda.is_available()" in c)
 
     assert "nvidia-smi" in conferencia and "subprocess" in conferencia
@@ -286,7 +286,7 @@ def test_checagem_de_gpu_nao_quebra_quando_o_nvidia_smi_nao_existe(monkeypatch: 
         raise FileNotFoundError(2, "No such file or directory", "nvidia-smi")
 
     monkeypatch.setattr(subprocess, "run", sem_nvidia_smi)
-    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    celulas = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3")
     conferencia = next(c for c in celulas if "torch.cuda.is_available()" in c)
     saida: list[str] = []
 
@@ -306,7 +306,7 @@ def test_checagem_de_gpu_nao_quebra_quando_o_nvidia_smi_nao_existe(monkeypatch: 
 
 def test_notebook_3_instala_o_wheel_sem_mexer_no_torch_e_confere_o_import() -> None:
     """Achado no Colab (24/11, noite): `No module named 'desenha_ml'`; o `-q` escondia o motivo."""
-    celulas = _celulas_de_codigo("03_slm_finetuning_qlora_gguf")
+    celulas = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v3")
     instalacao = next(c for c in celulas if "desenha_ml-*.whl" in c and "RODA" in c)
 
     assert "--no-deps" in instalacao  # só precisa do numpy; o pip não deve mexer no torch do Unsloth
@@ -316,7 +316,7 @@ def test_notebook_3_instala_o_wheel_sem_mexer_no_torch_e_confere_o_import() -> N
 
 def test_notebook_3_para_antes_de_treinar_se_o_packing_juntou_conversas() -> None:
     """Rodada de 24/11 (noite) usou um .ipynb antigo: packing ligado de novo (363 conversas → 110 linhas)."""
-    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_qlora_gguf"))
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_zedorabisco_v3"))
     trava = codigo.index("len(trainer.train_dataset) == len(ds_treino)")
 
     assert "packing=False" in codigo
