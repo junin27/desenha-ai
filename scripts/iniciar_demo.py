@@ -15,7 +15,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from demo_comum import PASTA_DA_DEMO, ler_manifesto, memoria_livre_em_bytes
+from demo_comum import (
+    PASTA_DA_DEMO,
+    configurar_saida_em_utf8,
+    ler_manifesto,
+    memoria_livre_em_bytes,
+)
 from desenha_ml.demo.manifesto import Manifesto
 from desenha_ml.demo.navegador import (
     PastasDoWindows,
@@ -139,6 +144,7 @@ def _subir(
 
 
 def main() -> int:
+    configurar_saida_em_utf8()
     manifesto = ler_manifesto()
     if isinstance(manifesto, Erro):
         print(f"ERRO: {manifesto.detalhe}", file=sys.stderr)

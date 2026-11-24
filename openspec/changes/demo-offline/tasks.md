@@ -11,7 +11,7 @@
 
 - [x] 2.1 `scripts/preparar_demo.py`: download com arquivo `.parcial` e conferência de tamanho, extração do llama.cpp, cópia dos GGUF e das redes, build do jogo e manifesto; *tag* do llama.cpp fixada e registrada no design: testes com servidor HTTP local para "Download interrompido" e "Preparação repetida"
 - [x] 2.2 `scripts/iniciar_demo.py` + `Iniciar Desenha Aí.bat`: Job Object, memória, servidores, espera por saúde, navegador e Ctrl+C: teste do Job Object com um processo filho de longa duração ("Ctrl+C") e conferência manual do `.bat`
-- [ ] 2.3 `scripts/conferir_demo.py` + `Conferir Desenha Aí.bat`: leitura das vozes no registro, memória, portas e fala real; teste da leitura das vozes com uma lista simulada
+- [x] 2.3 `scripts/conferir_demo.py` + `Conferir Desenha Aí.bat`: leitura das vozes no registro, memória, portas e fala real; teste da leitura das vozes com uma lista simulada
 - [ ] 2.4 `docs/checklist_evento.md` (cenário "Checklist disponível"), seção "Como rodar a demo" no README e `demo/` no `.gitignore`
 
 ## 3. Ensaio real e verificação

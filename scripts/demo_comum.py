@@ -13,6 +13,13 @@ CAMINHO_DO_MANIFESTO = PASTA_DA_DEMO / "manifesto.json"
 BYTES_POR_BLOCO = 8 * 1024 * 1024  # blocos grandes: o GGUF tem ~1 GB
 
 
+def configurar_saida_em_utf8() -> None:
+    """O console do Windows costuma estar em cp1252, que não tem ✓ ✗ ⚠ →; sem isso o print quebra."""
+    for fluxo in (sys.stdout, sys.stderr):
+        if hasattr(fluxo, "reconfigure"):
+            fluxo.reconfigure(encoding="utf-8", errors="replace")
+
+
 def sha256_do_arquivo(caminho: Path) -> str:
     with caminho.open("rb") as arquivo:
         return sha256_de_blocos(iter(lambda: arquivo.read(BYTES_POR_BLOCO), b""))
