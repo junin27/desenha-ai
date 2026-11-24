@@ -82,9 +82,15 @@ class RegistroBruto(TypedDict):
 def executar_lotes(
     lotes: Iterable[Lote], teacher: Teacher, checkpoint: Path, registrar: Callable[[str], None] = print
 ) -> list[RegistroBruto]:
-    """Pede cada lote ainda não gravado e grava na hora; devolve todos os registros do checkpoint."""
-    feitos = {r["lote_id"] for r in _ler_checkpoint(checkpoint)}
-    pendentes = [lote for lote in lotes if lote.identificador not in feitos]
+    """Pede cada lote ainda não completo e grava na hora; devolve todos os registros do checkpoint.
+
+    Lote "completo" = todas as amostras com saída. Um lote que ficou vazio (ou com menos exemplos que o
+    pedido) é refeito ao retomar e seus registros antigos são trocados: sem isso a falha ficaria presa.
+    """
+    gravados = _ler_checkpoint(checkpoint)
+    completos = _lotes_completos(gravados)
+    pendentes = [lote for lote in lotes if lote.identificador not in completos]
+    _descartar_do_checkpoint(checkpoint, gravados, {lote.identificador for lote in pendentes})
     for numero, lote in enumerate(pendentes, start=1):
         saida = teacher.gerar(lote.prompt, lote.temperatura)
         _gravar(checkpoint, _registros(lote, saida))
@@ -92,6 +98,20 @@ def executar_lotes(
             f"lote {numero}/{len(pendentes)} ({lote.identificador}) {'ok' if saida else 'SEM RESPOSTA'}"
         )
     return _ler_checkpoint(checkpoint)
+
+
+def _lotes_completos(registros: list[RegistroBruto]) -> set[str]:
+    todos = {r["lote_id"] for r in registros}
+    return todos - {r["lote_id"] for r in registros if r["saida"] is None}
+
+
+def _descartar_do_checkpoint(checkpoint: Path, registros: list[RegistroBruto], lotes: set[str]) -> None:
+    """Remove os registros incompletos dos lotes que serão refeitos (os completos não são tocados)."""
+    if not any(r["lote_id"] in lotes for r in registros):
+        return
+    restantes = [r for r in registros if r["lote_id"] not in lotes]
+    linhas = [json.dumps(r, ensure_ascii=False) + chr(10) for r in restantes]
+    checkpoint.write_text("".join(linhas), encoding="utf8", newline=chr(10))
 
 
 def _registros(lote: Lote, saida: object | None) -> list[RegistroBruto]:

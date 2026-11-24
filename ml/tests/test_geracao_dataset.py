@@ -114,6 +114,46 @@ def test_lote_sem_resposta_e_gravado_sem_saida(tmp_path: Path) -> None:
     assert registros[0]["saida"] is None
 
 
+def test_retomada_refaz_so_o_lote_que_ficou_sem_saida(tmp_path: Path) -> None:
+    """Achado no Colab (24/11): 90 amostras `vazia` ficavam presas no checkpoint e nunca eram refeitas."""
+    checkpoint = tmp_path / "bruto.jsonl"
+    relogio = RelogioFalso()
+    primeira = ApiFalsa(['{"exemplos": ["a"]}', *[None] * 5, '{"exemplos": ["c"]}'])
+    executar_lotes(_lotes(3), _teacher(primeira, relogio), checkpoint)
+
+    segunda = ApiFalsa(['{"exemplos": ["b"]}'])
+    registros = executar_lotes(_lotes(3), _teacher(segunda, relogio), checkpoint)
+
+    assert len(segunda.prompts) == 1 and segunda.prompts[0] == "prompt 1"
+    assert [(r["lote_id"], r["saida"]) for r in registros] == [("l0", "a"), ("l2", "c"), ("l1", "b")]
+    assert len(checkpoint.read_text(encoding="utf8").splitlines()) == 3
+
+
+def test_lote_com_menos_exemplos_que_o_pedido_tambem_e_refeito(tmp_path: Path) -> None:
+    checkpoint = tmp_path / "bruto.jsonl"
+    relogio = RelogioFalso()
+    lote = Lote("l0", "PERGUNTA", "prompt", 0.8, ["e1", "e2"], [{}, {}])
+    executar_lotes([lote], _teacher(ApiFalsa(['{"exemplos": ["so um"]}']), relogio), checkpoint)
+
+    segunda = ApiFalsa(['{"exemplos": ["um", "dois"]}'])
+    registros = executar_lotes([lote], _teacher(segunda, relogio), checkpoint)
+
+    assert len(segunda.prompts) == 1
+    assert [r["saida"] for r in registros] == ["um", "dois"]
+
+
+def test_retomada_nao_refaz_lotes_completos_nem_duplica_linhas(tmp_path: Path) -> None:
+    checkpoint = tmp_path / "bruto.jsonl"
+    relogio = RelogioFalso()
+    executar_lotes(_lotes(2), _teacher(ApiFalsa(['{"exemplos": ["a"]}'] * 2), relogio), checkpoint)
+
+    terceira = ApiFalsa([])
+    executar_lotes(_lotes(2), _teacher(terceira, relogio), checkpoint)
+
+    assert terceira.prompts == []
+    assert len(checkpoint.read_text(encoding="utf8").splitlines()) == 2
+
+
 # ---------------------------------------------------------------------------------------- pedidos
 def test_180_pedidos_de_charada() -> None:
     lotes = pedidos_de_charada(semente=1)
