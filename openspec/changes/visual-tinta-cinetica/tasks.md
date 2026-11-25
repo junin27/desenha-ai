@@ -39,7 +39,7 @@
 
 ## 7. Verificação
 
-- [ ] 7.1 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build e `openspec validate --all --strict`).
+- [x] 7.1 `bash scripts/verificar.sh` verde (pytest, mypy, ruff, vitest, lint, typecheck, build e `openspec validate --all --strict`).
 
 ## Workflow follow-up
 

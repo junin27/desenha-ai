@@ -335,6 +335,7 @@ textarea {
 
 .titulo-do-jogo {
   margin: 0;
+  width: 100%;
 }
 
 .titulo-do-jogo .titulo {
