@@ -57,6 +57,12 @@ A acurácia vem das métricas que o painel técnico já lê (`metricas_redes.jso
 ### D9. Transição por pincelada sem atrasar a lógica
 A pincelada é um SVG por cima de tudo, com `pointer-events: none`, que cobre (≈ 550 ms), troca a tela e descobre. A troca de tela continua síncrona em relação ao estado; o atraso é só visual e limitado a 1,2 s. Com movimento reduzido a troca é imediata.
 
+### D10. Fontes embutidas pelo Fontsource, maiúsculas por CSS e ícones em SVG próprio
+O usuário escolheu (25/11) a opção "Giz e lápis" do protótipo 12: **Gochi Hand** nos títulos e **Patrick Hand** no resto, as duas OFL. Entram como dependências `@fontsource/gochi-hand` e `@fontsource/patrick-hand` (download autorizado), importadas só no peso 400 e no subconjunto latino; o Vite copia os `.woff2` para o build, então nada é pedido à internet. `font-display: swap` com fonte do sistema como reserva. Títulos e botões ficam em maiúsculas com `text-transform: uppercase` (o texto no DOM continua igual, então testes, voz e leitores de tela não mudam). Os ícones são caminhos SVG desenhados para o projeto, num módulo `presentation/icones.ts` (`criarIcone(nome)`), com `stroke: currentColor` e `aria-hidden`.
+- *Alternativa descartada:* baixar as fontes do Google Fonts em tempo de execução (quebra o offline) ou copiar os `.woff2` à mão (perde a versão e a licença que o pacote traz).
+- *Alternativa descartada:* biblioteca de ícones (Lucide, Phosphor): traço limpo demais para o visual de caneta e uma dependência a mais.
+- *Risco:* a Patrick Hand é mais estreita; o tamanho base sobe ~12% e as capturas nas duas resoluções conferem que nada passa a rolar.
+
 ## Risks / Trade-offs
 
 - [Animações pesam no notebook do estande (CPU, sem GPU dedicada)] → só `transform`/`opacity`; o fundo de rabiscos é limitado a ~6 rabiscos ao mesmo tempo; medir FPS no ensaio de 29/11 e desligar o fundo se cair abaixo de 30 FPS.

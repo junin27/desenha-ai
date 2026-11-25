@@ -46,8 +46,41 @@ Com `prefers-reduced-motion: reduce`, a pincelada, os rabiscos do fundo, o confe
 - **THEN** todas as telas aparecem sem pincelada nem confete e a partida termina no placar
 
 ### Requirement: Legibilidade e offline mantidos
-O visual novo SHALL manter os requisitos da spec `interface-do-jogo`: fonte de pelo menos 24 px no texto do jogo, nenhuma rolagem a 1366×768 e a 1920×1080 em nenhuma tela, e nenhum recurso de fora (as fontes são as do sistema).
+O visual novo SHALL manter os requisitos da spec `interface-do-jogo`: fonte de pelo menos 24 px no texto do jogo, nenhuma rolagem a 1366×768 e a 1920×1080 em nenhuma tela, e nenhum recurso de fora (as fontes ficam embutidas no build).
 
 #### Scenario: Todas as telas a 1366×768
 - **WHEN** cada tela (abertura, apelido, charada, desenho, veredito, placar) é aberta a 1366×768
 - **THEN** nenhuma delas tem rolagem vertical ou horizontal
+
+### Requirement: Fontes do jogo
+Os títulos (o título do jogo e os títulos de cada tela e cartão) SHALL usar a fonte Gochi Hand, e o resto do texto do jogo (charada, palpites, falas, campos e botões) SHALL usar a fonte Patrick Hand, as duas com licença OFL e embutidas no build em woff2, sem nenhum pedido para fora de `localhost`. Se uma fonte não carregar, SHALL valer uma fonte do sistema, sem quebrar a tela.
+
+#### Scenario: Fontes no build offline
+- **WHEN** o build é inspecionado
+- **THEN** os arquivos das fontes Gochi Hand e Patrick Hand estão dentro dele e nenhum `@font-face` aponta para fora
+
+#### Scenario: Título de tela
+- **WHEN** a tela de apelido é exibida
+- **THEN** o título "Qual é o seu apelido?" usa a Gochi Hand e o campo de apelido usa a Patrick Hand
+
+### Requirement: Títulos e botões em maiúsculas
+Os títulos e o texto de todos os botões do jogo SHALL aparecer em letras maiúsculas, com os acentos preservados. O que o visitante digita (apelido e pergunta) e o texto corrido SHALL NOT ser convertidos.
+
+#### Scenario: Botão com acento
+- **WHEN** a tela de apelido é exibida
+- **THEN** o botão aparece como "COMEÇAR PARTIDA" e a sugestão como "PEÃO VELOZ"
+
+#### Scenario: Apelido digitado
+- **WHEN** o visitante digita "Juninho" no campo de apelido
+- **THEN** o campo mostra "Juninho" e o placar mostra "Juninho"
+
+### Requirement: Ícones desenhados
+Títulos e botões SHALL poder levar um ícone desenhado no mesmo traço de caneta (lápis, borracha, lixeira, raio, jogar, troféu, lupa, balão, chapéu, estrela, casinha, redes, enviar, ordem), embutido no build, na cor do texto ao lado e sem texto próprio (o nome do botão continua sendo o texto dele).
+
+#### Scenario: Botões do desenho com ícone
+- **WHEN** a tela de desenho é exibida
+- **THEN** os botões "LÁPIS", "BORRACHA", "LIMPAR" e "PRONTO!" mostram cada um o seu ícone ao lado do texto
+
+#### Scenario: Ícone não muda o nome do botão
+- **WHEN** um leitor de tela lê o botão da borracha
+- **THEN** o nome lido é "Borracha", sem texto extra do ícone
