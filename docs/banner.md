@@ -1,6 +1,6 @@
 # Conteúdo do banner
 
-> O enunciado exige seguir **rigorosamente o modelo padrão do professor**. O template ainda não está no projeto; este texto segue as seções pedidas (contextualização, arquitetura, dados e treinamento, resultados e conclusões) e deve ser encaixado no layout oficial. Os números são dos resultados reais em `notebooks/resultados/` (redes em `modelos_redes/`; Zé na rodada v7, em `rodada5/`). Atualizado em 25/11/2026, com o Zé v7 aprovado no critério oficial.
+> O enunciado exige seguir **rigorosamente o modelo padrão do professor**. O template oficial (`Banner Workshop IA.pptx`, 90 × 120 cm, fica fora do repositório, na pasta acima) já foi preenchido: `docs/banner/Banner Desenha Ai.pptx` (prévia em `docs/banner/previa.png`), gerado por `scripts/figuras_do_banner.py` e `scripts/montar_banner.py`. O template tem quatro seções (Introdução, Metodologia, Resultados e Referências), então o pôster é uma versão mais curta deste texto: contextualização vira Introdução, arquitetura e dados viram Metodologia e as conclusões entram em Resultados. O texto do pôster fica em `TEXTOS`, dentro do `montar_banner.py`; este arquivo continua sendo a versão completa. Os números são dos resultados reais em `notebooks/resultados/` (redes em `modelos_redes/`; Zé na rodada v7, em `rodada5/`). Atualizado em 25/11/2026, com o Zé v7 aprovado no critério oficial.
 
 ## Título
 **Desenha Aí, Sô!** — Redes Neurais que adivinham seus rabiscos e um SLM caipira que julga
