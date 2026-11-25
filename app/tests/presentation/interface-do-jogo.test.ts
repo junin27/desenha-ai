@@ -106,13 +106,28 @@ describe("tela de início", () => {
 });
 
 describe("tela da charada", () => {
-  it("mostra o Zé pensando ao vivo e o botão de desenhar desativado", () => {
+  it("charada sem vazamento: mostra só 'Pensando…' enquanto o Zé gera, sem o raciocínio que cita a palavra", () => {
     tela.mostrar(
-      estado({ etapa: "charada", falaAoVivo: { etapa: "pensando", pensamento: "Malhada e", resposta: "" } }),
+      estado({
+        etapa: "charada",
+        falaAoVivo: { etapa: "pensando", pensamento: "A palavra é melancia", resposta: "" },
+      }),
     );
     expect(texto("[data-texto=rodada]")).toContain("1 de 3");
-    expect(texto("[data-texto=ze-ao-vivo]")).toContain("Malhada e");
+    expect(texto("[data-texto=ze-ao-vivo]")).toBe("Pensando…");
+    expect(raiz.textContent).not.toContain("melancia");
     expect(raiz.querySelector<HTMLButtonElement>("[data-acao=desenhar]")?.disabled).toBe(true);
+  });
+
+  it("charada sem vazamento: a resposta parcial, ainda não filtrada, também não aparece", () => {
+    tela.mostrar(
+      estado({
+        etapa: "charada",
+        falaAoVivo: { etapa: "respondendo", pensamento: "", resposta: "Charada: É melancia" },
+      }),
+    );
+    expect(texto("[data-texto=ze-ao-vivo]")).toBe("Pensando…");
+    expect(raiz.textContent).not.toContain("melancia");
   });
 
   it("com a charada pronta, mostra o texto e libera o botão de desenhar", () => {

@@ -1,10 +1,12 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
 import { RODADAS_POR_PARTIDA } from "../../domain/rodada/pontuacao";
 import { botao, criar } from "../dom";
-import { falaAoVivoNaTela, seloDaFala } from "../textos";
+import { seloDaFala } from "../textos";
 import type { ComandosDoJogo, Tela } from "./tela";
 
-/** Charada: o Zé pensando ao vivo, depois a charada e o botão para começar a desenhar. */
+const TEXTO_ENQUANTO_GERA = "Pensando…";
+
+/** Charada: "Pensando…" enquanto o Zé gera, depois a charada validada e o botão para começar a desenhar. */
 export class TelaCharada implements Tela {
   readonly raiz: HTMLElement;
   private readonly rodada = criar("p", { classe: "rodada", dados: { texto: "rodada" } });
@@ -31,7 +33,9 @@ export class TelaCharada implements Tela {
     this.rodada.textContent = `Rodada ${estado.rodada + 1} de ${RODADAS_POR_PARTIDA}`;
     const pronta = estado.charada !== undefined;
     this.pensando.hidden = pronta;
-    this.pensando.textContent = falaAoVivoNaTela(estado.falaAoVivo) || "Pensando…";
+    // Sem a fala parcial: o raciocínio costuma citar a palavra secreta e a resposta ainda não passou pelo filtro
+    // de vazamento (spec interface-do-jogo, "Charada sem vazamento durante a geração").
+    this.pensando.textContent = TEXTO_ENQUANTO_GERA;
     this.charada.textContent = estado.charada?.texto ?? "";
     this.selo.hidden = estado.charada === undefined;
     if (estado.charada !== undefined) {

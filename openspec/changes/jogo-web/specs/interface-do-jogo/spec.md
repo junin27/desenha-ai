@@ -7,11 +7,18 @@ Apresentar o jogo no estande de forma legível e direta para o público, com cap
 ## ADDED Requirements
 
 ### Requirement: Telas da partida
-O jogo SHALL ter uma tela para cada etapa da spec `partida`: início (apelido, placar e botão Jogar), charada (com o Zé "pensando" ao vivo), desenho (canvas, cronômetro, charada e os 3 primeiros palpites ao vivo), veredito (narração, veredito e pontos) e fim (total e posição no placar).
+O jogo SHALL ter uma tela para cada etapa da spec `partida`: início (apelido, placar e botão Jogar), charada (com "Pensando…" enquanto o Zé gera), desenho (canvas, cronômetro, charada e os 3 primeiros palpites ao vivo), veredito (narração, veredito e pontos) e fim (total e posição no placar).
 
 #### Scenario: Etapa e tela coincidem
 - **WHEN** a partida muda de etapa
 - **THEN** a tela correspondente é exibida em até 100 ms
+
+### Requirement: Charada sem vazamento durante a geração
+Enquanto o Zé gera a charada, a tela SHALL mostrar só "Pensando…", sem o raciocínio nem a resposta parciais, porque o raciocínio costuma citar a palavra secreta e a resposta ainda não passou pelo filtro de vazamento. A charada SHALL aparecer só depois de validada (do Zé ou de reserva).
+
+#### Scenario: Pensamento cita a palavra
+- **WHEN** a fala parcial do Zé na etapa charada é "<pensamento>A palavra é melancia"
+- **THEN** a tela mostra "Pensando…" e o texto "melancia" não aparece
 
 ### Requirement: Captura do desenho
 O canvas SHALL aceitar mouse, toque e caneta (Pointer Events), registrar cada traço como a sequência de pontos (x, y) e ter um botão "Limpar" que apaga o desenho e reinicia os palpites sem reiniciar o cronômetro.
