@@ -32,8 +32,8 @@ O modelo base SHALL receber o mesmo prompt e passar pelas mesmas conferências (
 - **THEN** a rodada usa a reserva e o painel conta uma fala de reserva para o modelo base
 
 ### Requirement: Selo de quem está falando
-As telas de charada, veredito e "Pergunte ao Zé" SHALL mostrar o selo "Zé destilado" ou "Qwen3 base (sem fine-tuning)" do modelo que gerou aquela fala, ou "Reserva" quando a fala mostrada veio da reserva.
+As telas de charada, veredito e "Pergunte ao Zé" SHALL mostrar o selo "Zé destilado" ou "Qwen3 base (sem fine-tuning)" do modelo que gerou aquela fala. Uma fala de reserva SHALL aparecer sem selo: "Reserva" é termo de bastidor e passa ao visitante a impressão de defeito; a reserva continua contada no painel técnico.
 
 #### Scenario: Selo da reserva
 - **WHEN** a charada mostrada é de reserva porque o base falhou
-- **THEN** o selo da charada é "Reserva"
+- **THEN** a charada aparece sem selo e o painel conta uma fala de reserva

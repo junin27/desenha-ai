@@ -16,9 +16,13 @@ function estado(alteracao: Partial<EstadoDaPartida>): EstadoDaPartida {
   return { ...ESTADO_INICIAL, nome: "Ana", categorias: [0, 1, 2], ...alteracao };
 }
 
-function selo(): string {
+function elementoDoSelo(): HTMLElement | null | undefined {
   const visiveis = [...raiz.querySelectorAll<HTMLElement>("[data-tela]")].filter((secao) => !secao.hidden);
-  return visiveis[0]?.querySelector("[data-texto=selo]")?.textContent ?? "";
+  return visiveis[0]?.querySelector<HTMLElement>("[data-texto=selo]");
+}
+
+function selo(): string {
+  return elementoDoSelo()?.textContent ?? "";
 }
 
 beforeEach(() => {
@@ -29,9 +33,10 @@ beforeEach(() => {
 });
 
 describe("selo de quem está falando", () => {
-  it("selo da reserva: charada de reserva mostra 'Reserva'", () => {
+  it("selo da reserva: charada de reserva aparece sem selo (termo de bastidor)", () => {
     tela.mostrar(estado({ etapa: "charada", charada: { texto: "Dá leite.", origem: "reserva" } }));
-    expect(selo()).toBe("Reserva");
+    expect(elementoDoSelo()?.hidden).toBe(true);
+    expect(selo()).toBe("");
   });
 
   it.each([
@@ -66,7 +71,7 @@ describe("selo de quem está falando", () => {
       erro: undefined,
       resposta: { texto: "Oi", origem: "reserva" },
     });
-    expect(selo()).toBe("Reserva");
+    expect(elementoDoSelo()?.hidden).toBe(true);
   });
 });
 

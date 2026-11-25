@@ -1,6 +1,6 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
 import { RODADAS_POR_PARTIDA } from "../../domain/rodada/pontuacao";
-import { botao, criar } from "../dom";
+import { botao, criar, mostrarSelo } from "../dom";
 import { falaAoVivoNaTela, seloDaFala, TITULO_DO_VEREDITO } from "../textos";
 import type { ComandosDoJogo, InformacoesDoJogo, Tela } from "./tela";
 
@@ -42,7 +42,7 @@ export class TelaVeredito implements Tela {
     this.pontos.textContent = `+${ultimo.pontos} pontos`;
     this.desafio.textContent = `Era: ${this.informacoes.nomesDasCategorias[ultimo.categoria] ?? ""}`;
     this.narracao.textContent = ultimo.narracao;
-    this.selo.textContent = seloDaFala(ultimo.origemDaNarracao, ultimo.modeloDaNarracao);
+    mostrarSelo(this.selo, seloDaFala(ultimo.origemDaNarracao, ultimo.modeloDaNarracao));
     const ultimaRodada = estado.rodada + 1 >= RODADAS_POR_PARTIDA;
     this.proxima.textContent = ultimaRodada ? "Ver resultado" : "Próxima rodada";
   }

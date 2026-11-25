@@ -1,5 +1,5 @@
 import type { EstadoDaConversa } from "../../application/conversa-com-o-ze";
-import { botao, criar } from "../dom";
+import { botao, criar, mostrarSelo } from "../dom";
 import { falaAoVivoNaTela, seloDaFala } from "../textos";
 import type { ComandosDaConversa } from "./tela";
 
@@ -44,10 +44,7 @@ export class TelaPergunta {
     this.aoVivo.hidden = !estado.respondendo;
     this.aoVivo.textContent = falaAoVivoNaTela(estado.falaAoVivo) || "Pensando…";
     this.resposta.textContent = estado.resposta?.texto ?? "";
-    this.selo.hidden = estado.resposta === undefined;
-    if (estado.resposta !== undefined) {
-      this.selo.textContent = seloDaFala(estado.resposta.origem, estado.resposta.modelo);
-    }
+    mostrarSelo(this.selo, estado.resposta && seloDaFala(estado.resposta.origem, estado.resposta.modelo));
     this.erro.textContent = estado.erro === undefined ? "" : MENSAGEM_DE_PERGUNTA_INVALIDA;
     if (!estado.aberta) this.campo.value = "";
   }

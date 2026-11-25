@@ -6,8 +6,9 @@ import { porcentagem, type LeituraParcial } from "../domain/ze/conversa";
 const PALPITES_NA_TELA = 3;
 
 /** Selo de quem gerou a fala mostrada (spec `comparacao-base-destilado`). */
+/** Selo de quem falou; a reserva não tem selo para o visitante (só o painel técnico a conta). */
 export function seloDaFala(origem: "ze" | "reserva", modelo: "destilado" | "base" | undefined): string {
-  if (origem === "reserva") return "Reserva";
+  if (origem === "reserva") return "";
   return modelo === "base" ? "Qwen3 base (sem fine-tuning)" : "Zé destilado";
 }
 

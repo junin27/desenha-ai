@@ -1,6 +1,6 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
 import { RODADAS_POR_PARTIDA } from "../../domain/rodada/pontuacao";
-import { botao, criar } from "../dom";
+import { botao, criar, mostrarSelo } from "../dom";
 import { seloDaFala } from "../textos";
 import type { ComandosDoJogo, Tela } from "./tela";
 
@@ -37,10 +37,7 @@ export class TelaCharada implements Tela {
     // de vazamento (spec interface-do-jogo, "Charada sem vazamento durante a geração").
     this.pensando.textContent = TEXTO_ENQUANTO_GERA;
     this.charada.textContent = estado.charada?.texto ?? "";
-    this.selo.hidden = estado.charada === undefined;
-    if (estado.charada !== undefined) {
-      this.selo.textContent = seloDaFala(estado.charada.origem, estado.charada.modelo);
-    }
+    mostrarSelo(this.selo, estado.charada && seloDaFala(estado.charada.origem, estado.charada.modelo));
     this.desenhar.disabled = !pronta;
   }
 }

@@ -35,3 +35,9 @@ export function botao(texto: string, acao: string, aoClicar: () => void): HTMLBu
 export function preencherLista(lista: HTMLOListElement | HTMLUListElement, textos: readonly string[]): void {
   lista.replaceChildren(...textos.map((texto) => criar("li", { texto })));
 }
+
+/** Mostra o selo de quem falou; sem texto (fala de reserva ou ainda sem fala), o selo some. */
+export function mostrarSelo(selo: HTMLElement, texto: string | undefined): void {
+  selo.textContent = texto ?? "";
+  selo.hidden = (texto ?? "") === "";
+}
