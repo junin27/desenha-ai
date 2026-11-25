@@ -6,7 +6,7 @@ acrescenta a captura do jogo. O template original não é alterado. As figuras v
 `scripts/figuras_do_banner.py`; os números do texto são os de `docs/banner.md`.
 
 Uso (a partir de `projeto_final/`):
-    python scripts/montar_banner.py --template "../Banner Workshop IA.pptx" --email seu@academico.unirv.edu.br
+    python scripts/montar_banner.py --template "docs/banner/Banner Workshop IA.pptx" --email seu@academico.unirv.edu.br
 """
 
 import argparse
@@ -255,7 +255,7 @@ def montar(template: Path, saida: Path, email: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument(
-        "--template", type=Path, default=Path("../Banner Workshop IA.pptx")
+        "--template", type=Path, default=Path("docs/banner/Banner Workshop IA.pptx")
     )
     parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO)
     parser.add_argument(

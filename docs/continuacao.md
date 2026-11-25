@@ -1,6 +1,6 @@
 # Continuação do trabalho (handoff entre sessões do Claude Code)
 
-Atualizado em 25/11/2026 (manhã). Ver primeiro a seção **Estado em 25/11/2026 (manhã) — LEIA PRIMEIRO** no fim deste arquivo; as seções de estado anteriores ficam como histórico. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
+Atualizado em 25/11/2026 (fim do dia). Ver primeiro a seção **Estado em 25/11/2026 (fim do dia) — LEIA PRIMEIRO** no fim deste arquivo; as seções de estado anteriores ficam como histórico. Esta é a fonte para continuar em **outra máquina**: leia antes de qualquer coisa, junto com `CLAUDE.md`, `.claude/rules/`, `docs/roteiro.md` e `docs/decisoes.md`.
 
 ## Quem é o usuário e o que ele espera (antes só na memória local do Claude)
 
@@ -164,10 +164,37 @@ O usuário vai trabalhar no **design, na experiência do usuário e em funcional
 
 ## Banner (25/11/2026): montado no template oficial
 
-- O template do professor (`Banner Workshop IA.pptx`, pôster de 90 × 120 cm, um slide) está **fora do Git**, na pasta acima do repositório. O pôster pronto é `docs/banner/Banner Desenha Ai.pptx` (**versionado**, já com o template dentro, então dá para editar em outra máquina), com a prévia em `docs/banner/previa.png`.
-- Gerar de novo: `python scripts/figuras_do_banner.py` (precisa do Pillow; lê os JSONs de métricas e desenha `docs/banner/figuras/`) e `python scripts/montar_banner.py --template "../Banner Workshop IA.pptx" --email SEU@academico.unirv.edu.br`. Os textos do pôster ficam em `TEXTOS` no `montar_banner.py`.
+- O template do professor (`Banner Workshop IA.pptx`, pôster de 90 × 120 cm, um slide) está **versionado** em `docs/banner/Banner Workshop IA.pptx` (cópia do original, que antes ficava só na pasta acima do repositório). O pôster pronto é `docs/banner/Banner Desenha Ai.pptx` (**versionado**, já com o template dentro, então dá para editar em outra máquina), com a prévia em `docs/banner/previa.png`.
+- Gerar de novo: `python scripts/figuras_do_banner.py` (precisa do Pillow; lê os JSONs de métricas e desenha `docs/banner/figuras/`) e `python scripts/montar_banner.py --email SEU@academico.unirv.edu.br` (o template padrão é o de `docs/banner/`). Os textos do pôster ficam em `TEXTOS` no `montar_banner.py`.
 - **O e-mail acadêmico** (gilberto.junior@academico.unirv.edu.br) já está no `docs/banner/Banner Desenha Ai.pptx`, com autorização do usuário para ficar no repositório público. Para trocar, rodar o segundo comando com `--email`.
 - **Figura 1** (captura do jogo, 4098 × 2136 px, categoria "casa" para a charada, o desenho e os palpites combinarem): refazer com o build servido em `localhost:4173` e o comando que está no topo de `scripts/figuras_do_banner.py` (`CATEGORIA=casa ESCALA=3 CLIPE=... node scripts/capturar_telas.mjs docs/banner/figuras 1366 768`). Ele esconde só na hora da foto a barra técnica, o padrão da câmera falsa e os rabiscos de fundo.
 - Para a impressão, as figuras de gráfico e o diagrama saem a 150 px/cm (cerca de 380 dpi), com letras de 22 a 28 pt e linhas de 1,4 a 3 mm.
 - Limites conhecidos: as figuras usam Segoe UI (o template usa Open Sans, que está embutida no .pptx mas não instalada); a última referência fica a cerca de 3 cm da borda; o banner é uma versão curta do `docs/banner.md`.
+
+## Estado em 25/11/2026 (fim do dia) — LEIA PRIMEIRO
+
+**Tudo o que foi feito está no GitHub (`main`); nada ficou só nesta máquina.** Verificação completa verde (472 testes Python, 622 TypeScript, OpenSpec 12/12).
+
+### Changes (`openspec list`)
+- **Completas, ainda não arquivadas** (só arquivar quando o usuário pedir, com `/openspec-archive-change`): `treino-das-redes`, `dataset-do-ze`, `fine-tuning-do-ze`, `jogo-web`, `bancada-do-ze`, `demo-offline`, `visual-tinta-cinetica`.
+- **`desenho-com-a-mao`: 20/21.** Falta só a 5.1: medir o **FPS do modo Mão com as redes ligadas** (meta ≥ 10) com webcam real, no ensaio de 29/11 no notebook do evento (trecho de console em `docs/capturas/README.md`). O usuário testou os gestos com mão real em 25/11 e disse que "ficou bom", sem números; por isso a 5.1 não foi marcada.
+- A **CSP do build** (D11 no `design.md` dessa change) bloqueia a telemetria do MediaPipe; foi conferida no Edge headless (`scripts/conferir_politica_de_conteudo.mjs`).
+
+### Banner e pitch: prontos
+- Pôster: `docs/banner/Banner Desenha Ai.pptx` (prévia `docs/banner/previa.png`), no template oficial, com os números reais do Zé v7 (base × destilado 0% → 100% em charada e veredito), Q8_0 e uma frase de limites. Figuras de gráfico e diagrama em alta resolução e linhas grossas para impressão; a Figura 1 é a tela do jogo em resolução tripla. Detalhes e como regerar: seção "Banner" acima. `docs/banner.md` e `docs/pitch.md` estão sem `[PENDENTE]`.
+- **Conferir antes de imprimir:** as 5 referências do banner foram escritas de memória, sem acesso aos artigos (autores, anos e links arXiv).
+
+### Pendências do usuário (por prazo)
+1. **Até 27/11 (cadastro):** `docs/cadastro.md` ainda diz "quantizado em 4 bits", mas o evento usa **GGUF Q8_0** (8 bits; o treino é QLoRA sobre o modelo em 4 bits NF4). Corrigir **antes** de enviar o formulário (o escopo trava depois). A mesma correção vale para o cabeçalho do `CLAUDE.md` ("GGUF 4 bits").
+2. **`openspec/config.yaml`, linha 33:** diz "nunca git push", o que contradiz a regra atual (push depois de cada commit com a verificação verde).
+3. **Checklist do evento** (`docs/checklist_evento.md`): liberar a câmera para `localhost` no navegador e medir o FPS do modo Mão; voz pt-BR (Microsoft Maria) instalada; porta 8080 livre (o serviço `PEMHTTPD-x64` do EDB PEM a ocupa na máquina de casa).
+4. **Ensaio de 29/11 e evento de 30/11**; impressão do banner (exportar o `.pptx` para PDF no PowerPoint).
+
+### O que NÃO está no Git (recriar na máquina nova)
+`ml/.venv`, `app/node_modules`, `app/dist`, `app/public/` (modelos e MediaPipe: `bash scripts/copiar_modelos.sh ...`), `saida/` (ensaio das redes; sem ele os testes de paridade ONNX são **pulados**, não reprovados), `demo/` (`scripts/preparar_demo.py`), caches. Os GGUF estão no Git LFS (`git lfs install` antes do clone; `GIT_LFS_SKIP_SMUDGE=1 git pull` para pular os modelos).
+- Os scripts `scripts/capturar_telas.mjs` e `scripts/conferir_politica_de_conteudo.mjs` assumem o **Edge** em `C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe` e o build servido em `localhost:4173` (`npm --prefix app run build` e `npm --prefix app run preview`).
+- `scripts/figuras_do_banner.py` precisa do **Pillow** (`python -m pip install pillow`; baixar só com o OK do usuário) e das fontes Segoe UI ou Arial do Windows.
+
+### Regras de trabalho que continuam valendo
+OpenSpec (spec aprovada pelo usuário antes do código), TDD, hexagonal no `app/`, commits pequenos com o porquê no corpo, terminando em `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` (pedido dele), e **`git push origin main` depois de cada commit com `bash scripts/verificar.sh` verde** (nunca `--force`, nunca commit com a verificação falhando). Baixar arquivos só com o OK dele (nome, origem, tamanho). Testar de verdade e dizer com franqueza o que não foi provado.
 
