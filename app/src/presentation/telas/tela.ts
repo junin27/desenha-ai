@@ -24,6 +24,8 @@ export interface ComandosDaConversa {
 export interface InformacoesDoJogo {
   readonly nomesDasCategorias: readonly string[];
   lerPlacar(): readonly PartidaNoPlacar[];
+  /** Acurácia de teste do ensemble (0 a 1), das métricas do treino; ausente quando o arquivo não existe. */
+  readonly acuraciaDoEnsemble?: number | undefined;
 }
 
 /** Uma tela por etapa: montada uma vez, atualizada a cada mudança do estado. */

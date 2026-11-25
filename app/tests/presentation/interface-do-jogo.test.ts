@@ -56,24 +56,43 @@ beforeEach(() => {
 });
 
 describe("etapa e tela coincidem", () => {
+  it("ao abrir, a primeira tela é a abertura (spec tela-de-abertura)", () => {
+    tela.mostrar(ESTADO_INICIAL);
+    expect(visivel()).toEqual(["abertura"]);
+  });
+
+  it("Jogar agora leva ao apelido e Ver placar ao placar", () => {
+    tela.mostrar(ESTADO_INICIAL);
+    clicar("[data-acao=jogar-agora]");
+    expect(visivel()).toEqual(["inicio"]);
+    clicar("[data-acao=ver-placar]");
+    expect(visivel()).toEqual(["placar"]);
+    clicar("[data-acao=voltar-do-placar]");
+    expect(visivel()).toEqual(["inicio"]);
+  });
+
   it.each([
-    ["inicio", "inicio"],
     ["charada", "charada"],
     ["desenhando", "desenho"],
     ["julgando", "veredito"],
     ["resultado", "veredito"],
-    ["fim", "fim"],
+    ["fim", "placar"],
   ] as const)("etapa %s mostra só a tela %s", (etapa, nomeDaTela) => {
     tela.mostrar(estado({ etapa, resultados: [RESULTADO_ACERTOU] }));
     expect(visivel()).toEqual([nomeDaTela]);
   });
 });
 
-describe("tela de início", () => {
-  it("botão Jogar começa a partida com o apelido digitado", () => {
+describe("tela de apelido", () => {
+  beforeEach(() => {
     tela.mostrar(ESTADO_INICIAL);
+    clicar("[data-acao=jogar-agora]");
+  });
+
+  it("botão Começar partida começa a partida com o apelido digitado", () => {
     const campo = raiz.querySelector<HTMLInputElement>("[data-campo=apelido]");
     if (campo !== null) campo.value = "Zé";
+    campo?.dispatchEvent(new Event("input"));
     clicar("[data-acao=jogar]");
     expect(comandos.chamadas).toEqual(["comecar:Zé"]);
   });
@@ -83,12 +102,22 @@ describe("tela de início", () => {
     expect(texto("[data-texto=erro]")).toContain("apelido");
   });
 
-  it("mostra o placar ordenado (mais pontos primeiro)", () => {
+  it("nome inválido deixa Começar partida desabilitado", () => {
+    expect(raiz.querySelector<HTMLButtonElement>("[data-acao=jogar]")?.disabled).toBe(true);
+  });
+
+  it("sugestão de apelido preenche o campo e libera Começar partida", () => {
+    clicar("[data-acao=sugestao-de-apelido]");
+    expect(raiz.querySelector<HTMLInputElement>("[data-campo=apelido]")?.value).toBe("Peão Veloz");
+    expect(raiz.querySelector<HTMLButtonElement>("[data-acao=jogar]")?.disabled).toBe(false);
+  });
+
+  it("Ver placar mostra o placar ordenado (mais pontos primeiro)", () => {
     placar = [
       { nome: "Bia", pontos: 30, terminadaEmMs: 1 },
       { nome: "Ana", pontos: 165, terminadaEmMs: 2 },
     ];
-    tela.mostrar(ESTADO_INICIAL);
+    clicar("[data-acao=ver-placar]");
     const linhas = [...raiz.querySelectorAll("[data-lista=placar] li")].map((li) => li.textContent);
     expect(linhas[0]).toContain("Ana");
     expect(linhas[0]).toContain("165");
@@ -96,7 +125,6 @@ describe("tela de início", () => {
   });
 
   it("aviso 'Redes divergentes do treino' só aparece quando avisado", () => {
-    tela.mostrar(ESTADO_INICIAL);
     const aviso = raiz.querySelector<HTMLElement>("[data-texto=aviso-redes]");
     expect(aviso?.hidden).toBe(true);
     tela.avisarRedesDivergentes();
@@ -205,14 +233,14 @@ describe("tela do veredito", () => {
   });
 });
 
-describe("tela do fim", () => {
+describe("placar no fim da partida", () => {
   it("mostra o total e a posição no placar", () => {
     placar = [
       { nome: "Bia", pontos: 200, terminadaEmMs: 1 },
       { nome: "Ana", pontos: 165, terminadaEmMs: 2 },
       { nome: "Caio", pontos: 30, terminadaEmMs: 3 },
     ];
-    tela.mostrar(estado({ etapa: "fim", total: 165 }));
+    tela.mostrar(estado({ etapa: "fim", nome: "Ana", total: 165 }));
     expect(texto("[data-texto=total]")).toContain("165");
     expect(texto("[data-texto=posicao]")).toContain("2º");
     clicar("[data-acao=nova-partida]");

@@ -73,15 +73,9 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
   contarFalasDaPartida(partida, medicoes);
   contarFalasDaConversa(conversa, medicoes);
 
-  const tela = new InterfaceDoJogo(raiz, partida, telaDoPlacar(classes, placar), conversa);
-  partida.aoMudar((estado) => {
-    tela.mostrar(estado);
-  });
-  conversa.aoMudar((estado) => {
-    tela.mostrarConversa(estado);
-  });
-  tela.mostrar(partida.estado);
-  await montarBarraDoEstande(leitor, medicoes, narrador);
+  const metricas = await lerMetricasDoTreino();
+  const tela = ligarTela(raiz, partida, conversa, telaDoPlacar(classes, placar, metricas));
+  montarBarraDoEstande(leitor, medicoes, narrador, metricas);
   void conferirRedesAoAbrir(redes.valor, tela, medicoes);
   instalarAtalhoDeZerarPlacar(document, {
     podeZerar: () => partida.estado.etapa === "inicio",
@@ -93,17 +87,48 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
   });
 }
 
-function telaDoPlacar(classes: ClassesDoJogo, placar: PlacarLocalStorage): InformacoesDoJogo {
-  return { nomesDasCategorias: classes.nomesDasCategorias, lerPlacar: () => placar.ler() };
+/** Monta a interface e a mantém em dia com a partida e a conversa. */
+function ligarTela(
+  raiz: HTMLElement,
+  partida: Partida,
+  conversa: ConversaComOZe,
+  informacoes: InformacoesDoJogo,
+): InterfaceDoJogo {
+  const tela = new InterfaceDoJogo(raiz, partida, informacoes, conversa, {
+    atrasoDaTrocaMs: ATRASO_DA_TROCA_DE_TELA_MS,
+  });
+  partida.aoMudar((estado) => {
+    tela.mostrar(estado);
+  });
+  conversa.aoMudar((estado) => {
+    tela.mostrarConversa(estado);
+  });
+  tela.mostrar(partida.estado);
+  return tela;
+}
+
+function telaDoPlacar(
+  classes: ClassesDoJogo,
+  placar: PlacarLocalStorage,
+  metricas: MetricasDoTreino,
+): InformacoesDoJogo {
+  // A abertura mostra a acurácia de teste do ensemble só quando as métricas existem (spec tela-de-abertura).
+  const ensemble = metricas.metricasDasRedes?.redes.find((rede) => rede.nome === "Ensemble");
+  return {
+    nomesDasCategorias: classes.nomesDasCategorias,
+    lerPlacar: () => placar.ler(),
+    acuraciaDoEnsemble: ensemble?.acuracia,
+  };
 }
 
 /** Botão da voz e "Bastidores" num canto fixo, fora das telas, e o painel técnico (bancada-do-ze). */
-async function montarBarraDoEstande(
+function montarBarraDoEstande(
   leitor: LeitorEmVoz,
   medicoes: MedicoesDaSessao,
   narrador: NarradorAlternavel,
-): Promise<void> {
-  const painel = new PainelTecnico({ medicoes, narrador, ...(await lerMetricasDoTreino()) });
+  metricas: MetricasDoTreino,
+): void {
+  const painel = new PainelTecnico({ medicoes, narrador, ...metricas });
   painel.instalarAtalho(document);
   const barra = criar("div", { classe: "barra-do-estande" }, [criarBotaoDaVoz(leitor), painel.botao]);
   document.body.append(painel.raiz, barra);
@@ -153,10 +178,16 @@ async function lerCharadas(): Promise<CharadasDeReserva> {
   return {};
 }
 
-/** Métricas opcionais do painel: arquivo ausente vira "—". */
-async function lerMetricasDoTreino(): Promise<
-  Pick<ConstructorParameters<typeof PainelTecnico>[0], "metricasDasRedes" | "metricasDoSlm">
-> {
+type MetricasDoTreino = Pick<
+  ConstructorParameters<typeof PainelTecnico>[0],
+  "metricasDasRedes" | "metricasDoSlm"
+>;
+
+/** Quando a pincelada cobre a tela e a troca acontece (spec `identidade-visual`). */
+const ATRASO_DA_TROCA_DE_TELA_MS = 450;
+
+/** Métricas opcionais do painel e da abertura: arquivo ausente vira "—" ou some. */
+async function lerMetricasDoTreino(): Promise<MetricasDoTreino> {
   const [redes, slm] = await Promise.all([
     buscarJson(buscar, `${PASTA_DOS_MODELOS}/metricas_redes.json`),
     buscarJson(buscar, `${PASTA_DOS_MODELOS}/metricas_slm.json`),

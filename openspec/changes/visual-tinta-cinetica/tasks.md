@@ -19,12 +19,12 @@
 
 ## 4. Telas
 
-- [ ] 4.1 `tela-abertura.ts`: teste (primeira tela ao carregar, sem campo de apelido; "94,7" vindo das métricas; sem métricas não mostra %; "Jogar agora" leva ao apelido; demonstração para fora da abertura) → implementar com a demonstração pré-gravada. Verifica: `npm --prefix app test -- tela-abertura`
-- [ ] 4.2 `tela-inicio.ts` vira a tela de apelido: sugestões preenchem o campo; "Começar partida" desabilitado com nome inválido; "Ver placar"; Pergunte ao Zé embutido (conversa continua na mesma tela). Testes da tela e os da `pergunte-ao-ze` continuam verdes. Verifica: `npm --prefix app test -- tela-inicio tela-pergunta`
-- [ ] 4.3 `tela-charada.ts` e `tela-desenho.ts` com o Zé (pensando enquanto gera, só "Pensando…" na tela; torcendo; assustado a 5 s) e cronômetro em anel. O teste de "Charada sem vazamento" continua verde. Verifica: `npm --prefix app test -- tela-charada tela-desenho`
-- [ ] 4.4 `tela-veredito.ts`: desenho da rodada redesenhado a partir dos traços restantes, selo nas cores da spec, pontos e total, palpite principal de CNN/LSTM/ensemble com % e cor, "—" sem traços, Zé comemorando/coçando/bravo, confete só no ACERTOU e limpo ao terminar. Verifica: `npm --prefix app test -- tela-veredito`
-- [ ] 4.5 `tela-placar.ts` (substitui `tela-fim.ts`): pódio das 5 primeiras, pesquisa, ordens, posição oficial e partida recém-jogada destacada; "Jogar de novo" volta ao apelido. Verifica: `npm --prefix app test -- tela-placar`
-- [ ] 4.6 `interface-do-jogo.ts`: abertura → apelido dentro da etapa `inicio`; `fim` mostra o placar; repasse dos traços do desenho ao veredito; teste "Etapa e tela coincidem" atualizado. Verifica: `npm --prefix app test -- interface-do-jogo`
+- [x] 4.1 `tela-abertura.ts`: teste (primeira tela ao carregar, sem campo de apelido; "94,7" vindo das métricas; sem métricas não mostra %; "Jogar agora" leva ao apelido; demonstração para fora da abertura) → implementar com a demonstração pré-gravada. Verifica: `npm --prefix app test -- tela-abertura`
+- [x] 4.2 `tela-inicio.ts` vira a tela de apelido: sugestões preenchem o campo; "Começar partida" desabilitado com nome inválido; "Ver placar"; Pergunte ao Zé embutido (conversa continua na mesma tela). Testes da tela e os da `pergunte-ao-ze` continuam verdes. Verifica: `npm --prefix app test -- tela-inicio tela-pergunta`
+- [x] 4.3 `tela-charada.ts` e `tela-desenho.ts` com o Zé (pensando enquanto gera, só "Pensando…" na tela; torcendo; assustado a 5 s) e cronômetro em anel. O teste de "Charada sem vazamento" continua verde. Verifica: `npm --prefix app test -- tela-charada tela-desenho`
+- [x] 4.4 `tela-veredito.ts`: desenho da rodada redesenhado a partir dos traços restantes, selo nas cores da spec, pontos e total, palpite principal de CNN/LSTM/ensemble com % e cor, "—" sem traços, Zé comemorando/coçando/bravo, confete só no ACERTOU e limpo ao terminar. Verifica: `npm --prefix app test -- tela-veredito`
+- [x] 4.5 `tela-placar.ts` (substitui `tela-fim.ts`): pódio das 5 primeiras, pesquisa, ordens, posição oficial e partida recém-jogada destacada; "Jogar de novo" volta ao apelido. Verifica: `npm --prefix app test -- tela-placar`
+- [x] 4.6 `interface-do-jogo.ts`: abertura → apelido dentro da etapa `inicio`; `fim` mostra o placar; repasse dos traços do desenho ao veredito; teste "Etapa e tela coincidem" atualizado. Verifica: `npm --prefix app test -- interface-do-jogo`
 
 ## 5. Identidade visual
 

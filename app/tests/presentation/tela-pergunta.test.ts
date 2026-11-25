@@ -58,17 +58,19 @@ beforeEach(() => {
 });
 
 describe("Pergunte ao Zé na tela", () => {
-  it("a tela de início tem o botão Pergunte ao Zé, que abre a conversa", () => {
-    raiz.querySelector<HTMLButtonElement>("[data-acao=pergunte-ao-ze]")?.click();
+  it("ao chegar no apelido a conversa é aberta, sem sair da tela (spec tela-de-abertura)", () => {
+    raiz.querySelector<HTMLButtonElement>("[data-acao=jogar-agora]")?.click();
     expect(conversa.chamadas).toEqual(["abrir"]);
+    tela.mostrarConversa(ABERTA);
+    expect(visivel()).toEqual(["inicio"]);
+    expect(raiz.querySelector("[data-parte=pergunte-ao-ze]")).not.toBeNull();
   });
 
-  it("ida e volta: conversa aberta mostra a tela da pergunta; fechada, volta ao início", () => {
+  it("pergunta pronta envia a pergunta e a tela de apelido continua visível", () => {
+    raiz.querySelector<HTMLButtonElement>("[data-acao=jogar-agora]")?.click();
     tela.mostrarConversa(ABERTA);
-    expect(visivel()).toEqual(["pergunta"]);
-    raiz.querySelector<HTMLButtonElement>("[data-acao=voltar]")?.click();
-    expect(conversa.chamadas).toEqual(["voltar"]);
-    tela.mostrarConversa(FECHADA);
+    raiz.querySelector<HTMLButtonElement>("[data-acao=pergunta-pronta]")?.click();
+    expect(conversa.chamadas).toEqual(["abrir", "perguntar:Como as redes adivinham?"]);
     expect(visivel()).toEqual(["inicio"]);
   });
 

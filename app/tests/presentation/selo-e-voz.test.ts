@@ -64,6 +64,7 @@ describe("selo de quem está falando", () => {
 
   it("a resposta do Pergunte ao Zé mostra o selo", () => {
     tela.mostrar(ESTADO_INICIAL);
+    raiz.querySelector<HTMLButtonElement>("[data-acao=jogar-agora]")?.click();
     tela.mostrarConversa({
       aberta: true,
       respondendo: false,
