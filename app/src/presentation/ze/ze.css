@@ -1,0 +1,466 @@
+/* Zé do Rabisco: traço, cores e um bloco por humor (spec personagem-do-ze). Animações só com transform e
+   opacity; com movimento reduzido elas param e fica só a expressão. */
+.ze {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.ze-svg {
+  width: 128px;
+  height: auto;
+  flex: none;
+  overflow: visible;
+}
+.ze-svg {
+  --pele: #f3c79b;
+  --palha: #e8b64c;
+  --tinta: #2b1a0a;
+  --suave: #6b4f2e;
+  --terracota: #b5401f;
+  --mostarda: #c98a00;
+  --fonte: "Segoe UI", system-ui, sans-serif;
+}
+/* ---------- Traço do personagem ---------- */
+.ze-svg .linha {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ze-svg .preenche {
+  stroke: var(--tinta);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+}
+.ze-svg .pele {
+  fill: var(--pele);
+}
+.ze-svg .palha {
+  fill: var(--palha);
+}
+.ze-svg .faixa {
+  fill: var(--terracota);
+}
+.ze-svg .olho {
+  fill: var(--tinta);
+}
+.ze-svg .bochecha {
+  fill: var(--terracota);
+  opacity: 0.35;
+}
+.ze-svg .sarda {
+  fill: #b7743f;
+}
+.ze-svg .lapis {
+  fill: var(--mostarda);
+}
+.ze-svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Partes que cada humor mexe (todas com a mesma transição suave) */
+.ze-svg .corpo,
+.ze-svg .cabeca,
+.ze-svg .chapeu,
+.ze-svg .braco-e,
+.ze-svg .braco-d,
+.ze-svg .sobrancelhas path,
+.ze-svg .capim {
+  transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.ze-svg .braco-e {
+  transform-origin: 90% 10%;
+}
+.ze-svg .braco-d {
+  transform-origin: 10% 10%;
+}
+.ze-svg .capim {
+  transform-origin: 0% 50%;
+}
+.ze-svg .boca > *,
+.ze-svg .olhos > *,
+.ze-svg .extras > * {
+  display: none;
+}
+
+/* Neutro (respira e pisca) */
+.ze-svg .corpo {
+  animation: respira 3s ease-in-out infinite;
+}
+@keyframes respira {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.ze-svg .olhos .aberto {
+  display: inline;
+  animation: pisca 4s infinite;
+}
+@keyframes pisca {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+.ze-svg .boca .sorriso {
+  display: inline;
+}
+.ze-svg .capim {
+  animation: capim 2.4s ease-in-out infinite;
+}
+@keyframes capim {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+/* Falando: boca abre e fecha, cabeça balança */
+.ze-svg.humor-falando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-falando .boca .fala {
+  display: inline;
+  animation: fala 0.18s infinite alternate;
+}
+@keyframes fala {
+  to {
+    transform: scaleY(0.25);
+  }
+}
+.ze-svg.humor-falando .cabeca {
+  animation: balanca 1.2s ease-in-out infinite;
+}
+@keyframes balanca {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+.ze-svg.humor-falando .braco-d {
+  transform: rotate(-35deg);
+}
+
+/* Pensando: olha para cima, mão no queixo, balões */
+.ze-svg.humor-pensando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-pensando .olhos .cima {
+  display: inline;
+}
+.ze-svg.humor-pensando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-pensando .boca .hum {
+  display: inline;
+}
+.ze-svg.humor-pensando .braco-d {
+  transform: rotate(-120deg) translate(-6px, 0);
+}
+.ze-svg.humor-pensando .extras .bolhas {
+  display: inline;
+}
+.ze-svg.humor-pensando .bolhas circle {
+  animation: bolha 1.5s ease-in-out infinite;
+}
+.ze-svg.humor-pensando .bolhas circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ze-svg.humor-pensando .bolhas circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes bolha {
+  50% {
+    transform: translateY(-6px) scale(1.15);
+  }
+}
+.ze-svg.humor-pensando .sobrancelhas .e {
+  transform: translateY(-4px) rotate(-8deg);
+}
+
+/* Torcendo: punhos para cima, pulinhos */
+.ze-svg.humor-torcendo .corpo {
+  animation: pulinho 0.5s ease-in-out infinite;
+}
+@keyframes pulinho {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.ze-svg.humor-torcendo .braco-e {
+  transform: rotate(140deg);
+}
+.ze-svg.humor-torcendo .braco-d {
+  transform: rotate(-140deg);
+}
+.ze-svg.humor-torcendo .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-torcendo .boca .aberta {
+  display: inline;
+}
+.ze-svg.humor-torcendo .sobrancelhas path {
+  transform: translateY(-4px);
+}
+
+/* Comemorando: pula alto e joga o chapéu, estrelas */
+.ze-svg.humor-comemorando .corpo {
+  animation: pulo 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+@keyframes pulo {
+  40% {
+    transform: translateY(-26px) rotate(-4deg);
+  }
+  70% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+.ze-svg.humor-comemorando .chapeu {
+  animation: jogachapeu 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+@keyframes jogachapeu {
+  40% {
+    transform: translateY(-44px) rotate(-25deg);
+  }
+  70% {
+    transform: none;
+  }
+}
+.ze-svg.humor-comemorando .braco-e {
+  transform: rotate(150deg);
+}
+.ze-svg.humor-comemorando .braco-d {
+  transform: rotate(-150deg);
+}
+.ze-svg.humor-comemorando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-comemorando .olhos .feliz {
+  display: inline;
+}
+.ze-svg.humor-comemorando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-comemorando .boca .aberta {
+  display: inline;
+}
+.ze-svg.humor-comemorando .extras .estrelas {
+  display: inline;
+}
+.ze-svg.humor-comemorando .estrelas path {
+  animation: brilha 0.9s ease-in-out infinite;
+}
+.ze-svg.humor-comemorando .estrelas path:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.ze-svg.humor-comemorando .estrelas path:nth-child(3) {
+  animation-delay: 0.6s;
+}
+@keyframes brilha {
+  50% {
+    transform: scale(1.4) rotate(30deg);
+  }
+}
+
+/* Bravo: sobrancelhas em V, treme, fumacinha, vermelho no rosto */
+.ze-svg.humor-bravo .cabeca {
+  animation: treme 0.12s infinite;
+}
+@keyframes treme {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+.ze-svg.humor-bravo .sobrancelhas .e {
+  transform: rotate(25deg) translateY(4px);
+}
+.ze-svg.humor-bravo .sobrancelhas .d {
+  transform: rotate(-25deg) translateY(4px);
+}
+.ze-svg.humor-bravo .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-bravo .boca .brava {
+  display: inline;
+}
+.ze-svg.humor-bravo .bochecha {
+  opacity: 0.8;
+}
+.ze-svg.humor-bravo .braco-e {
+  transform: rotate(-20deg);
+}
+.ze-svg.humor-bravo .braco-d {
+  transform: rotate(20deg);
+}
+.ze-svg.humor-bravo .extras .fumaca {
+  display: inline;
+}
+.ze-svg.humor-bravo .fumaca path {
+  animation: fumaca 1s ease-out infinite;
+}
+.ze-svg.humor-bravo .fumaca path:nth-child(2) {
+  animation-delay: 0.5s;
+}
+@keyframes fumaca {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(1.2);
+  }
+}
+
+/* Entediado: olhos meio fechados, cabeça caída, bocejo, "zzz" */
+.ze-svg.humor-entediado .corpo {
+  animation: respira 5s ease-in-out infinite;
+}
+.ze-svg.humor-entediado .cabeca {
+  transform: rotate(10deg) translateY(4px);
+}
+.ze-svg.humor-entediado .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-entediado .olhos .meio {
+  display: inline;
+}
+.ze-svg.humor-entediado .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-entediado .boca .tedio {
+  display: inline;
+  animation: boceja 4s ease-in-out infinite;
+}
+@keyframes boceja {
+  40%,
+  60% {
+    transform: scale(1.5, 2.4);
+  }
+}
+.ze-svg.humor-entediado .braco-d {
+  transform: rotate(-150deg) translate(-4px, 6px);
+}
+.ze-svg.humor-entediado .capim {
+  animation: none;
+  transform: rotate(30deg);
+}
+.ze-svg.humor-entediado .extras .zzz {
+  display: inline;
+}
+.ze-svg.humor-entediado .zzz text {
+  animation: zzz 3s ease-in-out infinite;
+  font: 700 18px var(--fonte);
+  fill: var(--suave);
+}
+.ze-svg.humor-entediado .zzz text:nth-child(2) {
+  animation-delay: 1s;
+}
+.ze-svg.humor-entediado .zzz text:nth-child(3) {
+  animation-delay: 2s;
+}
+@keyframes zzz {
+  from {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(14px, -26px);
+  }
+}
+
+/* Triste (errou): coça a cabeça, gota de suor, boca torta */
+.ze-svg.humor-cocando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-cocando .olhos .triste {
+  display: inline;
+}
+.ze-svg.humor-cocando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-cocando .boca .torta {
+  display: inline;
+}
+.ze-svg.humor-cocando .sobrancelhas .e {
+  transform: rotate(-20deg);
+}
+.ze-svg.humor-cocando .sobrancelhas .d {
+  transform: rotate(20deg);
+}
+.ze-svg.humor-cocando .braco-d {
+  animation: coca 0.4s ease-in-out infinite alternate;
+}
+@keyframes coca {
+  from {
+    transform: rotate(-150deg);
+  }
+  to {
+    transform: rotate(-165deg);
+  }
+}
+.ze-svg.humor-cocando .extras .gota {
+  display: inline;
+  animation: gota 1.6s ease-in infinite;
+}
+@keyframes gota {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+/* Assustado (tempo acabando): olhos arregalados, cabelo arrepiado, treme */
+.ze-svg.humor-assustado .corpo {
+  animation: treme 0.1s infinite;
+}
+.ze-svg.humor-assustado .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-assustado .olhos .arregalado {
+  display: inline;
+}
+.ze-svg.humor-assustado .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-assustado .boca .oh {
+  display: inline;
+}
+.ze-svg.humor-assustado .chapeu {
+  transform: translateY(-12px);
+}
+.ze-svg.humor-assustado .sobrancelhas path {
+  transform: translateY(-7px);
+}
+.ze-svg.humor-assustado .braco-e {
+  transform: rotate(60deg);
+}
+.ze-svg.humor-assustado .braco-d {
+  transform: rotate(-60deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-svg *,
+  .ze-svg {
+    animation: none !important;
+    transition: none !important;
+  }
+}

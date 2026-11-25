@@ -8,9 +8,9 @@
 
 ## 2. Humor do Zé (TDD)
 
-- [ ] 2.1 `presentation/ze/controle-de-humor.ts` (puro): testes dos cenários da spec `personagem-do-ze` (pensando na charada não pronta; torcendo no desenho; assustado com ≤ 5 s; comemorando/coçando-a-cabeça/bravo no veredito; neutro no resto) → implementar. Verifica: `npm --prefix app test -- controle-de-humor`
-- [ ] 2.2 `presentation/ze/personagem.ts`: cria o SVG do Zé (desenho do protótipo 11, sem recurso externo) com `mudarHumor` e `falar(texto)` que volta ao humor anterior; testes em jsdom: um humor por vez, fala restaura o humor. Verifica: `npm --prefix app test -- personagem`
-- [ ] 2.3 Temporizador de tédio (30 s, reiniciado por `pointerdown`/`pointermove`/`keydown`, desligado no desenho) com relógio falso do Vitest: entediado aos 30 s, volta ao humor anterior na interação, nunca no desenho. Verifica: `npm --prefix app test -- tedio`
+- [x] 2.1 `presentation/ze/controle-de-humor.ts` (puro): testes dos cenários da spec `personagem-do-ze` (pensando na charada não pronta; torcendo no desenho; assustado com ≤ 5 s; comemorando/coçando-a-cabeça/bravo no veredito; neutro no resto) → implementar. Verifica: `npm --prefix app test -- controle-de-humor`
+- [x] 2.2 `presentation/ze/personagem.ts`: cria o SVG do Zé (desenho do protótipo 11, sem recurso externo) com `mudarHumor` e `falar(texto)` que volta ao humor anterior; testes em jsdom: um humor por vez, fala restaura o humor. Verifica: `npm --prefix app test -- personagem`
+- [x] 2.3 Temporizador de tédio (30 s, reiniciado por `pointerdown`/`pointermove`/`keydown`, desligado no desenho) com relógio falso do Vitest: entediado aos 30 s, volta ao humor anterior na interação, nunca no desenho. Verifica: `npm --prefix app test -- tedio`
 
 ## 3. Borracha na captura
 
