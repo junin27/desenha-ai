@@ -1,4 +1,5 @@
 import type { EstadoDaConversa } from "../../application/conversa-com-o-ze";
+import { botaoComIcone, comIcone } from "../icones";
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
 import { limparNome } from "../../domain/rodada/pontuacao";
 import { botao, criar } from "../dom";
@@ -42,14 +43,14 @@ export class TelaInicio implements Tela {
       if (evento.key === "Enter" && !this.comecar.disabled) this.jogar();
     });
     this.aviso.hidden = true;
-    this.comecar = botao("Começar partida", "jogar", () => {
+    this.comecar = botaoComIcone("jogar", "Começar partida", "jogar", () => {
       this.jogar();
     });
     this.comecar.classList.add("principal");
-    const verPlacar = botao("Ver placar", "ver-placar", aoVerPlacar);
+    const verPlacar = botaoComIcone("trofeu", "Ver placar", "ver-placar", aoVerPlacar);
     verPlacar.classList.add("secundario");
     const apelido = criar("div", { classe: "cartao apelido" }, [
-      criar("h2", { texto: "Qual é o seu apelido?" }),
+      comIcone("chapeu", criar("h2", { texto: "Qual é o seu apelido?" })),
       this.campo,
       this.criarSugestoes(),
       criar("div", { classe: "linha" }, [this.comecar, verPlacar]),

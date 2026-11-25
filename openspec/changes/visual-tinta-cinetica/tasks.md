@@ -43,11 +43,11 @@
 
 ## 8. Fontes, maiúsculas e ícones (pedido de 25/11)
 
-- [ ] 8.1 Instalar `@fontsource/gochi-hand` e `@fontsource/patrick-hand` em `app/` (download autorizado); teste que lê o CSS falhando: títulos com Gochi Hand, texto com Patrick Hand, `text-transform: uppercase` em títulos e botões e não em campos → implementar no `estilo.css`. Verifica: `npm --prefix app test -- estilo`
-- [ ] 8.2 Teste de build offline: os `.woff2` das duas fontes estão no `dist` e nenhum `@font-face` aponta para fora → implementar a importação no `main.ts`. Verifica: `npm --prefix app run build && npm --prefix app test -- build`
-- [ ] 8.3 `presentation/icones.ts`: testes de `criarIcone` (SVG com `aria-hidden`, traço na cor do texto, nome desconhecido não existe pelo tipo) → implementar com os 14 ícones; o botão com ícone mantém o texto como nome. Verifica: `npm --prefix app test -- icones`
-- [ ] 8.4 Pôr os ícones nos títulos e botões das telas (no lugar dos emojis do desenho); teste da tela de desenho: os 4 botões têm ícone e o nome continua "Lápis", "Borracha", "Limpar", "Pronto!". Verifica: `npm --prefix app test -- tela-desenho`
-- [ ] 8.5 Refazer as capturas nas duas resoluções e com movimento reduzido (`scripts/capturar_telas.mjs`): nenhuma tela com rolagem; `bash scripts/verificar.sh` verde.
+- [x] 8.1 Instalar `@fontsource/gochi-hand` e `@fontsource/patrick-hand` em `app/` (download autorizado); teste que lê o CSS falhando: títulos com Gochi Hand, texto com Patrick Hand, `text-transform: uppercase` em títulos e botões e não em campos → implementar no `estilo.css`. Verifica: `npm --prefix app test -- estilo`
+- [x] 8.2 Teste de build offline: os `.woff2` das duas fontes estão no `dist` e nenhum `@font-face` aponta para fora → implementar a importação no `main.ts`. Verifica: `npm --prefix app run build && npm --prefix app test -- build`
+- [x] 8.3 `presentation/icones.ts`: testes de `criarIcone` (SVG com `aria-hidden`, traço na cor do texto, nome desconhecido não existe pelo tipo) → implementar com os 14 ícones; o botão com ícone mantém o texto como nome. Verifica: `npm --prefix app test -- icones`
+- [x] 8.4 Pôr os ícones nos títulos e botões das telas (no lugar dos emojis do desenho); teste da tela de desenho: os 4 botões têm ícone e o nome continua "Lápis", "Borracha", "Limpar", "Pronto!". Verifica: `npm --prefix app test -- tela-desenho`
+- [x] 8.5 Refazer as capturas nas duas resoluções e com movimento reduzido (`scripts/capturar_telas.mjs`): nenhuma tela com rolagem; `bash scripts/verificar.sh` verde.
 
 ## Workflow follow-up
 

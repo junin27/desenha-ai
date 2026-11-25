@@ -67,3 +67,5 @@ Problemas que as capturas pegaram e já foram corrigidos:
 - O título da abertura ficava pequeno porque o `h1` encolhia dentro do grid.
 
 Não coberto aqui: o momento "Pensando…" da charada (sem o `llama-server` a reserva responde na hora), o Zé respondendo com o modelo de verdade e o FPS das animações no notebook do evento (fica para o ensaio de 29/11).
+
+**Atualização (25/11, tarefa 8.5):** as capturas foram refeitas com as fontes Gochi Hand (títulos) e Patrick Hand (texto), títulos e botões em maiúsculas e os ícones desenhados. Continuam sem rolagem nas 9 telas, a 1366×768, a 1920×1080 e com movimento reduzido.

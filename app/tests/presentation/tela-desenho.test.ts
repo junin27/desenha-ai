@@ -92,3 +92,20 @@ describe("Requisito: Quando cada humor aparece no desenho (spec personagem-do-ze
     expect(humor()).toBe("assustado");
   });
 });
+
+describe("Requisito: Ícones desenhados nos botões do desenho (spec identidade-visual)", () => {
+  it("test_os_4_botoes_tem_icone_e_o_nome_continua_o_texto", () => {
+    tela.atualizar(estado({}));
+    const nomes = [
+      "[data-ferramenta=lapis]",
+      "[data-ferramenta=borracha]",
+      "[data-acao=limpar]",
+      "[data-acao=pronto]",
+    ].map((seletor) => {
+      const botao = tela.raiz.querySelector<HTMLButtonElement>(seletor);
+      expect(botao?.querySelector("svg.icone")).not.toBeNull();
+      return botao?.textContent;
+    });
+    expect(nomes).toEqual(["Lápis", "Borracha", "Limpar", "Pronto!"]);
+  });
+});

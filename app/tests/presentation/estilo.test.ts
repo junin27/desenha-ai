@@ -123,10 +123,28 @@ describe("Requisito: Legibilidade e offline mantidos", () => {
       )
       .filter(([, tamanho]) => tamanho < 24);
     expect(pequenas).toEqual([]);
-    expect(CSS).toMatch(/--texto-base: clamp\(24px,/u);
+    const minimo = Number(/--texto-base: clamp\((\d+)px,/u.exec(CSS)?.[1]);
+    expect(minimo).toBeGreaterThanOrEqual(24);
   });
 
   it("test_sem_fonte_nem_recurso_externo", () => {
     expect(CSS).not.toMatch(/@import|url\(\s*["']?https?:/u);
+  });
+});
+
+describe("Requisito: Fontes do jogo", () => {
+  it("test_titulos_usam_gochi_hand_e_o_texto_patrick_hand", () => {
+    expect(CSS).toMatch(/--fonte-titulo: "Gochi Hand",/u);
+    expect(CSS).toMatch(/--fonte-texto: "Patrick Hand",/u);
+    expect(CSS).toMatch(/h1,\s*h2[^{]*\{[^}]*font-family: var\(--fonte-titulo\)/u);
+    expect(CSS).toMatch(/:root \{[^}]*font-family: var\(--fonte-texto\)/u);
+  });
+});
+
+describe("Requisito: Títulos e botões em maiúsculas", () => {
+  it("test_titulos_e_botoes_em_maiusculas_e_campos_nao", () => {
+    expect(CSS).toMatch(/h1,\s*h2[^{]*\{[^}]*text-transform: uppercase/u);
+    expect(CSS).toMatch(/\nbutton \{[^}]*text-transform: uppercase/u);
+    expect(CSS).toMatch(/\ninput,\s*textarea,\s*\.campo \{[^}]*text-transform: none/u);
   });
 });

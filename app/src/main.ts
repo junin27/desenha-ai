@@ -2,6 +2,9 @@
  * Raiz de composição (D-04): o único arquivo que conhece todas as camadas. Lê os arquivos do jogo, cria
  * os adaptadores reais, monta a partida, a conversa, a voz e o painel e liga a tela.
  */
+// Fontes embutidas no build (spec identidade-visual): só o subconjunto latino, peso 400.
+import "@fontsource/gochi-hand/latin-400.css";
+import "@fontsource/patrick-hand/latin-400.css";
 import "./estilo.css";
 import { conferirParidade } from "./application/autoteste-de-paridade";
 import { ClassificadorMedido } from "./application/classificador-medido";

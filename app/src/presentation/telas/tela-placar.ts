@@ -1,4 +1,5 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
+import { botaoComIcone, comIcone } from "../icones";
 import { listarPlacar, type LinhaDoPlacar, type OrdemDaLista } from "../../domain/rodada/listagem-do-placar";
 import { ordemOficialDoPlacar, type PartidaNoPlacar } from "../../domain/rodada/pontuacao";
 import { botao, criar } from "../dom";
@@ -50,22 +51,25 @@ export class TelaPlacar implements Tela {
       elemento.dataset["ordem"] = ordem;
       return elemento;
     });
-    this.jogarDeNovo = botao("Jogar de novo", "nova-partida", () => {
+    this.jogarDeNovo = botaoComIcone("estrela", "Jogar de novo", "nova-partida", () => {
       comandos.novaPartida();
     });
     this.jogarDeNovo.classList.add("principal");
-    const voltar = botao("Início", "voltar-do-placar", aoVoltar);
+    const voltar = botaoComIcone("casinha", "Início", "voltar-do-placar", aoVoltar);
     voltar.classList.add("secundario");
     this.resumo.append(this.total, this.posicao);
     const tabela = criar("div", { classe: "cartao tabela-do-placar" }, [
-      criar("h2", { texto: "Placar" }),
+      comIcone("trofeu", criar("h2", { texto: "Placar" })),
       this.resumo,
       criar("div", { classe: "controles" }, [this.busca, ...this.botoesDeOrdem]),
       this.lista,
       this.vazio,
       criar("div", { classe: "linha" }, [this.jogarDeNovo, voltar]),
     ]);
-    const lado = criar("div", { classe: "lado-do-podio" }, [criar("h2", { texto: "Top 5" }), this.podio]);
+    const lado = criar("div", { classe: "lado-do-podio" }, [
+      comIcone("estrela", criar("h2", { texto: "Top 5" })),
+      this.podio,
+    ]);
     this.raiz = criar("section", { classe: "tela tela-placar", dados: { tela: "placar" } }, [lado, tabela]);
   }
 

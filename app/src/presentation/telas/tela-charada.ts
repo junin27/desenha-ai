@@ -1,6 +1,7 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
+import { botaoComIcone } from "../icones";
 import { RODADAS_POR_PARTIDA } from "../../domain/rodada/pontuacao";
-import { botao, criar, mostrarSelo } from "../dom";
+import { criar, mostrarSelo } from "../dom";
 import { seloDaFala } from "../textos";
 import { humorDaPartida } from "../ze/controle-de-humor";
 import { PersonagemDoZe, type OpcoesDoPersonagem } from "../ze/personagem";
@@ -22,7 +23,7 @@ export class TelaCharada implements Tela {
 
   constructor(comandos: ComandosDoJogo, opcoesDoZe: OpcoesDoPersonagem = {}) {
     this.ze = new PersonagemDoZe(opcoesDoZe);
-    this.desenhar = botao("Desenhar!", "desenhar", () => {
+    this.desenhar = botaoComIcone("lapis", "Desenhar!", "desenhar", () => {
       comandos.desenhar();
     });
     this.desenhar.classList.add("principal");

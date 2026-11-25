@@ -1,7 +1,8 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
+import { botaoComIcone, comIcone } from "../icones";
 import { desenhoDePontos, type Traco } from "../../domain/desenho/desenho";
 import { CapturaDoDesenho, type Ferramenta } from "../captura-do-desenho";
-import { botao, criar } from "../dom";
+import { criar } from "../dom";
 import { palpitesComChance, type PalpiteNaTela } from "../textos";
 import { humorDaPartida } from "../ze/controle-de-humor";
 import { PersonagemDoZe, type OpcoesDoPersonagem } from "../ze/personagem";
@@ -45,16 +46,16 @@ export class TelaDesenho implements Tela {
       this.enviar(tracos, terminado);
     });
     this.botoesDeFerramenta = {
-      lapis: this.botaoDeFerramenta("lapis", "✏️ Lápis"),
-      borracha: this.botaoDeFerramenta("borracha", "🧽 Borracha"),
+      lapis: this.botaoDeFerramenta("lapis", "Lápis"),
+      borracha: this.botaoDeFerramenta("borracha", "Borracha"),
     };
     const ferramentas = criar("div", { classe: "ferramentas" }, [
       this.botoesDeFerramenta.lapis,
       this.botoesDeFerramenta.borracha,
-      botao("🗑️ Limpar", "limpar", () => {
+      botaoComIcone("lixeira", "Limpar", "limpar", () => {
         this.limpar();
       }),
-      botao("Pronto!", "pronto", () => void this.comandos.pronto()),
+      botaoComIcone("raio", "Pronto!", "pronto", () => void this.comandos.pronto()),
     ]);
     const coluna = criar("div", { classe: "coluna-do-quadro" }, [
       this.charada,
@@ -62,7 +63,7 @@ export class TelaDesenho implements Tela {
       ferramentas,
     ]);
     const palpites = criar("div", { classe: "cartao palpites-ao-vivo" }, [
-      criar("h2", { texto: "O que as redes acham" }),
+      comIcone("redes", criar("h2", { texto: "O que as redes acham" })),
       this.palpites,
       this.semPalpite,
     ]);
@@ -101,7 +102,7 @@ export class TelaDesenho implements Tela {
   }
 
   private botaoDeFerramenta(ferramenta: Ferramenta, texto: string): HTMLButtonElement {
-    const elemento = botao(texto, `ferramenta-${ferramenta}`, () => {
+    const elemento = botaoComIcone(ferramenta, texto, `ferramenta-${ferramenta}`, () => {
       this.escolher(ferramenta);
     });
     elemento.classList.add("ferramenta");

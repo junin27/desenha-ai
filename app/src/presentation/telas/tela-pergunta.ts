@@ -1,4 +1,5 @@
 import type { EstadoDaConversa } from "../../application/conversa-com-o-ze";
+import { botaoComIcone, comIcone } from "../icones";
 import { botao, criar, mostrarSelo } from "../dom";
 import { falaAoVivoNaTela, seloDaFala } from "../textos";
 import { PersonagemDoZe, type OpcoesDoPersonagem } from "../ze/personagem";
@@ -35,7 +36,7 @@ export class TelaPergunta {
     this.campo.maxLength = TAMANHO_MAXIMO_DA_PERGUNTA;
     this.campo.rows = 1;
     this.campo.placeholder = "Pergunte qualquer coisa ao Zé…";
-    this.perguntar = botao("Enviar", "perguntar", () => {
+    this.perguntar = botaoComIcone("enviar", "Enviar", "perguntar", () => {
       this.enviar(this.campo.value);
     });
     this.rodape.append(this.campo, this.perguntar);
@@ -52,7 +53,7 @@ export class TelaPergunta {
       }),
     );
     this.raiz = criar("div", { classe: "cartao conversa", dados: { parte: "pergunte-ao-ze" } }, [
-      criar("h2", { texto: "Pergunte ao Zé" }),
+      comIcone("balao", criar("h2", { texto: "Pergunte ao Zé" })),
       this.ze.raiz,
       this.aoVivo,
       this.resposta,

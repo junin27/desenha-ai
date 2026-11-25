@@ -1,5 +1,6 @@
 import { SEGUNDOS_DA_RODADA } from "../../domain/rodada/pontuacao";
-import { botao, criar } from "../dom";
+import { botaoComIcone } from "../icones";
+import { criar } from "../dom";
 import { PersonagemDoZe, type OpcoesDoPersonagem } from "../ze/personagem";
 import type { InformacoesDoJogo } from "./tela";
 
@@ -63,7 +64,7 @@ export class TelaAbertura {
     this.ze.raiz.classList.add("ze-da-abertura");
     this.desenho = criarQuadroDaDemonstracao();
     this.numeros = this.criarNumeros();
-    const jogar = botao("Jogar agora", "jogar-agora", aoJogar);
+    const jogar = botaoComIcone("jogar", "Jogar agora", "jogar-agora", aoJogar);
     jogar.classList.add("principal");
     const texto = criar("div", { classe: "chamada-da-abertura" }, [
       criarTitulo(),

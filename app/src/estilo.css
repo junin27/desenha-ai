@@ -20,13 +20,17 @@
   --pessego: #f9e3c9;
   --verde-claro: #eef6e6;
   --rosado: #f9dcd6;
-  --texto-base: clamp(24px, 1.9vw, 32px);
-  --texto-grande: clamp(32px, 3vw, 52px);
+  /* A Patrick Hand é mais estreita que a fonte do sistema: o tamanho sobe ~12% (D10 do design). */
+  --texto-base: clamp(26px, 2.1vw, 36px);
+  --texto-grande: clamp(34px, 3.2vw, 56px);
+  /* Fontes embutidas no build (Fontsource, OFL); a do sistema só entra se elas não carregarem. */
+  --fonte-titulo: "Gochi Hand", "Segoe UI", system-ui, sans-serif;
+  --fonte-texto: "Patrick Hand", "Segoe UI", system-ui, sans-serif;
   --espaco: clamp(12px, 1.8vh, 24px);
   /* Contorno torto de caneta: raios diferentes em cada canto. */
   --torto: 255px 18px 225px 18px / 18px 225px 18px 255px;
   --torto-2: 18px 255px 18px 225px / 225px 18px 255px 18px;
-  font-family: "Segoe UI", "Trebuchet MS", system-ui, sans-serif;
+  font-family: var(--fonte-texto);
   color: var(--tinta);
   background: var(--papel);
 }
@@ -113,15 +117,53 @@ body::after {
   }
 }
 
+/* Títulos em Gochi Hand e em maiúsculas (spec identidade-visual, "Fontes do jogo" e "Títulos e botões em
+   maiúsculas"). Só o CSS muda a caixa: o texto no código continua igual para a voz e os leitores de tela. */
 h1,
-h2,
+h2 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 p {
   margin: 0;
 }
 
+/* Ícones desenhados (spec identidade-visual): traço de caneta na cor do texto ao lado. */
+.icone {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+h2:has(> .icone) {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+h2 > .icone {
+  color: var(--terracota);
+  transform: rotate(-6deg);
+}
+
+button:has(> .icone) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+}
+
 h2 {
   font-size: var(--texto-grande);
-  letter-spacing: -0.01em;
 }
 
 .linha {
@@ -145,7 +187,9 @@ h2 {
 
 button {
   font: inherit;
-  font-weight: 700;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   cursor: pointer;
   color: var(--tinta);
   background: var(--quadro);
@@ -202,7 +246,6 @@ button.secundario {
 }
 
 button.chip {
-  font-weight: 600;
   padding: 0.15em 0.7em;
   background: var(--creme);
 }
@@ -225,6 +268,7 @@ input,
 textarea,
 .campo {
   font: inherit;
+  text-transform: none;
   color: var(--tinta);
   background: #fff;
   border: 3px solid var(--tinta);
@@ -345,12 +389,9 @@ textarea {
 }
 
 .titulo text {
-  font:
-    900 140px "Segoe UI Black",
-    "Segoe UI",
-    system-ui,
-    sans-serif;
-  letter-spacing: -6px;
+  font: 400 132px var(--fonte-titulo);
+  text-transform: uppercase;
+  letter-spacing: 2px;
   fill: transparent;
   stroke: var(--tinta);
   stroke-width: 2.5;

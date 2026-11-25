@@ -14,7 +14,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 4,
+    "rabiscos": 5,
     "humor": "neutro"
   },
   {
@@ -32,7 +32,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 5,
+    "rabiscos": 4,
     "humor": "torcendo"
   },
   {
@@ -68,8 +68,8 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 4,
-    "humor": "comemorando"
+    "rabiscos": 5,
+    "humor": "coçando-a-cabeça"
   },
   {
     "arquivo": "1920x1080-6-placar.png",
