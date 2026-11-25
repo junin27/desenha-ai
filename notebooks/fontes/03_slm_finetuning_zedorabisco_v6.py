@@ -20,7 +20,7 @@
 # **mesmo** que o jogo envia ao `llama-server` (contrato Python ↔ TypeScript).
 #
 # > **Antes de rodar:** GPU **T4** (ou L4). A célula de instalação abre um menu de upload para o `desenha_ml-*.whl`, o
-# > `dataset_slm.zip` (Parte 2) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
+# > `dataset_slm.zip` **revisado** (`notebooks/resultados/dataset_slm_v2/`) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
 # > (rodada completa, ≈ 40–60 min, gera o GGUF do Zé). O ensaio (`True`, ≈ 10 min) só testa as etapas e não vale para o
 # > critério de aprovação.
 
@@ -172,6 +172,11 @@ print(torch.cuda.get_device_name(0), "| VRAM", round(torch.cuda.get_device_prope
 # %%
 exigir_arquivos("dataset_slm.zip", "modelos_redes.zip")
 with zipfile.ZipFile("/content/dataset_slm.zip") as arquivo_zip:
+    # A v6 treina com o treino revisado (raciocínio do veredito pela regra, charada sem a palavra no pensamento)
+    if "relatorio_revisao.json" not in arquivo_zip.namelist():
+        raise RuntimeError("Este dataset_slm.zip é o antigo. Suba o de notebooks/resultados/dataset_slm_v2/ "
+                           "(Ambiente de execução → Desconectar e excluir, e rode de novo).")
+    print("Revisão do treino:", json.loads(arquivo_zip.read("relatorio_revisao.json")))
     arquivo_zip.extractall("/content/dataset_slm")
 with zipfile.ZipFile("/content/modelos_redes.zip") as arquivo_zip:
     FICHA = montar_ficha(json.loads(arquivo_zip.read("metricas_redes.json")))

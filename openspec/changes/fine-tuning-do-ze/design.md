@@ -2,7 +2,7 @@
 
 ## Context
 
-O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v5.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
+O rascunho `notebooks/fontes/03_slm_finetuning_zedorabisco_v6.py` já tem a sequência Unsloth (carregar em 4 bits, LoRA, `SFTTrainer`, `train_on_responses_only`, `save_pretrained_gguf`), mas monta o prompt numa célula, repete as regras de avaliação (vazamento, veredito, números) e fixa o número de parâmetros (2,03 × 10⁹) à mão. O pacote já tem `conversa` (entradas e leitura da fala), `curadoria` (filtros com códigos) e o padrão de contrato. Esta máquina não tem GPU NVIDIA, então o treino só roda no Colab. Motivação em `proposal.md`.
 
 ## Goals / Non-Goals
 
