@@ -18,26 +18,26 @@
 
 ## 2. Portas e adaptadores
 
-- [ ] 2.1 Portas `DetectorDeMao` e `CameraDoEstande` em `application/portas.ts`; teste de arquitetura continua verde. Verifica: `npm --prefix app test -- arquitetura`
-- [ ] 2.2 Baixar `@mediapipe/tasks-vision` (npm) e o `hand_landmarker.task` (download autorizado); script de cópia para `app/public/mao/` integrado ao `copiar_modelos.sh`; teste de build: wasm e modelo no `dist`, nada carregado de fora (lista fechada atualizada se preciso). Verifica: `npm --prefix app run build && npm --prefix app test -- build`
-- [ ] 2.3 `infrastructure/mao/detector-mediapipe.ts` e `camera-do-navegador.ts`: teste do adaptador da câmera com `getUserMedia` falso (permissão negada vira erro esperado, não exceção; desligar para as trilhas) → implementar; o detector real é conferido no navegador (tarefa 5.1). Verifica: `npm --prefix app test -- camera`
+- [x] 2.1 Portas `DetectorDeMao` e `CameraDoEstande` em `application/portas.ts`; teste de arquitetura continua verde. Verifica: `npm --prefix app test -- arquitetura`
+- [x] 2.2 Baixar `@mediapipe/tasks-vision` (npm) e o `hand_landmarker.task` (download autorizado); script de cópia para `app/public/mao/` integrado ao `copiar_modelos.sh`; teste de build: wasm e modelo no `dist`, nada carregado de fora (lista fechada atualizada se preciso). Verifica: `npm --prefix app run build && npm --prefix app test -- build`
+- [x] 2.3 `infrastructure/mao/detector-mediapipe.ts` e `camera-do-navegador.ts`: teste do adaptador da câmera com `getUserMedia` falso (permissão negada vira erro esperado, não exceção; desligar para as trilhas) → implementar; o detector real é conferido no navegador (tarefa 5.1). Verifica: `npm --prefix app test -- camera`. Conferido em 25/11/2026 no Edge headless com câmera falsa: o modelo e o wasm carregam e o laço de detecção roda; a detecção de uma mão de verdade fica na 5.1
 
 ## 3. Captura e controle da mão
 
 - [x] 3.1 `CapturaDoDesenho` com a interface de fonte (começar, continuar, terminar, apagar em): os testes atuais continuam verdes e um teste novo prova que traços vindos da fonte da mão saem iguais aos do mouse. Verifica: `npm --prefix app test -- captura`
-- [ ] 3.2 `presentation/mao/controle-da-mao.ts` com `DetectorFalso` e relógio falso: `lapis` desenha e termina o traço ao sumir; `borracha` apaga; mão aberta parada 3 s limpa; troca de modo termina o traço e mantém os traços. Verifica: `npm --prefix app test -- controle-da-mao`
+- [x] 3.2 `presentation/mao/controle-da-mao.ts` com `DetectorFalso` e relógio falso: `lapis` desenha e termina o traço ao sumir; `borracha` apaga; mão aberta parada 3 s limpa; troca de modo termina o traço e mantém os traços. Verifica: `npm --prefix app test -- controle-da-mao`
 
 ## 4. Telas
 
-- [ ] 4.1 Seletor de modo (Mouse/Mão) na tela de apelido e na de desenho, salvo nas preferências do estande; teste: escolha lembrada após recarregar; troca durante o desenho não apaga nem pausa. Verifica: `npm --prefix app test -- seletor-de-modo`
-- [ ] 4.2 Miniatura espelhada com os pontos e o nome do gesto; câmera ligada só no desenho em modo Mão; aviso "Câmera indisponível: desenhe com o mouse" e volta ao Mouse quando falha. Verifica: `npm --prefix app test -- miniatura`
-- [ ] 4.3 O lápis da tarefa 1B.3 segue o dedo no modo Mão (indicador no lápis, palma na borracha e na mão aberta) e some quando a mão some. Verifica: `npm --prefix app test -- lapis-no-quadro controle-da-mao`
-- [ ] 4.4 `main.ts` liga câmera, detector e controle; o CSS das peças novas passa no teste de estilo (paleta, contraste, 24 px). Verifica: `bash scripts/verificar.sh`
+- [x] 4.1 Seletor de modo (Mouse/Mão) na tela de apelido e na de desenho, salvo nas preferências do estande; teste: escolha lembrada após recarregar; troca durante o desenho não apaga nem pausa. Verifica: `npm --prefix app test -- seletor-de-modo`
+- [x] 4.2 Miniatura espelhada com os pontos e o nome do gesto; câmera ligada só no desenho em modo Mão; aviso "Câmera indisponível: desenhe com o mouse" e volta ao Mouse quando falha. Verifica: `npm --prefix app test -- miniatura`
+- [x] 4.3 O lápis da tarefa 1B.3 segue o dedo no modo Mão (indicador no lápis, palma na borracha e na mão aberta) e some quando a mão some. Verifica: `npm --prefix app test -- lapis-no-quadro controle-da-mao`
+- [x] 4.4 `main.ts` liga câmera, detector e controle; o CSS das peças novas passa no teste de estilo (paleta, contraste, 24 px). Verifica: `bash scripts/verificar.sh`
 
 ## 5. Conferência real
 
 - [ ] 5.1 Na máquina com webcam: desenhar uma casa com o dedo, apagar com a mão fechada, limpar com a mão aberta parada 3 s, trocar Mouse↔Mão no meio da rodada; medir quadros por segundo com as redes ligadas (meta ≥ 10). Registrar em `docs/capturas/README.md`.
-- [ ] 5.2 Capturas novas (`scripts/capturar_telas.mjs`) do modo Mouse com o lápis no quadro; nenhuma tela com rolagem; `bash scripts/verificar.sh` verde.
+- [x] 5.2 Capturas novas (`scripts/capturar_telas.mjs`) do modo Mouse com o lápis no quadro; nenhuma tela com rolagem; `bash scripts/verificar.sh` verde. Feito em 25/11/2026: 20 capturas (10 telas a 1366×768 e a 1920×1080, incluindo a 4c com o modo Mão ligado) em `docs/capturas/desenho-com-a-mao/`, nenhuma com rolagem; verificação verde (472 testes Python, 622 TypeScript)
 
 ## Workflow follow-up
 

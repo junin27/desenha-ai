@@ -155,3 +155,10 @@ O usuário vai trabalhar no **design, na experiência do usuário e em funcional
 - C "Show de TV": palco escuro, letreiro dourado e magenta, barra de LEDs, placar eletrônico, holofote.
 - Próximo passo: **não propor de novo essas três**. Fazer a **descoberta guiada** da skill site-motion-director (perguntar o que ele não gostou em cada uma, pedir referências de sites ou jogos de que ele gosta, contrastes como claro/escuro e sóbrio/divertido) antes de prototipar outra vez.
 - **Voz do Zé:** o usuário decidiu manter a voz do Windows por enquanto. Pesquisa feita: não existe voz caipira pronta e offline; o viável é Piper pt-BR no navegador (sotaque neutro); caipira de verdade exige gravar 30–60 min de alguém com o sotaque (com consentimento) e treinar a voz.
+
+## Estado em 25/11/2026 (noite): desenho com a mão — LEIA PRIMEIRO
+
+- **change `desenho-com-a-mao`:** código e testes do modo Mão prontos e verificados (472 Python, 622 TypeScript, OpenSpec 12/12). Todas as tarefas estão marcadas, **menos a 5.1**, que precisa do usuário: webcam e mão reais (desenhar uma casa com o dedo, apagar com a mão fechada, limpar com a mão aberta parada 3 s, trocar Mouse↔Mão no meio da rodada) e medir o FPS com as redes ligadas (meta ≥ 10), registrando em `docs/capturas/README.md`.
+- **CSP só no build** (`app/vite.config.ts`, decisão D11): bloqueia a telemetria do MediaPipe (`odml.pa.googleapis.com`, a cada 60 s). Conferida no Edge headless com `node scripts/conferir_politica_de_conteudo.mjs [pasta] 75` (precisa do build servido em `localhost:4173`). Se um dia ela quebrar algo, ajuste a política, não a remova.
+- **Pendências anotadas pelo usuário (não são para agora):** (a) antes de 27/11, corrigir "4 bits" em `docs/cadastro.md` para GGUF Q8_0 (ele envia o formulário); (b) preencher os `[PENDENTE]` do banner e do pitch e citar o desenho com a mão; (c) arquivar as changes só quando ele pedir; (d) trocar "nunca git push" na linha 33 de `openspec/config.yaml` (hoje contradiz a regra de push depois de cada commit verde); (e) checklist do evento: liberar a câmera para `localhost` e medir o FPS no ensaio de 29/11 (`docs/checklist_evento.md` ainda não fala de câmera).
+

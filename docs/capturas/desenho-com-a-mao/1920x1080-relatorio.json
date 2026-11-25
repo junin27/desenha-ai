@@ -1,0 +1,92 @@
+[
+  {
+    "arquivo": "1920x1080-1-abertura.png",
+    "tela": "abertura",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "neutro"
+  },
+  {
+    "arquivo": "1920x1080-2-apelido.png",
+    "tela": "inicio",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 5,
+    "humor": "neutro"
+  },
+  {
+    "arquivo": "1920x1080-3b-charada.png",
+    "tela": "charada",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "neutro"
+  },
+  {
+    "arquivo": "1920x1080-4-desenho.png",
+    "tela": "desenho",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "torcendo"
+  },
+  {
+    "arquivo": "1920x1080-4b-desenho-borracha.png",
+    "tela": "desenho",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "torcendo"
+  },
+  {
+    "arquivo": "1920x1080-4c-desenho-mao.png",
+    "tela": "desenho",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "torcendo"
+  },
+  {
+    "arquivo": "1920x1080-5a-veredito.png",
+    "tela": "veredito",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "coçando-a-cabeça"
+  },
+  {
+    "arquivo": "1920x1080-5b-veredito-sem-desenho.png",
+    "tela": "veredito",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "bravo"
+  },
+  {
+    "arquivo": "1920x1080-5c-veredito-ultima-rodada.png",
+    "tela": "veredito",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": "coçando-a-cabeça"
+  },
+  {
+    "arquivo": "1920x1080-6-placar.png",
+    "tela": "placar",
+    "rolagemV": false,
+    "rolagemH": false,
+    "pincelada": false,
+    "rabiscos": 4,
+    "humor": null
+  }
+]

@@ -16,7 +16,9 @@ mkdirSync(saida, { recursive: true });
 
 const perfil = mkdtempSync(join(tmpdir(), "edge-cdp-"));
 const edge = spawn(EDGE, [`--headless=new`, `--remote-debugging-port=${PORTA}`, `--user-data-dir=${perfil}`,
-  `--window-size=${W},${H}`, "--hide-scrollbars", "--mute-audio", "about:blank"], { stdio: "ignore" });
+  `--window-size=${W},${H}`, "--hide-scrollbars", "--mute-audio",
+  // Câmera falsa (imagem de teste, sem mão): só serve para a miniatura do modo Mão aparecer na captura 4c.
+  "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream", "about:blank"], { stdio: "ignore" });
 
 async function alvo() {
   for (let i = 0; i < 50; i++) {
@@ -84,6 +86,16 @@ for (let rodada = 1; rodada <= 3; rodada++) {
     await capturar("4-desenho");
     await js(`document.querySelector('[data-ferramenta=borracha]').click();`);
     await capturar("4b-desenho-borracha");
+    // Modo Mão no meio da rodada (traços mantidos): confere que a miniatura não cria rolagem. Volta ao Mouse.
+    await js(`[...document.querySelectorAll('[data-modo=mao]')].find((b) => b.offsetParent !== null).click();`);
+    for (let i = 0; i < 40; i++) {
+      await espera(500);
+      if (await js(`const m = document.querySelector('[data-parte=miniatura]'); return m !== null && !m.hidden;`)) break;
+    }
+    await espera(1000);
+    await capturar("4c-desenho-mao");
+    await js(`[...document.querySelectorAll('[data-modo=mouse]')].find((b) => b.offsetParent !== null).click();`);
+    await espera(500);
   }
   await js(`document.querySelector('[data-acao=pronto]').click();`);
   await espera(4500);

@@ -73,3 +73,20 @@ Não coberto aqui: o momento "Pensando…" da charada (sem o `llama-server` a re
 ## Lápis de cor, partículas, som e painel (change desenho-com-a-mao, tarefa 1B.6)
 
 Tiradas em 25/11/2026 na pasta `desenho-com-a-mao/`, no jogo de verdade (build, redes treinadas, sem `llama-server`), com eventos de mouse reais do Edge headless a 1366×768: casa em tinta, porta em vermelho grosso (lápis vermelho e pó vermelho), balde azul dentro da casa, conta-gotas na porta (a cor atual virou `#b3261e` e a ferramenta voltou ao Lápis) e borracha passando no telhado: o traço do telhado saiu, **a pintura do balde ficou** (como pede a spec `paleta-de-desenho`) e as redes reclassificaram (casa 56% → celeiro 37%). As 9 telas seguem sem rolagem a 1366×768 e 1920×1080. O som não foi ouvido (o ambiente das capturas não reproduz áudio).
+
+## Modo Mão e política de conteúdo (change desenho-com-a-mao, tarefas 2.x, 4.x e 5.2)
+
+Rodado em 25/11/2026 no Edge headless (build + `preview`, redes treinadas, sem `llama-server`).
+
+**Capturas** (`desenho-com-a-mao/`, `scripts/capturar_telas.mjs`): as 10 telas da partida a 1366×768 e a 1920×1080, mais a `4c-desenho-mao`, em que o modo Mão é ligado no meio da rodada 1 (os traços ficam) e a miniatura espelhada da câmera aparece. O `*-relatorio.json` de cada resolução registra a rolagem: **nenhuma das 20 telas rola**.
+
+**Política de conteúdo no build** (`scripts/conferir_politica_de_conteudo.mjs`, decisão D11 do design):
+- Partida inteira com a CSP ativa: as redes ONNX palpitaram (uma casa deu "casa 71%") e a rodada chegou ao veredito, com **zero violações**.
+- Modo Mão com a câmera falsa do Edge: o MediaPipe carregou o modelo e o wasm, a miniatura apareceu, o vídeo chegou a 640×480 e o laço de detecção rodou, **sem violação** e sem o aviso "Câmera indisponível".
+- Depois de 75 s, a **única** violação foi o MediaPipe tentando enviar o registro de uso a `https://odml.pa.googleapis.com/v1/log`, bloqueado por `connect-src`. Os únicos hosts contatados foram `localhost:4173` e `127.0.0.1:8080` (o Zé desligado recusa a conexão, como esperado).
+
+**Não provado aqui** (a câmera falsa é uma imagem de teste, sem mão):
+- Os gestos com mão e webcam reais (lápis, borracha, mão aberta parada por 3 s) e o **FPS ≥ 10** com as redes ligadas: tarefa 5.1, precisa de webcam e de alguém na frente dela. As regras dos gestos estão cobertas por testes com mãos sintéticas, não por uma mão de verdade.
+- A liberação da câmera para `localhost` no navegador do evento (fica no checklist).
+- A faixa de botões "Voz pt-BR" e "Bastidores" encosta de leve no balão do Zé a 1366×768 (visível na `4c`); não afeta a rolagem e não foi mexido.
+
