@@ -20,6 +20,12 @@ FIGURAS = Path("docs/banner/figuras")
 CAPTURA_DO_JOGO = Path("docs/capturas/desenho-com-a-mao/1920x1080-4c-desenho-mao.png")
 EMU_POR_CM = 360000
 AZUL_UNIRV = "004AAD"
+# A captura do jogo ocupa a faixa entre o texto da Introdução e o título da Metodologia. Para ela ficar grande,
+# a Metodologia (título cinza e texto) desce um pouco; há folga antes do diagrama do rodapé.
+Y_DA_CAPTURA_CM = 55.8
+ALTURA_DA_CAPTURA_CM = 13.6
+DESCIDA_DA_METODOLOGIA_CM = 2.5
+FORMAS_DA_METODOLOGIA = ("Group 29", "TextBox 46", "TextBox 47")
 
 TITULO = "Desenha Aí, Sô!: duas redes neurais e um SLM caipira que adivinham e julgam o seu rabisco"
 AUTOR = "Gilberto Aparecido Dias Junior"
@@ -143,12 +149,26 @@ def posicao_da_forma(xml: str, nome: str) -> tuple[int, int, int, int]:
     return tuple(int(v) for v in achou.groups())  # type: ignore[return-value]
 
 
+def descer_forma(xml: str, nome: str, centimetros: float) -> str:
+    """Desce uma forma (ou grupo) do slide; a primeira posição depois do nome é a da própria forma."""
+    inicio = xml.index(f'name="{nome}"')
+    achou = re.compile(r'<a:off x="(\d+)" y="(\d+)"/>').search(xml, inicio)
+    if achou is None:
+        raise SystemExit(f"forma {nome} sem posição no template")
+    y = int(achou.group(2)) + round(centimetros * EMU_POR_CM)
+    return (
+        xml[: achou.start()]
+        + f'<a:off x="{achou.group(1)}" y="{y}"/>'
+        + xml[achou.end() :]
+    )
+
+
 def figura_do_jogo(xml: str) -> str:
     """Captura do jogo (e a legenda) no espaço livre abaixo do texto da Introdução."""
     x, _, largura, _ = posicao_da_forma(xml, "TextBox 45")
-    y = round(56.6 * EMU_POR_CM)
-    largura_da_figura = round(15.4 * EMU_POR_CM)
-    altura_da_figura = round(largura_da_figura * 1080 / 1920)
+    y = round(Y_DA_CAPTURA_CM * EMU_POR_CM)
+    altura_da_figura = round(ALTURA_DA_CAPTURA_CM * EMU_POR_CM)
+    largura_da_figura = round(altura_da_figura * 1920 / 1080)
     imagem = (
         '<p:pic><p:nvPicPr><p:cNvPr id="100" name="Captura do jogo" descr="Tela de desenho do jogo no modo Mão"/>'
         '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>'
@@ -178,6 +198,8 @@ def montar(template: Path, saida: Path, email: str) -> None:
     xml = trocar_texto_simples(xml, "TextBox 43", f" {email}")
     for nome, textos in TEXTOS.items():
         xml = trocar_paragrafos(xml, nome, textos)
+    for forma in FORMAS_DA_METODOLOGIA:
+        xml = descer_forma(xml, forma, DESCIDA_DA_METODOLOGIA_CM)
     xml = xml.replace("</p:spTree>", figura_do_jogo(xml) + "</p:spTree>")
     relacoes = arquivos["ppt/slides/_rels/slide1.xml.rels"].decode("utf8")
     relacoes = relacoes.replace(
