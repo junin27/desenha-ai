@@ -191,7 +191,7 @@ O usuário vai trabalhar no **design, na experiência do usuário e em funcional
 4. **Ensaio de 29/11 e evento de 30/11**; impressão do banner (exportar o `.pptx` para PDF no PowerPoint).
 
 ### O que NÃO está no Git (recriar na máquina nova)
-`ml/.venv`, `app/node_modules`, `app/dist`, `app/public/` (modelos e MediaPipe: `bash scripts/copiar_modelos.sh ...`), `saida/` (ensaio das redes; sem ele os testes de paridade ONNX são **pulados**, não reprovados), `demo/` (`scripts/preparar_demo.py`), caches. Os GGUF estão no Git LFS (`git lfs install` antes do clone; `GIT_LFS_SKIP_SMUDGE=1 git pull` para pular os modelos).
+`ml/.venv` e `app/node_modules` (grandes e específicos da máquina: recriar com os comandos de "Configurar outra máquina"), `demo/` (`scripts/preparar_demo.py`) e caches. **Estão no Git por pedido do usuário (25/11, fim do dia):** `saida/` (ensaio das redes e do dataset), `app/public/` (modelos e MediaPipe) e `app/dist/` (build); se ficarem velhos, regenerar com `bash scripts/copiar_modelos.sh ...` e `npm --prefix app run build`. Os GGUF estão no Git LFS (`git lfs install` antes do clone; `GIT_LFS_SKIP_SMUDGE=1 git pull` para pular os modelos).
 - Os scripts `scripts/capturar_telas.mjs` e `scripts/conferir_politica_de_conteudo.mjs` assumem o **Edge** em `C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe` e o build servido em `localhost:4173` (`npm --prefix app run build` e `npm --prefix app run preview`).
 - `scripts/figuras_do_banner.py` precisa do **Pillow** (`python -m pip install pillow`; baixar só com o OK do usuário) e das fontes Segoe UI ou Arial do Windows.
 

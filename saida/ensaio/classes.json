@@ -1,0 +1,162 @@
+{
+ "categorias": [
+  {
+   "indice": 0,
+   "en": "cow",
+   "pt": "vaca"
+  },
+  {
+   "indice": 1,
+   "en": "horse",
+   "pt": "cavalo"
+  },
+  {
+   "indice": 2,
+   "en": "pig",
+   "pt": "porco"
+  },
+  {
+   "indice": 3,
+   "en": "cat",
+   "pt": "gato"
+  },
+  {
+   "indice": 4,
+   "en": "dog",
+   "pt": "cachorro"
+  },
+  {
+   "indice": 5,
+   "en": "bird",
+   "pt": "passarinho"
+  },
+  {
+   "indice": 6,
+   "en": "fish",
+   "pt": "peixe"
+  },
+  {
+   "indice": 7,
+   "en": "snake",
+   "pt": "cobra"
+  },
+  {
+   "indice": 8,
+   "en": "spider",
+   "pt": "aranha"
+  },
+  {
+   "indice": 9,
+   "en": "butterfly",
+   "pt": "borboleta"
+  },
+  {
+   "indice": 10,
+   "en": "tractor",
+   "pt": "trator"
+  },
+  {
+   "indice": 11,
+   "en": "pickup truck",
+   "pt": "caminhonete"
+  },
+  {
+   "indice": 12,
+   "en": "barn",
+   "pt": "celeiro"
+  },
+  {
+   "indice": 13,
+   "en": "guitar",
+   "pt": "violão"
+  },
+  {
+   "indice": 14,
+   "en": "hat",
+   "pt": "chapéu"
+  },
+  {
+   "indice": 15,
+   "en": "sun",
+   "pt": "sol"
+  },
+  {
+   "indice": 16,
+   "en": "moon",
+   "pt": "lua"
+  },
+  {
+   "indice": 17,
+   "en": "cloud",
+   "pt": "nuvem"
+  },
+  {
+   "indice": 18,
+   "en": "lightning",
+   "pt": "raio"
+  },
+  {
+   "indice": 19,
+   "en": "tree",
+   "pt": "árvore"
+  },
+  {
+   "indice": 20,
+   "en": "flower",
+   "pt": "flor"
+  },
+  {
+   "indice": 21,
+   "en": "banana",
+   "pt": "banana"
+  },
+  {
+   "indice": 22,
+   "en": "watermelon",
+   "pt": "melancia"
+  },
+  {
+   "indice": 23,
+   "en": "pineapple",
+   "pt": "abacaxi"
+  },
+  {
+   "indice": 24,
+   "en": "house",
+   "pt": "casa"
+  },
+  {
+   "indice": 25,
+   "en": "bicycle",
+   "pt": "bicicleta"
+  },
+  {
+   "indice": 26,
+   "en": "airplane",
+   "pt": "avião"
+  },
+  {
+   "indice": 27,
+   "en": "campfire",
+   "pt": "fogueira"
+  },
+  {
+   "indice": 28,
+   "en": "coffee cup",
+   "pt": "xícara de café"
+  },
+  {
+   "indice": 29,
+   "en": "eyeglasses",
+   "pt": "óculos"
+  }
+ ],
+ "w_cnn": 0.6,
+ "pre_processamento": {
+  "espessura": 1.6,
+  "epsilon": 2.0,
+  "maximo_de_pontos": 130,
+  "lado_da_imagem": 28,
+  "lado_da_caixa": 22
+ }
+}

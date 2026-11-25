@@ -1,0 +1,338 @@
+[
+ {
+  "texto": "Como a IA sabe o que eu desenhei?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é uma rede neural?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Você está conectado na internet?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é um Small Language Model?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é quantização?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Quem fez esse projeto?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "O que é destilação de conhecimento?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT?",
+  "evolucao": "seed"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como a IA sabe o que eu desenhei? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é uma rede neural? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Qual a diferença entre a CNN e a LSTM? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que a máquina adivinha antes de eu terminar o desenho? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Você está conectado na internet? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é um Small Language Model? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Como vocês treinaram o Zé do Rabisco? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é quantização? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Por que o computador às vezes confunde vaca com cavalo? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Quem fez esse projeto? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "O que é destilação de conhecimento? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_depth"
+ },
+ {
+  "texto": "Isso aí é o ChatGPT? Explica com um exemplo da roça? Explica com um exemplo da roça?",
+  "evolucao": "in_breadth"
+ }
+]
