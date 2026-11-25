@@ -97,3 +97,13 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - **Contingência (limite: manhã de 28/11):** demo sem o Zé treinado, usando charadas/narrações de reserva; no banner, dataset + ensaio + quantização.
 - **Com o usuário:** cadastro na planilha até 27/11, template oficial do banner, voz pt-BR (Microsoft Maria) no notebook do evento, impressão, ensaio em 29/11.
 - O GGUF da rodada reprovada ficou no Drive (`desenha_ai_so/`); não usar.
+
+## Estado em 25/11/2026 (madrugada) — LEIA PRIMEIRO
+
+- **Rodadas do notebook 3** (resultados em `notebooks/resultados/rodada{3,4,5}`, medições locais em `…/avaliacao_local/`; teste e validação congelados, mesmo SHA-256 desde a v3):
+  - v5 (5 épocas): oficial formato 93,5%, CHARADA 75%, VEREDITO 90,9%, PERGUNTA 100%: reprovado.
+  - v6 (treino revisado: veredito pela regra, charada sem a palavra no pensamento): oficial VEREDITO 100%, mas o GGUF **Q4** perdia o formato.
+  - **v7** (v6 + abertura da charada sem "o que é, o que é", dataset `notebooks/resultados/dataset_slm_v3/`): **oficial APROVADO, 100% em formato, CHARADA, VEREDITO e PERGUNTA** (Colab, 16 bits, guloso).
+- **GGUF do jogo:** o **Q4_K_M quebra o formato** da v7 (validação: formato 65%, VEREDITO 23%); o **Q8_0** (1,83 GB) não. Com temperatura 0,3 e sem penalidade (escolhido na validação: 100% / 93,8% / 95,5% / 100%), o teste deu formato 100%, CHARADA 81,2% (13/16, abaixo de 85% por uma charada; as 3 falhas vazam a palavra e o jogo troca pela reserva), VEREDITO 100%, PERGUNTA 100%, máximo de 17,8 s por fala. O teste do Q8 foi usado duas vezes: a primeira, com penalidade 1,1, revelou o "VEREDITO: PELADO" (a penalidade punia repetir o rótulo).
+- **Feito nesta sessão:** charada sem vazamento na tela; parâmetros corrigidos (1,72 bi, LoRA 1,01%, FP16 3,44 GB) no notebook e no banner; revisão offline do treino (`scripts/revisar_dataset.py`); jogo com temperatura 0,3 e sem penalidade; `docs/cadastro.md` com os campos do formulário e o padrão da planilha do professor (repetição = vermelho).
+- **Próximo passo:** change na demo-offline para usar o GGUF Q8_0 (hoje `preparar_demo.py` grava o Zé com o nome `…Q4_K_M.gguf`); `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf`; ensaio real; voltar o formato do Zé a ✗ no checklist; preencher os `[PENDENTE]` de banner e pitch; arquivar as 6 changes. Cadastro no formulário até 27/11 (com o usuário).
