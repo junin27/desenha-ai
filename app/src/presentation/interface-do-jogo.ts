@@ -11,6 +11,7 @@ import { TelaPlacar } from "./telas/tela-placar";
 import { TelaVeredito } from "./telas/tela-veredito";
 import { TransicaoPorPincelada } from "./transicao";
 import type { OpcoesDoPersonagem, PersonagemDoZe } from "./ze/personagem";
+import { ModoDeDesenhoAtual } from "./mao/seletor-de-modo";
 import { VigiaDoTedio } from "./ze/vigia-do-tedio";
 
 export type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo } from "./telas/tela";
@@ -72,9 +73,10 @@ export class InterfaceDoJogo {
       this.irParaOInicio(tela);
     };
     this.abertura = new TelaAbertura(informacoes, irPara("inicio"), opcoesDoZe);
-    this.inicio = new TelaInicio(comandos, conversa, irPara("placar"), opcoesDoZe);
+    const modo = opcoes.desenho?.modo ?? new ModoDeDesenhoAtual("mouse");
+    this.inicio = new TelaInicio(comandos, conversa, irPara("placar"), opcoesDoZe, modo);
     this.charada = new TelaCharada(comandos, opcoesDoZe);
-    this.desenho = new TelaDesenho(comandos, informacoes, { ...opcoesDoZe, ...opcoes.desenho });
+    this.desenho = new TelaDesenho(comandos, informacoes, { ...opcoesDoZe, ...opcoes.desenho, modo });
     this.veredito = new TelaVeredito(comandos, informacoes, {
       ...opcoesDoZe,
       comemorar: () => {

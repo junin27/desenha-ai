@@ -91,6 +91,11 @@ export class PainelDeDesenho {
     this.usar("lapis");
   }
 
+  /** Volta à ferramenta do painel (o modo Mão troca lápis e borracha pelos gestos). */
+  reaplicar(): void {
+    this.usar(this.ferramenta);
+  }
+
   usar(ferramenta: Ferramenta): void {
     this.ferramenta = ferramenta;
     this.escolhas.usar(ferramenta);

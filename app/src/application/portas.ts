@@ -1,4 +1,5 @@
 import type { Desenho } from "../domain/desenho/desenho";
+import type { PontosDaMao } from "../domain/mao/pontos";
 import type { Resultado } from "../domain/resultado";
 import type { PartidaNoPlacar } from "../domain/rodada/pontuacao";
 import type { Veredito } from "../domain/rodada/veredito";
@@ -107,4 +108,21 @@ export interface PreferenciasDoDesenho {
   gravarSomLigado(ligado: boolean): void;
   modo(): ModoDeDesenho;
   gravarModo(modo: ModoDeDesenho): void;
+}
+
+/** Por que a câmera não ligou (spec `desenho-com-a-mao`, "Sem câmera, o jogo segue no Mouse"). */
+export interface ErroDaCamera {
+  readonly codigo: "sem_camera" | "permissao_negada" | "modelo_indisponivel";
+  readonly detalhe: string;
+}
+
+/** Webcam do estande: liga só no desenho em modo Mão e desliga ao sair. */
+export interface CameraDoEstande {
+  ligar(): Promise<Resultado<void, ErroDaCamera>>;
+  desligar(): void;
+}
+
+/** Rede de visão que acha os 21 pontos da primeira mão no quadro atual da câmera. */
+export interface DetectorDeMao {
+  detectar(instanteMs: number): PontosDaMao | undefined;
 }

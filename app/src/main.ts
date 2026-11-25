@@ -38,6 +38,10 @@ import { criarBotaoDaVoz } from "./presentation/botao-da-voz";
 import { criar } from "./presentation/dom";
 import { mostrarErroDeCarregamento } from "./presentation/erro-de-carregamento";
 import { PreferenciasDoDesenhoLocalStorage } from "./infrastructure/preferencias-do-desenho";
+import { CameraDoNavegador, type DispositivosDeMidia } from "./infrastructure/mao/camera-do-navegador";
+import { DetectorMediaPipe } from "./infrastructure/mao/detector-mediapipe";
+import type { DependenciasDaMao } from "./presentation/mao/modo-mao";
+import { ModoDeDesenhoAtual } from "./presentation/mao/seletor-de-modo";
 import { FundoDeRabiscos } from "./presentation/fundo-de-rabiscos";
 import { InterfaceDoJogo, type InformacoesDoJogo } from "./presentation/interface-do-jogo";
 import { PainelTecnico } from "./presentation/painel-tecnico";
@@ -92,6 +96,19 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
   });
 }
 
+/** Câmera do navegador e o MediaPipe, carregado só quando o visitante escolhe a Mão (D1 de desenho-com-a-mao). */
+function dependenciasDaMao(): DependenciasDaMao {
+  // fora de contexto seguro (http que não é localhost) o navegador não oferece mediaDevices
+  const dispositivos: DispositivosDeMidia | undefined =
+    "mediaDevices" in navigator ? navigator.mediaDevices : undefined;
+  const camera = new CameraDoNavegador(dispositivos);
+  return {
+    camera,
+    video: camera.video,
+    criarDetector: () => DetectorMediaPipe.criar(camera.video),
+  };
+}
+
 /** Monta a interface e a mantém em dia com a partida e a conversa. */
 function ligarTela(
   raiz: HTMLElement,
@@ -107,6 +124,10 @@ function ligarTela(
       aoMudarSom: (ligado) => {
         preferencias.gravarSomLigado(ligado);
       },
+      modo: new ModoDeDesenhoAtual(preferencias.modo(), (modo) => {
+        preferencias.gravarModo(modo);
+      }),
+      mao: dependenciasDaMao(),
     },
   });
   partida.aoMudar((estado) => {

@@ -5,6 +5,7 @@ import { limparNome } from "../../domain/rodada/pontuacao";
 import { botao, criar } from "../dom";
 import type { OpcoesDoPersonagem } from "../ze/personagem";
 import type { PersonagemDoZe } from "../ze/personagem";
+import { ModoDeDesenhoAtual, SeletorDeModo } from "../mao/seletor-de-modo";
 import { TelaPergunta } from "./tela-pergunta";
 import type { ComandosDaConversa, ComandosDoJogo, Tela } from "./tela";
 
@@ -31,6 +32,7 @@ export class TelaInicio implements Tela {
     conversa: ComandosDaConversa,
     aoVerPlacar: () => void,
     opcoesDoZe: OpcoesDoPersonagem = {},
+    modo: ModoDeDesenhoAtual = new ModoDeDesenhoAtual("mouse"),
   ) {
     this.pergunta = new TelaPergunta(conversa, opcoesDoZe);
     this.campo.maxLength = TAMANHO_MAXIMO_DO_APELIDO;
@@ -53,6 +55,10 @@ export class TelaInicio implements Tela {
       comIcone("chapeu", criar("h2", { texto: "Qual é o seu apelido?" })),
       this.campo,
       this.criarSugestoes(),
+      criar("div", { classe: "linha escolha-do-modo" }, [
+        criar("span", { classe: "dica", texto: "Desenhar com:" }),
+        new SeletorDeModo(modo).raiz,
+      ]),
       criar("div", { classe: "linha" }, [this.comecar, verPlacar]),
       this.erro,
       criar("p", { classe: "dica", texto: "3 rodadas · acertou rápido vale mais · quase (top 3) vale 30" }),

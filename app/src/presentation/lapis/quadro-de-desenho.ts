@@ -10,6 +10,7 @@ import {
 import { criar } from "../dom";
 import { DesgasteDoLapis } from "./desgaste";
 import { tom } from "./desenho-do-lapis";
+import type { QuadroParaAMao } from "../mao/controle-da-mao";
 import { LapisNoQuadro } from "./lapis-no-quadro";
 import { opacidadeDa, type Particula, SistemaDeParticulas } from "./particulas";
 import { type GeradorDeSom, GeradorWebAudio, SomDoDesenho } from "./som-do-desenho";
@@ -35,7 +36,7 @@ export interface OpcoesDoQuadro {
  * O quadro de desenho em camadas (D9 do design): pintura do balde embaixo, traços no meio (a captura) e
  * partículas em cima, com o lápis no lugar do cursor. Liga a captura ao lápis, às partículas e ao som.
  */
-export class QuadroDeDesenho {
+export class QuadroDeDesenho implements QuadroParaAMao {
   readonly raiz: HTMLElement;
   readonly captura: CapturaDoDesenho;
   readonly som: SomDoDesenho;
@@ -102,6 +103,18 @@ export class QuadroDeDesenho {
     this.desgaste.renovar();
     this.desgasteDesenhado = [this.desgaste.corpo, this.desgaste.borracha, this.desgaste.ponta];
     this.lapis.redesenhar();
+  }
+
+  comecarEm(ponto: Ponto): void {
+    this.captura.comecarEm(ponto);
+  }
+
+  continuarEm(ponto: Ponto): void {
+    this.captura.continuarEm(ponto);
+  }
+
+  terminar(): void {
+    this.captura.terminar();
   }
 
   /** Posição do ponteiro (mouse ou dedo) sem encostar: o lápis acompanha. */

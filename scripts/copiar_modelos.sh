@@ -51,5 +51,18 @@ if [[ -n "$METRICAS_SLM" ]]; then
   fi
 fi
 
+# Modo Mão (change desenho-com-a-mao): modelo da mão do MediaPipe e o wasm da biblioteca, servidos pelo
+# próprio jogo para o desenho com a mão funcionar offline. Sem eles, o jogo cai para o mouse com aviso.
+MODELO_DA_MAO="notebooks/resultados/modelo_mao/hand_landmarker.task"
+WASM_DA_MAO="app/node_modules/@mediapipe/tasks-vision/wasm"
+DESTINO_DA_MAO="app/public/mao"
+if [[ -f "$MODELO_DA_MAO" && -d "$WASM_DA_MAO" ]]; then
+  mkdir -p "$DESTINO_DA_MAO"
+  cp "$MODELO_DA_MAO" "$DESTINO_DA_MAO/"
+  cp "$WASM_DA_MAO/vision_wasm_internal.js" "$WASM_DA_MAO/vision_wasm_internal.wasm" "$DESTINO_DA_MAO/"
+else
+  echo "AVISO: modelo da mão ou wasm do MediaPipe ausente; o modo Mão ficará indisponível." >&2
+fi
+
 echo "OK: modelos copiados de $ORIGEM_DAS_REDES para $DESTINO"
 ls -la "$DESTINO"
