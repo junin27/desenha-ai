@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lápis no quadro</title>
+<style>
+  :root { --papel: #f7ecd4; --quadro: #fffdf6; --tinta: #2b1a0a; --tinta-suave: #6b4f2e; --terracota: #b5401f; --mostarda: #c98a00; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--papel); color: var(--tinta); font-family: "Segoe UI", system-ui, sans-serif; min-height: 100vh;
+    display: grid; place-items: center; gap: 14px; padding: 20px; }
+  h1 { font-size: 34px; text-transform: uppercase; letter-spacing: .03em; }
+  p { color: var(--tinta-suave); font-size: 20px; text-align: center; max-width: 64ch; }
+  .mesa { display: flex; gap: 22px; align-items: flex-start; }
+  button { font: 700 20px "Segoe UI", system-ui; text-transform: uppercase; padding: 8px 14px; border: 3px solid var(--tinta);
+    border-radius: 14px 40px 14px 40px / 40px 14px 40px 14px; background: var(--quadro); box-shadow: 4px 4px 0 var(--tinta); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; }
+  button[aria-pressed=true] { background: var(--terracota); color: var(--quadro); }
+  .icone { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Painel no estilo de jogo de desenho: ferramentas, espessura e paleta */
+  .painel { width: 236px; background: var(--quadro); border: 3px solid var(--tinta); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+    box-shadow: 8px 8px 0 var(--terracota); padding: 18px 16px; display: grid; gap: 14px; }
+  .painel h2 { font-size: 18px; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-suave); }
+  .ferramentas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ferramentas button { justify-content: center; font-size: 15px; padding: 8px 6px; flex-direction: column; gap: 2px; }
+  .espessuras { display: flex; gap: 10px; }
+  .espessuras button { width: 56px; height: 52px; justify-content: center; padding: 0; }
+  .espessuras span { display: block; border-radius: 50%; background: currentColor; }
+  .paleta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .cor { width: 100%; aspect-ratio: 1; border: 3px solid var(--tinta); border-radius: 12px 4px 14px 5px; cursor: pointer; box-shadow: 2px 2px 0 var(--tinta);
+    transition: transform .12s; }
+  .cor:hover { transform: scale(1.1) rotate(-4deg); }
+  .cor[aria-pressed=true] { outline: 4px solid var(--terracota); outline-offset: 2px; transform: scale(1.08); }
+  .atual { display: flex; align-items: center; gap: 10px; font: 700 16px "Segoe UI", system-ui; color: var(--tinta-suave); text-transform: uppercase; }
+  .atual i { width: 44px; height: 44px; border: 3px solid var(--tinta); border-radius: 50%; display: block; box-shadow: 2px 2px 0 var(--tinta); }
+
+  .quadro { position: relative; width: 600px; height: 600px; background: #fff; border: 3px solid var(--tinta);
+    border-radius: 18px 255px 18px 225px / 225px 18px 255px 18px; box-shadow: 8px 8px 0 var(--mostarda); cursor: none; overflow: hidden; touch-action: none; }
+  canvas { position: absolute; inset: 0; pointer-events: none; }
+  #tela { pointer-events: auto; }
+  .ancora { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 2; }
+  .ancora.visivel { opacity: 1; }
+  .ancora svg { position: absolute; left: 0; top: 0; overflow: visible; }
+  .circulo-borracha { position: absolute; width: 40px; height: 40px; left: -20px; top: -20px; border: 3px dashed var(--terracota); border-radius: 50%; display: none; }
+  .ancora[data-ferramenta=borracha] .circulo-borracha { display: block; animation: gira 3s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .ancora.encostou .mola { animation: afunda .28s cubic-bezier(.3, 1.8, .5, 1); }
+  @keyframes afunda { 35% { transform: scale(.86, 1.08) translate(4px, 6px); } }
+  .modo { transition: opacity .1s, transform .35s cubic-bezier(.3, 1.8, .5, 1); transform-origin: 0 0; opacity: 0; transform: scale(.4) rotate(60deg); }
+  .ancora[data-ferramenta=lapis] .modo-lapis, .ancora[data-ferramenta=borracha] .modo-borracha,
+  .ancora[data-ferramenta=balde] .modo-balde, .ancora[data-ferramenta=contagotas] .modo-contagotas { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+<h1>Lápis no quadro</h1>
+<p>Escolha a cor, a espessura e a ferramenta. As partículas saem da cor do traço; a borracha solta farelo da cor dela. As redes continuam vendo só os traços (a cor e o balde são enfeite).</p>
+<div class="mesa">
+  <aside class="painel">
+    <h2>Ferramentas</h2>
+    <div class="ferramentas" id="ferramentas">
+      <button data-ferramenta="lapis" aria-pressed="true"><svg class="icone" viewBox="0 0 24 24"><path d="M4 20 L5.5 15 L16 4.5 C17 3.5 18.6 3.6 19.6 4.6 C20.5 5.6 20.5 7 19.5 8 L9 18.5 Z"/><path d="M14.5 6 L18 9.5"/></svg>Lápis</button>
+      <button data-ferramenta="borracha" aria-pressed="false"><svg class="icone" viewBox="0 0 24 24"><path d="M3.5 15.5 L12.5 6.5 C13.3 5.7 14.6 5.7 15.4 6.5 L19.5 10.6 C20.3 11.4 20.3 12.7 19.5 13.5 L13 20 L7.5 20 Z"/><path d="M9 10 L15.8 16.8"/></svg>Borracha</button>
+      <button data-ferramenta="balde" aria-pressed="false"><svg class="icone" viewBox="0 0 24 24"><path d="M5 10 L12 3 L19 10 L12 17 Z"/><path d="M8.5 6.5 L4 2"/><path d="M19.5 14 C19.5 14 21.5 16.6 21.5 18 C21.5 19.1 20.6 20 19.5 20 C18.4 20 17.5 19.1 17.5 18 C17.5 16.6 19.5 14 19.5 14 Z"/></svg>Balde</button>
+      <button data-ferramenta="contagotas" aria-pressed="false"><svg class="icone" viewBox="0 0 24 24"><path d="M14.5 4.5 C15.6 3.4 17.4 3.4 18.5 4.5 L19.5 5.5 C20.6 6.6 20.6 8.4 19.5 9.5 L17.5 11.5 L12.5 6.5 Z"/><path d="M13.5 7.5 L5 16 L4 20 L8 19 L16.5 10.5"/></svg>Conta-gotas</button>
+    </div>
+    <h2>Espessura</h2>
+    <div class="espessuras" id="espessuras">
+      <button data-espessura="5" aria-pressed="false"><span style="width:8px;height:8px"></span></button>
+      <button data-espessura="9" aria-pressed="true"><span style="width:14px;height:14px"></span></button>
+      <button data-espessura="16" aria-pressed="false"><span style="width:22px;height:22px"></span></button>
+    </div>
+    <h2>Cores</h2>
+    <div class="paleta" id="paleta"></div>
+    <div class="atual"><i id="cor-atual"></i>Cor do lápis</div>
+    <button id="b-limpar">Limpar tudo</button>
+    <button id="b-som" aria-pressed="true">🔊 Som</button>
+  </aside>
+  <div class="quadro" id="quadro">
+    <canvas id="tela" width="600" height="600"></canvas>
+    <canvas id="particulas" width="600" height="600"></canvas>
+    <div class="ancora" id="ancora" data-ferramenta="lapis">
+      <div class="circulo-borracha"></div>
+      <svg width="1" height="1" aria-hidden="true">
+        <defs>
+          <linearGradient id="madeira" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dcb0"/><stop offset="1" stop-color="#d9b07a"/></linearGradient>
+          <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f6f6"/><stop offset=".45" stop-color="#b9bcc2"/><stop offset=".55" stop-color="#8d9097"/><stop offset="1" stop-color="#dcdee1"/></linearGradient>
+          <linearGradient id="borracha" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4a8a6"/><stop offset="1" stop-color="#c8605e"/></linearGradient>
+          <linearGradient id="brilho" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+          <radialGradient id="sombra"><stop offset="0" stop-color="#2b1a0a" stop-opacity=".35"/><stop offset="1" stop-color="#2b1a0a" stop-opacity="0"/></radialGradient>
+        </defs>
+        <ellipse id="sombra" cx="60" cy="18" rx="70" ry="10" fill="url(#sombra)"/>
+        <g id="inclina"><g class="mola"><g transform="scale(.85)">
+          <g class="modo modo-lapis"><g transform="rotate(-45)" id="lapis-horizontal"></g></g>
+          <g class="modo modo-borracha"><g id="borracha-horizontal"></g></g>
+          <!-- Balde: a gota de tinta cai no ponto -->
+          <g class="modo modo-balde" transform="translate(4 -50)">
+            <path d="M8 26 L36 0 L64 26 L36 54 Z" fill="#fffdf6" stroke="#2b1a0a" stroke-width="3" stroke-linejoin="round" transform="rotate(10 36 26)"/>
+            <path id="tinta-do-balde" d="M14 30 Q30 40 52 24 L60 26 L36 54 Z" stroke="#2b1a0a" stroke-width="2" transform="rotate(10 36 26)"/>
+            <path d="M22 12 L6 -6" stroke="#2b1a0a" stroke-width="4" stroke-linecap="round"/>
+            <path id="gota-do-balde" d="M-4 40 C-4 40 4 48 4 54 C4 58 0 60 -4 60 C-8 60 -12 58 -12 54 C-12 48 -4 40 -4 40 Z" stroke="#2b1a0a" stroke-width="2" transform="translate(4 -10)"/>
+          </g>
+          <!-- Conta-gotas: a ponta no ponto -->
+          <g class="modo modo-contagotas" transform="rotate(-45)">
+            <path d="M0 0 L22 -5 L22 5 Z" fill="#d7e8ef" stroke="#2b1a0a" stroke-width="2.5" stroke-linejoin="round"/>
+            <rect x="22" y="-7" width="70" height="14" rx="3" fill="#e9f3f7" stroke="#2b1a0a" stroke-width="2.5"/>
+            <rect id="liquido" x="24" y="-5" width="40" height="10" fill="#2b1a0a"/>
+            <path d="M92 -10 L106 -10 Q126 -10 126 0 Q126 10 106 10 L92 10 Z" fill="#c8605e" stroke="#2b1a0a" stroke-width="2.5"/>
+          </g>
+        </g></g></g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+const LADO = 600;
+const quadro = document.getElementById("quadro"), tela = document.getElementById("tela"), cx = tela.getContext("2d", { willReadFrequently: true });
+const pc = document.getElementById("particulas").getContext("2d");
+const ancora = document.getElementById("ancora"), inclina = document.getElementById("inclina"), sombra = document.getElementById("sombra");
+const CORES = ["#2b1a0a", "#6b4f2e", "#9a9aa2", "#ffffff", "#b3261e", "#e8743b", "#f2c14e", "#f6dcb0",
+               "#2f7d32", "#8cc152", "#1f5fa8", "#5bc0eb", "#6a3d9a", "#e07bb5", "#a0522d", "#3a8f8f"];
+const COR_DA_BORRACHA = ["#f4a8a6", "#e58c8a", "#c8605e"]; // os mesmos tons do desenho da borracha
+let ferramenta = "lapis", cor = CORES[0], espessura = 9, desenhando = false, ultimo = null, somLigado = true;
+
+/* Fundo branco de verdade (o balde e o conta-gotas leem os pixels) */
+cx.fillStyle = "#fff"; cx.fillRect(0, 0, LADO, LADO);
+
+/* ---------- Desgaste: encolhe até um mínimo e continua funcionando ---------- */
+const CORPO_INTEIRO = 150, CORPO_MINIMO = 40, BORRACHA_INTEIRA = 30, BORRACHA_MINIMA = 6;
+let corpo = CORPO_INTEIRO, borrachaRestante = BORRACHA_INTEIRA, ponta = 1;
+
+function clarear(hex, f) { const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const m = (c) => Math.round(f > 0 ? c + (255 - c) * f : c * (1 + f)); return `rgb(${m(r)},${m(g)},${m(b)})`; }
+/* Lápis de cor: o corpo tem a cor escolhida, com faces claras e escuras para dar volume */
+function lapisSvg() {
+  const fimCorpo = 30 + corpo, fimAnel = fimCorpo + 22, fimBorracha = fimAnel + borrachaRestante, grafite = 4 + 6 * ponta;
+  const contorno = cor === "#2b1a0a" ? "#000" : "#2b1a0a";
+  return `
+    <path d="M0 0 L30 -14 L30 14 Z" fill="url(#madeira)" stroke="#2b1a0a" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M0 ${-1.5 - 3 * (1 - ponta)} L${grafite} -4.7 L${grafite} 4.7 L0 ${1.5 + 3 * (1 - ponta)} Z" fill="${cor}" stroke="#2b1a0a" stroke-width="1"/>
+    <rect x="30" y="-14" width="${corpo}" height="9" fill="${clarear(cor, .35)}"/>
+    <rect x="30" y="-5" width="${corpo}" height="10" fill="${cor}"/>
+    <rect x="30" y="5" width="${corpo}" height="9" fill="${clarear(cor, -.3)}"/>
+    <rect x="30" y="-14" width="${corpo}" height="28" fill="url(#brilho)"/>
+    <rect x="30" y="-14" width="${corpo}" height="28" fill="none" stroke="${contorno}" stroke-width="2.5"/>
+    <path d="M30 -14 Q34 -9 30 -5 Q34 0 30 5 Q34 9 30 14" fill="#f6dcb0" stroke="#2b1a0a" stroke-width="2"/>
+    <rect x="${fimCorpo}" y="-15" width="22" height="30" rx="3" fill="url(#metal)" stroke="#2b1a0a" stroke-width="2.5"/>
+    <path d="M${fimCorpo + 7} -15 L${fimCorpo + 7} 15 M${fimCorpo + 15} -15 L${fimCorpo + 15} 15" stroke="#7d8087" stroke-width="1.5"/>
+    <path d="M${fimAnel} -14 L${fimBorracha - 8} -14 Q${fimBorracha} -14 ${fimBorracha} 0 Q${fimBorracha} 14 ${fimBorracha - 8} 14 L${fimAnel} 14 Z"
+      fill="url(#borracha)" stroke="#2b1a0a" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M${fimAnel + 4} -8 Q${fimAnel + 10} -9 ${fimBorracha - 4} -4" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>`;
+}
+function redesenharLapis() {
+  const fim = 30 + corpo + 22 + borrachaRestante;
+  document.getElementById("lapis-horizontal").innerHTML = lapisSvg();
+  document.getElementById("borracha-horizontal").innerHTML = `<g transform="rotate(-45) translate(${fim} 0) scale(-1 1)">${lapisSvg()}</g>`;
+  document.getElementById("tinta-do-balde").setAttribute("fill", cor);
+  document.getElementById("gota-do-balde").setAttribute("fill", cor);
+  document.getElementById("liquido").setAttribute("fill", cor);
+  document.getElementById("cor-atual").style.background = cor;
+}
+function gastar(distancia) {
+  if (ferramenta === "lapis") { corpo = Math.max(CORPO_MINIMO, corpo - distancia * 0.03); ponta = Math.max(0, ponta - distancia * 0.0025); }
+  else borrachaRestante = Math.max(BORRACHA_MINIMA, borrachaRestante - distancia * 0.012);
+  redesenharLapis();
+}
+
+/* ---------- Partículas: lápis na cor do traço; borracha na cor da borracha ---------- */
+const CHAO = LADO - 10;
+let particulas = [];
+const sortear = (lista) => lista[Math.floor(Math.random() * lista.length)];
+function tonsDoTraco() { return [cor, clarear(cor, .25), clarear(cor, -.25)]; }
+function nova(tipo, x, y, forca, tons) {
+  const angulo = Math.random() * Math.PI * 2;
+  const base = { tipo, x, y, giro: Math.random() * 6, vgiro: (Math.random() - .5) * .5, vida: 1, quicou: 0, cor: sortear(tons) };
+  if (tipo === "lasca") return { ...base, vx: Math.cos(angulo) * (2 + forca * 4), vy: -2 - Math.random() * 4 * forca, tamanho: 6 + Math.random() * 8, curva: .6 + Math.random() * .8, duracao: .010 };
+  if (tipo === "po") return { ...base, vx: (Math.random() - .5) * 3, vy: -Math.random() * 2, tamanho: 2 + Math.random() * 3, duracao: .016 };
+  if (tipo === "faisca") return { ...base, vx: Math.cos(angulo) * (3 + forca * 5), vy: Math.sin(angulo) * (3 + forca * 5), tamanho: 3 + Math.random() * 3, duracao: .05 };
+  return { ...base, vx: (Math.random() - .5) * (3 + forca * 5), vy: -1 - Math.random() * 3 * forca, tamanho: 8 + Math.random() * 10, curva: 1 + Math.random(), duracao: .004 };
+}
+function soltarParticulas([x, y], distancia) {
+  const forca = Math.min(1, distancia / 14);
+  if (ferramenta === "lapis") {
+    const tons = tonsDoTraco();
+    for (let i = 0; i < 2 + forca * 6; i++) particulas.push(nova("po", x, y, forca, tons));
+    if (Math.random() < .25 + forca * .5) particulas.push(nova("lasca", x, y, forca, tons));
+    if (Math.random() < .4 * forca) for (let i = 0; i < 3; i++) particulas.push(nova("faisca", x, y, forca, tons));
+  } else {
+    for (let i = 0; i < 1 + forca * 3; i++) particulas.push(nova("minhoca", x, y, forca, COR_DA_BORRACHA));
+    for (let i = 0; i < 2 + forca * 4; i++) particulas.push(nova("po", x, y, forca, COR_DA_BORRACHA));
+  }
+  // Acima do limite, as mais antigas somem depressa (fade), em vez de sumirem de uma vez
+  const excesso = particulas.length - LIMITE_DE_PARTICULAS;
+  for (let i = 0; i < excesso; i++) particulas[i].duracao = Math.max(particulas[i].duracao, .05);
+}
+function desenharParticula(p) {
+  // desbota suave nos últimos 40% da vida (antes a opacidade "estalava")
+  pc.save(); pc.translate(p.x, p.y); pc.rotate(p.giro); pc.globalAlpha = Math.max(0, Math.min(1, p.vida / .4));
+  pc.fillStyle = p.cor; pc.strokeStyle = p.cor;
+  if (p.tipo === "lasca") { pc.lineWidth = 3; pc.beginPath(); pc.arc(0, 0, p.tamanho / 2, 0, Math.PI * p.curva); pc.stroke(); }
+  else if (p.tipo === "minhoca") { pc.lineWidth = 4; pc.lineCap = "round"; pc.beginPath(); pc.moveTo(-p.tamanho / 2, 0);
+    pc.quadraticCurveTo(0, -p.tamanho * .35 * p.curva, p.tamanho / 2, 0); pc.stroke(); }
+  else if (p.tipo === "faisca") { pc.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? p.tamanho * .4 : p.tamanho; pc.lineTo(Math.cos(i * Math.PI / 4) * r, Math.sin(i * Math.PI / 4) * r); } pc.fill(); }
+  else pc.fillRect(-p.tamanho / 2, -p.tamanho / 2, p.tamanho, p.tamanho);
+  // partícula branca ou muito clara ganha um contorno fino para aparecer no papel
+  if (p.cor === "#ffffff") { pc.strokeStyle = "#9a9aa2"; pc.lineWidth = .8; pc.strokeRect(-p.tamanho / 2, -p.tamanho / 2, p.tamanho, p.tamanho); }
+  pc.restore();
+}
+/* Passo da física em tempo real (não depende do FPS): sem isso, um quadro lento faz tudo "pular" */
+const LIMITE_DE_PARTICULAS = 600;
+let instanteAnterior = performance.now();
+function passoDasParticulas(agora) {
+  const dt = Math.min(2.5, (agora - instanteAnterior) / 16.67); // 1 = um quadro a 60 fps
+  instanteAnterior = agora;
+  pc.clearRect(0, 0, LADO, LADO);
+  for (const p of particulas) {
+    if (p.parada) { p.vida -= p.duracao * .6 * dt; desenharParticula(p); continue; } // assentou: só desbota, sem tremer
+    p.vida -= p.duracao * dt;
+    if (p.tipo !== "faisca") p.vy += .32 * dt;
+    const atrito = Math.pow(p.tipo === "faisca" ? .9 : .985, dt);
+    p.vx *= atrito; p.x += p.vx * dt; p.y += p.vy * dt; p.giro += p.vgiro * dt;
+    if (p.y >= CHAO) {
+      p.y = CHAO; p.vx *= .6; p.vgiro *= .5;
+      p.vy = -p.vy * (p.tipo === "minhoca" ? .45 : .25);
+      // quique fraco ou já quicou: trava no chão de vez (era o "pisca-pisca")
+      if (++p.quicou > 2 || Math.abs(p.vy) < 1.2) { p.parada = true; p.vy = 0; p.vx = 0; p.vgiro = 0; p.y = CHAO; }
+    }
+    desenharParticula(p);
+  }
+  particulas = particulas.filter((p) => p.vida > 0 && p.x > -20 && p.x < LADO + 20);
+  pc.globalAlpha = 1; requestAnimationFrame(passoDasParticulas);
+}
+requestAnimationFrame(passoDasParticulas);
+
+/* ---------- Balde (preenche a área da mesma cor) e conta-gotas ---------- */
+function corDoPixel(x, y) { const d = cx.getImageData(Math.round(x), Math.round(y), 1, 1).data; return "#" + [d[0], d[1], d[2]].map((v) => v.toString(16).padStart(2, "0")).join(""); }
+function encher(x0, y0) {
+  const img = cx.getImageData(0, 0, LADO, LADO), d = img.data, n = parseInt(cor.slice(1), 16), alvo = [n >> 16, (n >> 8) & 255, n & 255];
+  const i0 = (Math.round(y0) * LADO + Math.round(x0)) * 4, ref = [d[i0], d[i0 + 1], d[i0 + 2]];
+  if (ref.every((v, k) => Math.abs(v - alvo[k]) < 4)) return;
+  const parecido = (i) => Math.abs(d[i] - ref[0]) + Math.abs(d[i + 1] - ref[1]) + Math.abs(d[i + 2] - ref[2]) < 90; // tolera a borda suavizada
+  const pilha = [[Math.round(x0), Math.round(y0)]];
+  while (pilha.length) {
+    const [x, y] = pilha.pop(); let i = (y * LADO + x) * 4;
+    if (x < 0 || y < 0 || x >= LADO || y >= LADO || !parecido(i)) continue;
+    d[i] = alvo[0]; d[i + 1] = alvo[1]; d[i + 2] = alvo[2]; d[i + 3] = 255;
+    pilha.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  cx.putImageData(img, 0, 0);
+  for (let i = 0; i < 30; i++) particulas.push(nova("faisca", x0, y0, 1, tonsDoTraco())); // respingo
+}
+
+/* ---------- Som ---------- */
+let audio, ganho, filtro;
+function prepararSom() {
+  if (audio) return; audio = new AudioContext();
+  const buffer = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate), dados = buffer.getChannelData(0);
+  for (let i = 0; i < dados.length; i++) dados[i] = Math.random() * 2 - 1;
+  const fonte = audio.createBufferSource(); fonte.buffer = buffer; fonte.loop = true;
+  filtro = audio.createBiquadFilter(); filtro.type = "bandpass"; ganho = audio.createGain(); ganho.gain.value = 0;
+  fonte.connect(filtro).connect(ganho).connect(audio.destination); fonte.start();
+}
+function somDoTraco(v) { if (!audio || !somLigado) return; const t = audio.currentTime, f = Math.min(1, v / 18);
+  filtro.frequency.setTargetAtTime(ferramenta === "lapis" ? 3200 + f * 1800 : 650 + f * 400, t, .02); filtro.Q.setTargetAtTime(ferramenta === "lapis" ? 1.4 : .8, t, .02);
+  ganho.gain.setTargetAtTime((ferramenta === "lapis" ? .25 : .4) * f, t, .03); }
+function calarSom() { if (audio) ganho.gain.setTargetAtTime(0, audio.currentTime, .05); }
+function bip(freqInicio, freqFim, duracao, tipo = "triangle", volume = .25) {
+  if (!audio || !somLigado) return; const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+  o.type = tipo; o.frequency.setValueAtTime(freqInicio, t); o.frequency.exponentialRampToValueAtTime(freqFim, t + duracao);
+  g.gain.setValueAtTime(volume, t); g.gain.exponentialRampToValueAtTime(.001, t + duracao + .02); o.connect(g).connect(audio.destination); o.start(); o.stop(t + duracao + .05); }
+
+/* ---------- Ponteiro ---------- */
+function ponto(e) { const r = quadro.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+function posicionar([x, y], dx = 0, v = 0) {
+  const tremor = desenhando ? Math.min(3, v * .18) : 0;
+  ancora.style.transform = `translate(${x + (Math.random() - .5) * tremor}px, ${y + (Math.random() - .5) * tremor}px)`;
+  inclina.setAttribute("transform", `rotate(${desenhando ? Math.max(-20, Math.min(20, dx * 1.4)) : 0})`);
+  sombra.setAttribute("cx", desenhando ? 40 : 70); sombra.setAttribute("cy", desenhando ? 10 : 34); sombra.setAttribute("opacity", desenhando ? 1 : .55);
+}
+quadro.addEventListener("pointerenter", () => ancora.classList.add("visivel"));
+quadro.addEventListener("pointerleave", () => { ancora.classList.remove("visivel"); desenhando = false; calarSom(); });
+quadro.addEventListener("pointerdown", (e) => {
+  prepararSom(); audio.resume(); const p = ponto(e);
+  ancora.classList.remove("encostou"); void ancora.offsetWidth; ancora.classList.add("encostou");
+  if (ferramenta === "balde") { encher(...p); bip(500, 180, .18, "sine", .3); return; }
+  if (ferramenta === "contagotas") { escolherCor(corDoPixel(...p)); bip(1200, 1600, .08, "sine", .2); escolher("lapis"); return; }
+  desenhando = true; ultimo = p; quadro.setPointerCapture(e.pointerId);
+  bip(ferramenta === "lapis" ? 900 : 300, ferramenta === "lapis" ? 300 : 120, .08);
+  for (let i = 0; i < 10; i++) particulas.push(nova(ferramenta === "lapis" ? "po" : "minhoca", ...p, .8, ferramenta === "lapis" ? tonsDoTraco() : COR_DA_BORRACHA));
+});
+addEventListener("pointerup", () => { desenhando = false; calarSom(); if (ultimo) posicionar(ultimo); });
+quadro.addEventListener("pointermove", (e) => {
+  const p = ponto(e); if (!desenhando) { posicionar(p); return; }
+  const dx = p[0] - ultimo[0], distancia = Math.hypot(dx, p[1] - ultimo[1]);
+  posicionar(p, dx, distancia);
+  cx.lineCap = "round"; cx.lineJoin = "round";
+  cx.strokeStyle = ferramenta === "borracha" ? "#fff" : cor;
+  cx.lineWidth = ferramenta === "borracha" ? 40 : espessura + 3 * (1 - ponta);
+  cx.beginPath(); cx.moveTo(...ultimo); cx.lineTo(...p); cx.stroke(); ultimo = p;
+  soltarParticulas(p, distancia); somDoTraco(distancia); gastar(distancia);
+});
+
+/* ---------- Painel ---------- */
+const paleta = document.getElementById("paleta");
+for (const c of CORES) { const b = document.createElement("button"); b.className = "cor"; b.style.background = c; b.dataset.cor = c; b.title = c; b.onclick = () => escolherCor(c); paleta.append(b); }
+function escolherCor(c) {
+  cor = c; for (const b of paleta.children) b.setAttribute("aria-pressed", String(b.dataset.cor === c));
+  redesenharLapis(); if (ferramenta === "borracha") escolher("lapis");
+}
+function escolher(f) { ferramenta = f; ancora.dataset.ferramenta = f;
+  for (const b of document.querySelectorAll("#ferramentas button")) b.setAttribute("aria-pressed", String(b.dataset.ferramenta === f)); }
+for (const b of document.querySelectorAll("#ferramentas button")) b.onclick = () => escolher(b.dataset.ferramenta);
+for (const b of document.querySelectorAll("#espessuras button")) b.onclick = () => { espessura = Number(b.dataset.espessura);
+  for (const o of document.querySelectorAll("#espessuras button")) o.setAttribute("aria-pressed", String(o === b)); };
+document.getElementById("b-limpar").onclick = () => { cx.fillStyle = "#fff"; cx.fillRect(0, 0, LADO, LADO); particulas = [];
+  corpo = CORPO_INTEIRO; borrachaRestante = BORRACHA_INTEIRA; ponta = 1; redesenharLapis(); };
+document.getElementById("b-som").onclick = (e) => { somLigado = !somLigado; e.currentTarget.setAttribute("aria-pressed", String(somLigado));
+  e.currentTarget.textContent = somLigado ? "🔊 Som" : "🔇 Som"; if (!somLigado) calarSom(); };
+
+escolherCor(CORES[0]); ancora.classList.add("visivel"); posicionar([330, 340]);
+</script>
+</body>
+</html>
