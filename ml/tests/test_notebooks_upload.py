@@ -366,7 +366,7 @@ def test_notebook_3_exige_o_zip_com_a_abertura_da_charada_sem_repeticao() -> Non
 
 
 def test_notebook_3_baixa_tambem_o_gguf_q8_em_celula_propria() -> None:
-    """Spec modelo-do-ze, "Artefatos do modelo": a v6 perdeu o formato no Q4; o Q8_0 decide se é a quantização."""
+    """Spec modelo-do-ze, "Artefatos do modelo": a v6 perdeu formato no Q4; o Q8_0 mostra se foi isso."""
     celulas = _celulas_de_codigo("03_slm_finetuning_zedorabisco_v7")
 
     celula_do_q8 = next(c for c in celulas if "baixar_com_menu(GGUF_Q8_DO_ZE)" in c)
