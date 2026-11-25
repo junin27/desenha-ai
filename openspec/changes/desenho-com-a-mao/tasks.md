@@ -2,14 +2,14 @@
 
 ## 1. Domínio: gestos e limpeza (TDD, puro)
 
-- [ ] 1.1 `domain/mao/pontos.ts` e `domain/mao/gestos.ts`: testes com pontos sintéticos (indicador esticado → `lapis`; mão fechada → `borracha`; cinco esticados → `mao_aberta`; outra forma → `nenhum`; polegar solto não atrapalha o `lapis`) → implementar. Verifica: `npm --prefix app test -- gestos`
-- [ ] 1.2 `EstabilizadorDeGesto`: testes (só troca após 3 quadros iguais; um quadro ruidoso não troca) → implementar. Verifica: `npm --prefix app test -- gestos`
-- [ ] 1.3 `domain/mao/limpeza.ts`: testes (3 s parada dispara; 2 s e depois anda 10% zera; trocar de gesto zera; fração do anel) → implementar. Verifica: `npm --prefix app test -- limpeza`
-- [ ] 1.4 `domain/mao/coordenadas.ts`: testes (espelhamento do X; margem de 15% mapeia para as bordas do quadro; suavização α = 0,5; centro da palma) → implementar. Verifica: `npm --prefix app test -- coordenadas`
+- [x] 1.1 `domain/mao/pontos.ts` e `domain/mao/gestos.ts`: testes com pontos sintéticos (indicador esticado → `lapis`; mão fechada → `borracha`; cinco esticados → `mao_aberta`; outra forma → `nenhum`; polegar solto não atrapalha o `lapis`) → implementar. Verifica: `npm --prefix app test -- gestos`
+- [x] 1.2 `EstabilizadorDeGesto`: testes (só troca após 3 quadros iguais; um quadro ruidoso não troca) → implementar. Verifica: `npm --prefix app test -- gestos`
+- [x] 1.3 `domain/mao/limpeza.ts`: testes (3 s parada dispara; 2 s e depois anda 10% zera; trocar de gesto zera; fração do anel) → implementar. Verifica: `npm --prefix app test -- limpeza`
+- [x] 1.4 `domain/mao/coordenadas.ts`: testes (espelhamento do X; margem de 15% mapeia para as bordas do quadro; suavização α = 0,5; centro da palma) → implementar. Verifica: `npm --prefix app test -- coordenadas`
 
 ## 1B. Lápis, partículas, som e painel (modo Mouse primeiro)
 
-- [ ] 1B.1 `domain/desenho/balde.ts`: testes de `preencherArea` (pinta a área fechada e não vaza para fora; tolera a borda suavizada; mesma cor não faz nada) → implementar. Verifica: `npm --prefix app test -- balde`
+- [x] 1B.1 `domain/desenho/balde.ts`: testes de `preencherArea` (pinta a área fechada e não vaza para fora; tolera a borda suavizada; mesma cor não faz nada) → implementar. Verifica: `npm --prefix app test -- balde`
 - [ ] 1B.2 `presentation/lapis/desgaste.ts` e `presentation/lapis/particulas.ts` (puros): testes do desgaste (encurta com a distância, para no mínimo e continua; volta inteiro) e da física (gravidade, quique, assentada não muda de posição e só desbota; limite de 600 desbota as antigas) → implementar. Verifica: `npm --prefix app test -- desgaste particulas`
 - [ ] 1B.3 `presentation/lapis/lapis-no-quadro.ts`: SVG próprio por ferramenta (lápis de cor, borracha virada, balde, conta-gotas) com a ponta no ponto; some fora do quadro; testes em jsdom da posição da âncora e da ferramenta mostrada. Verifica: `npm --prefix app test -- lapis-no-quadro`
 - [ ] 1B.4 `presentation/lapis/som-do-desenho.ts` atrás de uma interface (`SomDoDesenho`), com dublê nos testes: toque ao encostar, volume pela velocidade, silêncio ao parar, desligado não toca; preferência salva. Verifica: `npm --prefix app test -- som-do-desenho`
