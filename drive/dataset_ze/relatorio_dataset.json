@@ -1,0 +1,43 @@
+{
+ "pedidos": 501,
+ "respostas": 501,
+ "rejeicoes": {
+  "formato_invalido": 84,
+  "vazou": 2,
+  "recusa": 1,
+  "veredito_errado": 13,
+  "numero_alucinado": 1
+ },
+ "reparos": {},
+ "origem_das_perguntas": {
+  "seed": 12,
+  "in_depth": 34,
+  "in_breadth": 35
+ },
+ "origem_dos_vereditos": {
+  "real": 218,
+  "sintetico": 22
+ },
+ "uso_da_api": {
+  "chamadas": 101,
+  "falhas": 82
+ },
+ "aprovadas": 400,
+ "aprovadas_por_tarefa": {
+  "CHARADA": 141,
+  "VEREDITO": 214,
+  "PERGUNTA": 45
+ },
+ "conjuntos": {
+  "treino": 322,
+  "val": 39,
+  "teste": 39
+ },
+ "suficiente": false,
+ "motivos_de_insuficiencia": [
+  "PERGUNTA: 45 amostras < 60"
+ ],
+ "categorias_sem_charada": [
+  "cavalo"
+ ]
+}
