@@ -128,3 +128,9 @@ O usuário vai trabalhar no **design, na experiência do usuário e em funcional
 3. **Arquivar as 6 changes** (`/openspec-archive-change`): `treino-das-redes`, `dataset-do-ze`, `fine-tuning-do-ze`, `jogo-web`, `bancada-do-ze`, `demo-offline` (as 6 aparecem como Complete no `openspec list`). Se a próxima sessão mexer na interface antes disso, arquivar depois.
 4. **Com o usuário:** enviar o formulário (um envio só; nomes exatos das disciplinas, ver `docs/cadastro.md`), encaixar o texto no modelo oficial de banner, ensaio de 29/11 no notebook do evento (tela cheia do `Iniciar Desenha Aí.bat`, Wi-Fi desligado, porta 8080 livre: o serviço `PEMHTTPD-x64` do EDB PEM ocupa a 8080 na máquina de casa, `Stop-Service PEMHTTPD-x64` como administrador), voz pt-BR.
 5. **Opcional:** guardar o modelo da 3ª época (menor perda de validação) exigiria outra rodada no Colab com *checkpoints*; não recomendado antes do evento.
+
+### Arquivos grandes (Git LFS) e o que ficou fora do Git — 25/11/2026
+
+- Os **GGUF de todas as rodadas** (v3 a v7, Q4_K_M e o **Q8_0 do evento** em `notebooks/resultados/rodada5/`) e o zip baixado do Drive estão no GitHub por **Git LFS** (~7,4 GB). Na outra máquina: `git lfs install` uma vez; `git clone`/`git pull` baixa tudo. Para o trabalho só de visual, dá para pular os modelos: `GIT_LFS_SKIP_SMUDGE=1 git pull` (os GGUF ficam como ponteiros) e, quando precisar do Zé, `git lfs pull --include "notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf"`.
+- O wheel do `desenha_ml` está versionado em `ml/dist/` e as cópias do dataset do Drive em `drive/dataset_ze/`; o diagnóstico do Codex que orientou as rodadas v6 e v7 está em `docs/diagnostico_codex.md`.
+- **Fora do Git de propósito:** `PROJETOS VALIDADOS - 24_11.xlsx` (tem nome e e-mail de outros alunos e o repositório é público; o padrão de aprovação está resumido em `docs/cadastro.md`), `demo/` (gerada por `preparar_demo.py`), `.venv` e `node_modules`.
