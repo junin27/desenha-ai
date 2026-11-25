@@ -30,5 +30,5 @@ rules:
 operations:
   apply:
     guidance:
-      - Siga TDD, teste falhando antes do código, e faça um commit local por tarefa lógica (nunca git push).
+      - Siga TDD, teste falhando antes do código, e faça um commit por tarefa lógica; com a verificação completa verde, git push origin main (nunca --force, nunca com a verificação falhando).
       - Rode a verificação completa antes de marcar a última tarefa.
