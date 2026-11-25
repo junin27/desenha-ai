@@ -25,9 +25,9 @@ AZUL_UNIRV = "004AAD"
 # Metodologia (título cinza e texto) desce e o diagrama do rodapé fica mais baixo e mais achatado.
 Y_DA_CAPTURA_CM = 55.8
 ALTURA_DA_LEGENDA_CM = 2.0
-DESCIDA_DA_METODOLOGIA_CM = 10.8
-Y_DO_DIAGRAMA_CM = 107.3
-ALTURA_DO_DIAGRAMA_CM = 9.6
+DESCIDA_DA_METODOLOGIA_CM = 12.7
+Y_DO_DIAGRAMA_CM = 108.3
+ALTURA_DO_DIAGRAMA_CM = 9.0
 FORMAS_DA_METODOLOGIA = ("Group 29", "TextBox 46", "TextBox 47")
 
 TITULO = "Desenha Aí, Sô!: duas redes neurais e um SLM caipira que adivinham e julgam o seu rabisco"
