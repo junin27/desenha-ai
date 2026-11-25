@@ -19,7 +19,7 @@ Depois do prazo, título, tema e escopo não podem mudar. O texto abaixo descrev
 
 **Breve descrição**
 
-> Jogo interativo em que o visitante resolve uma charada criada por um Small Language Model e desenha a resposta em 20 segundos. Uma CNN, que vê o desenho como imagem, e uma LSTM, que lê a sequência de traços, foram treinadas no Google Quick, Draw! e tentam reconhecer o rabisco em tempo real, enquanto ele é feito. O Zé do Rabisco, um Qwen3-1.7B treinado por destilação de um LLM maior e ajustado com QLoRA, julga o desenho a partir das probabilidades das redes, narra como um locutor de rodeio goiano e responde perguntas do público. Tudo roda offline num notebook comum, sem placa de vídeo, com o modelo quantizado em 4 bits. No workshop, os visitantes jogam e veem as redes e o SLM trabalhando ao vivo.
+> Jogo interativo em que o visitante resolve uma charada criada por um Small Language Model e desenha a resposta em 20 segundos. Uma CNN, que vê o desenho como imagem, e uma LSTM, que lê a sequência de traços, foram treinadas no Google Quick, Draw! e tentam reconhecer o rabisco em tempo real, enquanto ele é feito. O Zé do Rabisco, um Qwen3-1.7B treinado por destilação de um LLM maior e ajustado com QLoRA, julga o desenho a partir das probabilidades das redes, narra como um locutor de rodeio goiano e responde perguntas do público. Tudo roda offline num notebook comum, sem placa de vídeo, com o modelo quantizado em 8 bits (GGUF Q8_0). No workshop, os visitantes jogam e veem as redes e o SLM trabalhando ao vivo.
 
 ## Padrão da planilha de 24/11 (verde = aprovado, vermelho = reprovado)
 

@@ -11,7 +11,7 @@ Um jogo em que você resolve uma charada, desenha a resposta e duas redes neurai
 | **CNN** | enxerga o desenho como imagem 28×28 | convoluções e blocos residuais |
 | **LSTM** | lê o desenho como sequência de traços, na ordem em que foi feito | rede recorrente bidirecional |
 | **Ensemble** | combina as probabilidades das duas | média ponderada |
-| **Zé do Rabisco** | cria charadas, dá o veredito e responde perguntas | Qwen3-1.7B destilado de um LLM professor, QLoRA (Unsloth), GGUF de 4 bits no llama.cpp |
+| **Zé do Rabisco** | cria charadas, dá o veredito e responde perguntas | Qwen3-1.7B destilado de um LLM professor, QLoRA (Unsloth), GGUF de 8 bits (Q8_0) no llama.cpp |
 
 O desenho do visitante passa pelo **mesmo pré-processamento** usado no treino. Ele existe em Python e em TypeScript, e um teste de contrato garante que as duas versões dão o mesmo resultado (ver `contratos/`).
 

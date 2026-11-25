@@ -1,6 +1,6 @@
 # CLAUDE.md — Desenha Aí, Sô!
 
-Jogo interativo para o 5º Workshop de IA da FASOFT/UniRV (30/11/2026) e projeto de portfólio. O visitante resolve uma charada criada por um SLM e desenha a resposta; uma CNN e uma LSTM tentam reconhecer o desenho em tempo real; o SLM "Zé do Rabisco" (Qwen3 destilado, QLoRA, GGUF 4 bits) julga e narra. Tudo roda **offline em CPU**; o treino roda no Google Colab.
+Jogo interativo para o 5º Workshop de IA da FASOFT/UniRV (30/11/2026) e projeto de portfólio. O visitante resolve uma charada criada por um SLM e desenha a resposta; uma CNN e uma LSTM tentam reconhecer o desenho em tempo real; o SLM "Zé do Rabisco" (Qwen3 destilado, QLoRA sobre o modelo em 4 bits, GGUF Q8_0 de 8 bits no evento) julga e narra. Tudo roda **offline em CPU**; o treino roda no Google Colab.
 
 Regras por área ficam em `.claude/rules/` e carregam sozinhas quando você mexe naquela pasta.
 
