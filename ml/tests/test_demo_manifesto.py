@@ -1,5 +1,6 @@
 """Requisitos "Manifesto da demo", "Downloads com versão fixada" e "Zé destilado ou modo ensaio"."""
 
+import json
 from collections.abc import Mapping
 
 import pytest
@@ -165,3 +166,28 @@ def test_json_invalido_vira_erro_com_o_valor_recebido(texto: str) -> None:
 def test_sha256_de_blocos_bate_com_o_valor_conhecido() -> None:
     assert sha256_de_blocos([]) == SHA_VAZIO
     assert sha256_de_blocos([b"ab", b"c"]) == sha256_de_blocos([b"abc"])
+
+
+def test_mesma_quantizacao_manifesto_registra_a_origem_do_gguf_do_ze() -> None:
+    manifesto = montar_manifesto(
+        versao_do_llama_cpp="b9999",
+        origem_do_gguf_base="unsloth/Qwen3-1.7B-GGUF:Qwen3-1.7B-Q8_0.gguf",
+        arquivos_comuns=(_arquivo(CAMINHO_BASE, 1_100, "bb"),),
+        gguf_do_ze=_arquivo(CAMINHO_ZE, 1_000, "dd"),
+        origem_do_gguf_do_ze="zedorabisco-1.7b-Q8_0.gguf",
+    )
+
+    lido = manifesto_de_json(manifesto_para_json(manifesto))
+
+    assert isinstance(lido, Ok)
+    assert lido.valor.origem_do_gguf_do_ze == "zedorabisco-1.7b-Q8_0.gguf"
+
+
+def test_mesma_quantizacao_manifesto_antigo_sem_a_origem_do_ze_continua_valido() -> None:
+    antigo = json.loads(manifesto_para_json(_manifesto_completo()))
+    del antigo["origem_do_gguf_do_ze"]
+
+    lido = manifesto_de_json(json.dumps(antigo))
+
+    assert isinstance(lido, Ok)
+    assert lido.valor.origem_do_gguf_do_ze is None

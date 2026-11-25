@@ -30,3 +30,10 @@ Se o GGUF do Zé destilado for informado, a preparação SHALL copiá-lo para a 
 #### Scenario: Sem o GGUF do Zé
 - **WHEN** a preparação roda sem o GGUF do Zé destilado
 - **THEN** o manifesto registra o modo ensaio e a saída avisa que o Zé destilado está faltando
+
+### Requirement: Mesma quantização no base e no destilado
+O GGUF do Qwen3 base da demo SHALL ter a mesma quantização do GGUF do Zé usado no evento, para a comparação base × destilado medir o fine-tuning e não a quantização. Desde a rodada v7 é Q8_0: o Q4_K_M quebrava o formato do Zé. O GGUF do Zé SHALL ficar na demo com um nome sem a quantização (`zedorabisco-1.7b.gguf`), e a quantização de cada GGUF SHALL constar no manifesto pela origem do arquivo.
+
+#### Scenario: Demo com o Zé em Q8_0
+- **WHEN** a preparação roda com `--gguf-do-ze …/zedorabisco-1.7b-Q8_0.gguf`
+- **THEN** a demo tem `modelos/zedorabisco-1.7b.gguf` e `modelos/qwen3-1.7b-base-Q8_0.gguf`, e o manifesto registra a origem dos dois

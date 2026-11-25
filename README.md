@@ -69,7 +69,7 @@ ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epo
 1. (Opcional, já feito em 24/11) `MODO_ENSAIO = True` (≈ 10 min): testa todas as etapas, inclusive a exportação GGUF.
 2. O notebook já vem em `MODO_ENSAIO = False`: rode a rodada completa (≈ 40–60 min).
 3. Confira a linha **CRITÉRIO DE APROVAÇÃO** (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o Qwen3 base).
-4. O notebook baixa o `resultados_ze.zip` (métricas, saídas do teste e gráficos) e o `zedorabisco-1.7b-Q4_K_M.gguf`; se o download do GGUF falhar, rode de novo só a célula dele.
+4. O notebook baixa o `resultados_ze.zip` (métricas, saídas do teste e gráficos) e os GGUF `zedorabisco-1.7b-Q4_K_M.gguf` e `zedorabisco-1.7b-Q8_0.gguf` (o evento usa o **Q8_0**: o Q4_K_M quebrava o formato do Zé); se um download falhar, rode de novo só a célula dele.
 
 ## Como rodar a demo (estande, offline)
 
@@ -77,10 +77,10 @@ ml/.venv/Scripts/python scripts/ensaio_treino_local.py --por-categoria 300 --epo
 
 ```bash
 bash scripts/copiar_modelos.sh                 # redes e charadas de reserva para o jogo (ensaio ou zip do Colab)
-ml/.venv/Scripts/python scripts/preparar_demo.py --gguf-do-ze caminho/zedorabisco-1.7b-Q4_K_M.gguf
+ml/.venv/Scripts/python scripts/preparar_demo.py --gguf-do-ze caminho/zedorabisco-1.7b-Q8_0.gguf
 ```
 
-Sem `--gguf-do-ze` a demo entra no **modo ensaio** (o Qwen3 base ocupa a vaga do Zé; a janela avisa). O comando baixa o `llama-server` (llama.cpp `b12651`, ~25 MB) e o Qwen3-1.7B Q4_K_M (~1,1 GB), monta `demo/` e grava o `demo/manifesto.json` com tamanho e SHA-256 de cada arquivo. Repetir o comando não baixa de novo o que já está íntegro.
+Sem `--gguf-do-ze` a demo entra no **modo ensaio** (o Qwen3 base ocupa a vaga do Zé; a janela avisa). O comando baixa o `llama-server` (llama.cpp `b12651`, ~25 MB) e o Qwen3-1.7B Q8_0 (~1,8 GB, mesma quantização do Zé), monta `demo/` e grava o `demo/manifesto.json` com tamanho e SHA-256 de cada arquivo. Repetir o comando não baixa de novo o que já está íntegro.
 
 **No evento, sem internet:** dê dois cliques em `Iniciar Desenha Aí.bat`. Ele sobe o Zé destilado na porta 8080 (que também serve o jogo), o Qwen3 base na 8081 se houver memória, espera os dois ficarem saudáveis e abre o jogo em tela cheia. Fechar a janela do terminal (ou Ctrl+C) encerra os servidores.
 

@@ -33,6 +33,7 @@ class Manifesto:
     origem_do_gguf_base: str
     modo_ensaio: bool
     arquivos: tuple[ArquivoDaDemo, ...]
+    origem_do_gguf_do_ze: str | None = None  # nome do arquivo de origem: diz a quantização (Q4_K_M, Q8_0)
 
     @property
     def aviso_de_modo_ensaio(self) -> str:
@@ -66,6 +67,7 @@ def montar_manifesto(
     origem_do_gguf_base: str,
     arquivos_comuns: tuple[ArquivoDaDemo, ...],
     gguf_do_ze: ArquivoDaDemo | None,
+    origem_do_gguf_do_ze: str | None = None,
 ) -> Manifesto:
     """Sem o GGUF do Zé o manifesto vira "modo ensaio": o base ocupa a vaga do destilado."""
     arquivos = arquivos_comuns if gguf_do_ze is None else (*arquivos_comuns, gguf_do_ze)
@@ -74,6 +76,7 @@ def montar_manifesto(
         origem_do_gguf_base=origem_do_gguf_base,
         modo_ensaio=gguf_do_ze is None,
         arquivos=arquivos,
+        origem_do_gguf_do_ze=None if gguf_do_ze is None else origem_do_gguf_do_ze,
     )
 
 
@@ -111,6 +114,7 @@ def manifesto_para_json(manifesto: Manifesto) -> str:
         {
             "versao_do_llama_cpp": manifesto.versao_do_llama_cpp,
             "origem_do_gguf_base": manifesto.origem_do_gguf_base,
+            "origem_do_gguf_do_ze": manifesto.origem_do_gguf_do_ze,
             "modo_ensaio": manifesto.modo_ensaio,
             "arquivos": [
                 {"caminho": a.caminho, "tamanho": a.tamanho, "sha256": a.sha256} for a in manifesto.arquivos
@@ -133,6 +137,7 @@ def manifesto_de_json(texto: str) -> Resultado[Manifesto]:
                     ArquivoDaDemo(str(a["caminho"]), int(a["tamanho"]), str(a["sha256"]))
                     for a in bruto["arquivos"]
                 ),
+                origem_do_gguf_do_ze=_texto_opcional(bruto.get("origem_do_gguf_do_ze")),
             )
         )
     except (ValueError, KeyError, TypeError) as causa:
@@ -142,3 +147,8 @@ def manifesto_de_json(texto: str) -> Resultado[Manifesto]:
             "esperado JSON com versao_do_llama_cpp, origem_do_gguf_base, modo_ensaio e arquivos"
         )
         return Erro("formato_invalido", detalhe)
+
+
+def _texto_opcional(valor: object) -> str | None:
+    """Manifestos de antes de 25/11/2026 não têm a origem do GGUF do Zé."""
+    return None if valor is None else str(valor)

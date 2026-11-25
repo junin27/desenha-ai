@@ -23,13 +23,13 @@ Módulos `manifesto`, `servidores` (linhas de comando e memória), `saude`, `nav
 
 ### D2 — Versões e origens fixadas
 - `llama-server`: zip oficial `llama-<tag>-bin-win-cpu-x64.zip` das *releases* do `ggml-org/llama.cpp`, com a *tag* fixada numa constante. A *tag* é escolhida na tarefa de preparação (a mais recente com o *build* para CPU no dia) e gravada no manifesto e aqui.
-- GGUF base: `unsloth/Qwen3-1.7B-GGUF`, arquivo `Qwen3-1.7B-Q4_K_M.gguf`, da mesma família de exportação (Unsloth, Q4_K_M) do Zé destilado, para a comparação ser justa.
+- GGUF base: `unsloth/Qwen3-1.7B-GGUF`, arquivo `Qwen3-1.7B-Q8_0.gguf` (1.834.426.944 bytes), da mesma família de exportação e **mesma quantização** do Zé destilado, para a comparação ser justa. Era Q4_K_M até 25/11/2026: na rodada v7, o Q4_K_M quebrou o formato do Zé (validação: formato 65%, VEREDITO 23%) e o Q8_0 não (100% e 95,5%), então o evento usa Q8_0 nos dois.
 - **Alternativa descartada:** `Qwen/Qwen3-1.7B-GGUF` oficial, que só tem Q8_0; comparar 8 bits com 4 bits misturaria quantização com fine-tuning.
 
 ### D3 — Pasta `demo/` (fora do Git)
 ```
 demo/llama/        llama-server.exe e DLLs
-demo/modelos/      zedorabisco-1.7b-Q4_K_M.gguf, qwen3-1.7b-base-Q4_K_M.gguf
+demo/modelos/      zedorabisco-1.7b.gguf (a quantização fica no manifesto), qwen3-1.7b-base-Q8_0.gguf
 demo/jogo/         build do jogo com app/public/modelos dentro
 demo/perfil/       perfil próprio do navegador (placar no localStorage dele)
 demo/registros/    saída de cada llama-server

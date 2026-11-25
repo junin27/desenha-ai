@@ -44,8 +44,8 @@ from job_do_windows import JobDoWindows, criar_job_que_encerra_os_filhos, inicia
 
 __all__ = ["criar_job_que_encerra_os_filhos", "iniciar_no_job"]
 
-NOME_DO_GGUF_BASE = "modelos/qwen3-1.7b-base-Q4_K_M.gguf"
-NOME_DO_GGUF_DO_ZE = "modelos/zedorabisco-1.7b-Q4_K_M.gguf"
+NOME_DO_GGUF_BASE = "modelos/qwen3-1.7b-base-Q8_0.gguf"
+NOME_DO_GGUF_DO_ZE = "modelos/zedorabisco-1.7b.gguf"
 SEGUNDOS_DA_SONDA = 2
 SEGUNDOS_PARA_ENCERRAR = 5
 SEGUNDOS_ENTRE_CONFERENCIAS = 1.0

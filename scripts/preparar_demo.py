@@ -4,7 +4,7 @@ Baixa o llama-server (versão fixada) e o GGUF do Qwen3 base, copia o GGUF do Z�
 gera o build do jogo e grava `demo/manifesto.json` com tamanho e SHA-256 de cada arquivo.
 
 Uso (a partir de `projeto_final/`):
-    ml/.venv/Scripts/python scripts/preparar_demo.py [--gguf-do-ze caminho/zedorabisco-1.7b-Q4_K_M.gguf]
+    ml/.venv/Scripts/python scripts/preparar_demo.py [--gguf-do-ze caminho/zedorabisco-1.7b-Q8_0.gguf]
 """
 
 import argparse
@@ -45,12 +45,14 @@ SHA256_DO_ZIP_DO_LLAMA_CPP = (
     "b2d794fa7587aba29f654d717ff9b73e31caeabf50a7766692903008bbe0855d"
 )
 REPOSITORIO_DO_GGUF_BASE = "unsloth/Qwen3-1.7B-GGUF"
-ARQUIVO_DO_GGUF_BASE = "Qwen3-1.7B-Q4_K_M.gguf"
+ARQUIVO_DO_GGUF_BASE = "Qwen3-1.7B-Q8_0.gguf"  # mesma quantização do Zé (rodada v7)
 URL_DO_GGUF_BASE = f"https://huggingface.co/{REPOSITORIO_DO_GGUF_BASE}/resolve/main/{ARQUIVO_DO_GGUF_BASE}"
-TAMANHO_DO_GGUF_BASE = 1_107_409_472
-SHA256_DO_GGUF_BASE = "b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897"
-NOME_DO_GGUF_BASE_NA_DEMO = "qwen3-1.7b-base-Q4_K_M.gguf"
-NOME_DO_GGUF_DO_ZE_NA_DEMO = "zedorabisco-1.7b-Q4_K_M.gguf"
+TAMANHO_DO_GGUF_BASE = 1_834_426_944
+SHA256_DO_GGUF_BASE = "0becaa825564295d82e9af4d008bca5f8b7f5f73bf1c6a0b58f7c53ef26b47fd"
+NOME_DO_GGUF_BASE_NA_DEMO = "qwen3-1.7b-base-Q8_0.gguf"
+NOME_DO_GGUF_DO_ZE_NA_DEMO = (
+    "zedorabisco-1.7b.gguf"  # sem a quantização: ela fica no manifesto
+)
 SEGUNDOS_SEM_RESPOSTA = 60
 
 
@@ -209,6 +211,7 @@ def gravar_manifesto(
         origem_do_gguf_base=f"{REPOSITORIO_DO_GGUF_BASE}:{ARQUIVO_DO_GGUF_BASE}",
         arquivos_comuns=comuns,
         gguf_do_ze=ze,
+        origem_do_gguf_do_ze=None if gguf_do_ze is None else gguf_do_ze.name,
     )
     (pasta_da_demo / "manifesto.json").write_text(
         manifesto_para_json(manifesto), encoding="utf8", newline="\n"

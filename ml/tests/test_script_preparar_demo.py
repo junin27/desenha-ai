@@ -156,3 +156,12 @@ def test_tag_do_llama_cpp_fixada_aparece_na_url_e_no_nome_do_zip(tag: str) -> No
     assert tag == script.TAG_DO_LLAMA_CPP
     assert tag in script.URL_DO_LLAMA_CPP
     assert script.URL_DO_LLAMA_CPP.endswith(f"llama-{tag}-bin-win-cpu-x64.zip")
+
+
+def test_mesma_quantizacao_base_e_ze_em_q8_com_nome_neutro_para_o_ze() -> None:
+    script = _carregar_script()
+
+    assert script.ARQUIVO_DO_GGUF_BASE == "Qwen3-1.7B-Q8_0.gguf"
+    assert script.NOME_DO_GGUF_BASE_NA_DEMO == "qwen3-1.7b-base-Q8_0.gguf"
+    assert script.NOME_DO_GGUF_DO_ZE_NA_DEMO == "zedorabisco-1.7b.gguf"
+    assert script.TAMANHO_DO_GGUF_BASE == 1_834_426_944
