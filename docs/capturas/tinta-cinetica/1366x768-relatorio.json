@@ -32,7 +32,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 5,
+    "rabiscos": 4,
     "humor": "torcendo"
   },
   {
@@ -50,7 +50,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 4,
+    "rabiscos": 5,
     "humor": "coçando-a-cabeça"
   },
   {
@@ -59,7 +59,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 4,
+    "rabiscos": 5,
     "humor": "bravo"
   },
   {
@@ -77,7 +77,7 @@
     "rolagemV": false,
     "rolagemH": false,
     "pincelada": false,
-    "rabiscos": 4,
+    "rabiscos": 5,
     "humor": null
   }
 ]

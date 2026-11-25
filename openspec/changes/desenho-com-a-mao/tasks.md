@@ -13,8 +13,8 @@
 - [x] 1B.2 `presentation/lapis/desgaste.ts` e `presentation/lapis/particulas.ts` (puros): testes do desgaste (encurta com a distância, para no mínimo e continua; volta inteiro) e da física (gravidade, quique, assentada não muda de posição e só desbota; limite de 600 desbota as antigas) → implementar. Verifica: `npm --prefix app test -- desgaste particulas`
 - [x] 1B.3 `presentation/lapis/lapis-no-quadro.ts`: SVG próprio por ferramenta (lápis de cor, borracha virada, balde, conta-gotas) com a ponta no ponto; some fora do quadro; testes em jsdom da posição da âncora e da ferramenta mostrada. Verifica: `npm --prefix app test -- lapis-no-quadro`
 - [x] 1B.4 `presentation/lapis/som-do-desenho.ts` atrás de uma interface (`SomDoDesenho`), com dublê nos testes: toque ao encostar, volume pela velocidade, silêncio ao parar, desligado não toca; preferência salva. Verifica: `npm --prefix app test -- som-do-desenho`
-- [ ] 1B.5 Captura com cor e espessura por traço e as três camadas (pintura, traços, partículas); painel com ferramentas, espessuras, 16 cores e cor atual; balde e conta-gotas; testes da tela de desenho (começo da rodada com Lápis/média/tinta; traço vermelho manda os mesmos pontos; borracha não apaga a pintura; conta-gotas volta ao Lápis). Verifica: `npm --prefix app test -- tela-desenho paleta`
-- [ ] 1B.6 Conferência no navegador (modo Mouse): desenhar, colorir, balde, conta-gotas, borracha; capturas sem rolagem a 1366×768 e 1920×1080; `bash scripts/verificar.sh` verde.
+- [x] 1B.5 Captura com cor e espessura por traço e as três camadas (pintura, traços, partículas); painel com ferramentas, espessuras, 16 cores e cor atual; balde e conta-gotas; testes da tela de desenho (começo da rodada com Lápis/média/tinta; traço vermelho manda os mesmos pontos; borracha não apaga a pintura; conta-gotas volta ao Lápis). Verifica: `npm --prefix app test -- tela-desenho paleta`
+- [x] 1B.6 Conferência no navegador (modo Mouse): desenhar, colorir, balde, conta-gotas, borracha; capturas sem rolagem a 1366×768 e 1920×1080; `bash scripts/verificar.sh` verde.
 
 ## 2. Portas e adaptadores
 
@@ -24,7 +24,7 @@
 
 ## 3. Captura e controle da mão
 
-- [ ] 3.1 `CapturaDoDesenho` com a interface de fonte (começar, continuar, terminar, apagar em): os testes atuais continuam verdes e um teste novo prova que traços vindos da fonte da mão saem iguais aos do mouse. Verifica: `npm --prefix app test -- captura`
+- [x] 3.1 `CapturaDoDesenho` com a interface de fonte (começar, continuar, terminar, apagar em): os testes atuais continuam verdes e um teste novo prova que traços vindos da fonte da mão saem iguais aos do mouse. Verifica: `npm --prefix app test -- captura`
 - [ ] 3.2 `presentation/mao/controle-da-mao.ts` com `DetectorFalso` e relógio falso: `lapis` desenha e termina o traço ao sumir; `borracha` apaga; mão aberta parada 3 s limpa; troca de modo termina o traço e mantém os traços. Verifica: `npm --prefix app test -- controle-da-mao`
 
 ## 4. Telas

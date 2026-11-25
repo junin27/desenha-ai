@@ -1,20 +1,29 @@
 import type { EstadoDaPartida } from "../../application/estado-da-partida";
-import { botaoComIcone, comIcone } from "../icones";
 import { desenhoDePontos, type Traco } from "../../domain/desenho/desenho";
-import { CapturaDoDesenho, type Ferramenta } from "../captura-do-desenho";
+import type { EstiloDoTraco } from "../captura-do-desenho";
 import { criar } from "../dom";
+import { botaoComIcone, comIcone } from "../icones";
+import { PainelDeDesenho } from "../lapis/painel-de-desenho";
+import { type OpcoesDoQuadro, QuadroDeDesenho } from "../lapis/quadro-de-desenho";
 import { palpitesComChance, type PalpiteNaTela } from "../textos";
 import { humorDaPartida } from "../ze/controle-de-humor";
 import { PersonagemDoZe, type OpcoesDoPersonagem } from "../ze/personagem";
 import { RelogioEmAnel } from "./relogio-em-anel";
 import type { ComandosDoJogo, InformacoesDoJogo, Tela } from "./tela";
 
-/** Resolução interna do canvas; o CSS ajusta o tamanho na tela e a captura converte as coordenadas. */
-const LADO_DO_CANVAS = 560;
 const FALA_DO_COMECO = "Bora, sô! Capricha no traço!";
 const FALA_DO_SUSTO = "Eita, tá acabando o tempo!";
 
-/** Desenho: quadro com lápis, borracha e limpar, cronômetro em anel, palpites ao vivo e o Zé torcendo. */
+export type OpcoesDaTelaDeDesenho = OpcoesDoPersonagem &
+  Omit<OpcoesDoQuadro, "aoEscolherCor"> & {
+    /** O visitante ligou ou desligou o som do desenho (para lembrar no navegador do estande). */
+    readonly aoMudarSom?: (ligado: boolean) => void;
+  };
+
+/**
+ * Desenho: painel (ferramentas, espessuras, cores), quadro em camadas com o lápis no ponteiro, "Limpar" e
+ * "Pronto", cronômetro em anel, palpites ao vivo e o Zé torcendo.
+ */
 export class TelaDesenho implements Tela {
   readonly raiz: HTMLElement;
   private readonly relogio = new RelogioEmAnel();
@@ -27,8 +36,8 @@ export class TelaDesenho implements Tela {
     classe: "dica",
     texto: "Desenhe que as redes já vão palpitando…",
   });
-  private readonly botoesDeFerramenta: Readonly<Record<Ferramenta, HTMLButtonElement>>;
-  private readonly captura: CapturaDoDesenho;
+  private readonly quadro: QuadroDeDesenho;
+  private readonly painel: PainelDeDesenho;
   private readonly ze: PersonagemDoZe;
   private ativa = false;
   private humorAnterior = "";
@@ -36,32 +45,29 @@ export class TelaDesenho implements Tela {
   constructor(
     private readonly comandos: ComandosDoJogo,
     private readonly informacoes: InformacoesDoJogo,
-    opcoesDoZe: OpcoesDoPersonagem = {},
+    opcoes: OpcoesDaTelaDeDesenho = {},
   ) {
-    this.ze = new PersonagemDoZe(opcoesDoZe);
-    const canvas = criar("canvas", { classe: "quadro" });
-    canvas.width = LADO_DO_CANVAS;
-    canvas.height = LADO_DO_CANVAS;
-    this.captura = new CapturaDoDesenho(canvas, (tracos, terminado) => {
-      this.enviar(tracos, terminado);
-    });
-    this.botoesDeFerramenta = {
-      lapis: this.botaoDeFerramenta("lapis", "Lápis"),
-      borracha: this.botaoDeFerramenta("borracha", "Borracha"),
-    };
-    const ferramentas = criar("div", { classe: "ferramentas" }, [
-      this.botoesDeFerramenta.lapis,
-      this.botoesDeFerramenta.borracha,
+    this.ze = new PersonagemDoZe(opcoes);
+    this.quadro = new QuadroDeDesenho(
+      (tracos, terminado) => {
+        this.enviar(tracos, terminado);
+      },
+      {
+        ...opcoes,
+        aoEscolherCor: (cor) => {
+          this.painel.pintar(cor);
+        },
+      },
+    );
+    this.painel = new PainelDeDesenho(this.quadro);
+    this.painel.raiz.append(this.criarBotaoDoSom(opcoes.aoMudarSom));
+    const acoes = criar("div", { classe: "ferramentas" }, [
       botaoComIcone("lixeira", "Limpar", "limpar", () => {
         this.limpar();
       }),
       botaoComIcone("raio", "Pronto!", "pronto", () => void this.comandos.pronto()),
     ]);
-    const coluna = criar("div", { classe: "coluna-do-quadro" }, [
-      this.charada,
-      criar("div", { classe: "moldura-do-quadro" }, [canvas]),
-      ferramentas,
-    ]);
+    const coluna = criar("div", { classe: "coluna-do-quadro" }, [this.charada, this.quadro.raiz, acoes]);
     const palpites = criar("div", { classe: "cartao palpites-ao-vivo" }, [
       comIcone("redes", criar("h2", { texto: "O que as redes acham" })),
       this.palpites,
@@ -69,6 +75,7 @@ export class TelaDesenho implements Tela {
     ]);
     const lateral = criar("aside", { classe: "lateral" }, [this.relogio.raiz, palpites, this.ze.raiz]);
     this.raiz = criar("section", { classe: "tela tela-desenho", dados: { tela: "desenho" } }, [
+      this.painel.raiz,
       coluna,
       lateral,
     ]);
@@ -76,7 +83,17 @@ export class TelaDesenho implements Tela {
 
   /** Traços atuais (já sem os apagados): o veredito mostra exatamente o que foi julgado. */
   get tracos(): readonly Traco[] {
-    return this.captura.tracos;
+    return this.quadro.tracosAtuais;
+  }
+
+  /** Cor e espessura de cada traço, na mesma ordem de `tracos`. */
+  get estilos(): readonly EstiloDoTraco[] {
+    return this.quadro.estilos;
+  }
+
+  /** O quadro, para o modo Mão mandar os passos do dedo pelo mesmo caminho do mouse. */
+  get quadroDeDesenho(): QuadroDeDesenho {
+    return this.quadro;
   }
 
   atualizar(estado: EstadoDaPartida): void {
@@ -101,34 +118,37 @@ export class TelaDesenho implements Tela {
     void this.ze.falar(humor === "assustado" ? FALA_DO_SUSTO : FALA_DO_COMECO);
   }
 
-  private botaoDeFerramenta(ferramenta: Ferramenta, texto: string): HTMLButtonElement {
-    const elemento = botaoComIcone(ferramenta, texto, `ferramenta-${ferramenta}`, () => {
-      this.escolher(ferramenta);
-    });
-    elemento.classList.add("ferramenta");
-    elemento.dataset["ferramenta"] = ferramenta;
-    return elemento;
-  }
-
-  private escolher(ferramenta: Ferramenta): void {
-    this.captura.usar(ferramenta);
-    for (const [nome, elemento] of Object.entries(this.botoesDeFerramenta)) {
-      elemento.setAttribute("aria-pressed", String(nome === ferramenta));
-    }
-  }
-
-  /** Ao entrar no desenho, o canvas começa limpo e com o lápis; fora dele, não captura. */
+  /** Ao entrar no desenho: quadro limpo, lápis novo, Lápis/média/tinta; fora dele, não captura. */
   private ativarCaptura(desenhando: boolean): void {
     if (desenhando === this.ativa) return;
     this.ativa = desenhando;
     if (desenhando) {
-      this.captura.limpar();
-      this.escolher("lapis");
+      this.quadro.limpar();
+      this.painel.reiniciar();
       this.humorAnterior = "";
-      this.captura.ligar();
+      this.quadro.captura.ligar();
     } else {
-      this.captura.desligar();
+      this.quadro.captura.desligar();
+      this.quadro.apontar(undefined);
     }
+  }
+
+  /** Liga e desliga o som do lápis (spec `lapis-no-quadro`, "Som do desenho"). */
+  private criarBotaoDoSom(aoMudar: ((ligado: boolean) => void) | undefined): HTMLButtonElement {
+    const nome = criar("span", { texto: "Som" });
+    const elemento = criar("button", { classe: "som-do-desenho", dados: { acao: "som-do-desenho" } }, [nome]);
+    elemento.type = "button";
+    const mostrar = (): void => {
+      elemento.setAttribute("aria-pressed", String(this.quadro.som.ligado));
+      nome.textContent = this.quadro.som.ligado ? "🔊 Som" : "🔇 Som";
+    };
+    elemento.addEventListener("click", () => {
+      this.quadro.som.ligar(!this.quadro.som.ligado);
+      aoMudar?.(this.quadro.som.ligado);
+      mostrar();
+    });
+    mostrar();
+    return elemento;
   }
 
   /** Com traços, reclassifica; se a borracha apagou tudo, zera os palpites como o "Limpar". */
@@ -139,7 +159,7 @@ export class TelaDesenho implements Tela {
   }
 
   private limpar(): void {
-    this.captura.limpar();
+    this.quadro.limpar();
     this.comandos.limparDesenho();
   }
 }

@@ -611,7 +611,7 @@ textarea {
 
 /* ---------- Desenho ---------- */
 .tela-desenho {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
 }
 
@@ -627,20 +627,241 @@ textarea {
   text-align: center;
 }
 
+/* Quadro em camadas (D9 de desenho-com-a-mao): pintura do balde, traços e partículas, com o lápis por cima. */
 .moldura-do-quadro {
-  width: min(60vh, 620px);
+  position: relative;
+  width: min(58vh, 600px);
   aspect-ratio: 1;
-}
-
-.quadro {
-  width: 100%;
-  height: 100%;
   background: #fff;
   border: 3px solid var(--tinta);
   border-radius: var(--torto-2);
   box-shadow: 8px 8px 0 var(--mostarda);
-  cursor: crosshair;
+  overflow: hidden;
+}
+
+.moldura-do-quadro canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.camada-pintura,
+.camada-particulas {
+  pointer-events: none;
+}
+
+/* O cursor do sistema some só dentro do quadro: quem aparece é o lápis (spec lapis-no-quadro). */
+.quadro {
+  cursor: none;
   touch-action: none;
+}
+
+.lapis-no-quadro {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.lapis-no-quadro.visivel {
+  opacity: 1;
+}
+
+.lapis-no-quadro svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+
+.lapis-no-quadro .inclina {
+  transform: rotate(var(--inclinacao, 0deg));
+  transition: transform 0.12s ease-out;
+}
+
+.lapis-no-quadro.encostou .mola {
+  animation: afunda 0.28s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+@keyframes afunda {
+  35% {
+    transform: scale(0.86, 1.08) translate(4px, 6px);
+  }
+}
+
+.lapis-no-quadro .sombra-do-lapis {
+  transform: translate(30px, 16px);
+  opacity: 0.55;
+  transition:
+    transform 0.15s,
+    opacity 0.15s;
+}
+
+.lapis-no-quadro.encostado .sombra-do-lapis {
+  transform: translate(-20px, -8px);
+  opacity: 1;
+}
+
+.lapis-no-quadro .modo {
+  opacity: 0;
+  transform: scale(0.4) rotate(60deg);
+  transform-origin: 0 0;
+  transition:
+    opacity 0.1s,
+    transform 0.35s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.lapis-no-quadro[data-ferramenta="lapis"] .modo-lapis,
+.lapis-no-quadro[data-ferramenta="borracha"] .modo-borracha,
+.lapis-no-quadro[data-ferramenta="balde"] .modo-balde,
+.lapis-no-quadro[data-ferramenta="contagotas"] .modo-contagotas {
+  opacity: 1;
+  transform: none;
+}
+
+.circulo-da-borracha {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  left: -20px;
+  top: -20px;
+  border: 3px dashed var(--terracota);
+  border-radius: 50%;
+  display: none;
+}
+
+.lapis-no-quadro[data-ferramenta="borracha"] .circulo-da-borracha {
+  display: block;
+  animation: gira 3s linear infinite;
+}
+
+@keyframes gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Painel de desenho: ferramentas só com ícone, espessuras e paleta (spec paleta-de-desenho). */
+.painel-de-desenho {
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  justify-items: center;
+  padding: 14px 12px;
+  background: var(--quadro);
+  border: 3px solid var(--tinta);
+  border-radius: var(--torto);
+  box-shadow: 6px 6px 0 var(--terracota);
+}
+
+.painel-de-desenho button {
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ferramentas-do-painel,
+.espessuras {
+  display: grid;
+  grid-template-columns: repeat(2, 54px);
+  gap: 8px;
+}
+
+.ferramentas-do-painel button,
+.espessuras button {
+  width: 54px;
+  height: 50px;
+}
+
+.ferramentas-do-painel .icone {
+  width: 30px;
+  height: 30px;
+}
+
+.espessuras {
+  grid-template-columns: repeat(3, 34px);
+}
+
+.espessuras button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 var(--tinta);
+}
+
+.ponto-da-espessura {
+  display: block;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ponto-da-espessura.fina {
+  width: 6px;
+  height: 6px;
+}
+
+.ponto-da-espessura.media {
+  width: 11px;
+  height: 11px;
+}
+
+.ponto-da-espessura.grossa {
+  width: 18px;
+  height: 18px;
+}
+
+.painel-de-desenho button[aria-pressed="true"] {
+  background: var(--terracota);
+  color: var(--quadro);
+}
+
+.paleta {
+  display: grid;
+  grid-template-columns: repeat(4, 26px);
+  gap: 6px;
+}
+
+.paleta button {
+  width: 26px;
+  height: 26px;
+  border-width: 2px;
+  border-radius: 8px 3px 9px 4px;
+  box-shadow: 2px 2px 0 var(--tinta);
+}
+
+/* A cor do botão é a da paleta, mesmo selecionado: o destaque é o contorno. */
+.paleta button[aria-pressed="true"] {
+  background: inherit;
+  outline: 3px solid var(--terracota);
+  outline-offset: 2px;
+}
+
+.cor-atual {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--tinta);
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 var(--tinta);
+}
+
+.som-do-desenho {
+  padding: 0.2em 0.6em;
+}
+
+/* Texto que só o leitor de tela (e os testes) leem: o botão mostra o ícone. */
+.so-leitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .ferramentas {
@@ -648,11 +869,6 @@ textarea {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-}
-
-.ferramenta[aria-pressed="true"] {
-  background: var(--terracota);
-  color: var(--quadro);
 }
 
 [data-acao="pronto"] {

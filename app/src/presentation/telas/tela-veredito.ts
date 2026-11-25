@@ -5,7 +5,7 @@ import type {
 } from "../../application/estado-da-partida";
 import type { Traco } from "../../domain/desenho/desenho";
 import { RODADAS_POR_PARTIDA } from "../../domain/rodada/pontuacao";
-import { desenharTracos } from "../captura-do-desenho";
+import { desenharTracos, type EstiloDoTraco } from "../captura-do-desenho";
 import { botao, criar, mostrarSelo } from "../dom";
 import { falaAoVivoNaTela, palpitesComChance, seloDaFala, TITULO_DO_VEREDITO } from "../textos";
 import { humorDaPartida } from "../ze/controle-de-humor";
@@ -45,6 +45,7 @@ export class TelaVeredito implements Tela {
   private readonly ze: PersonagemDoZe;
   private readonly comemorar: () => void;
   private tracos: readonly Traco[] = [];
+  private estilos: readonly EstiloDoTraco[] = [];
   /** Rodada já reagida (quantos resultados e quais categorias), para o Zé e o confete não repetirem. */
   private rodadaReagida = "";
 
@@ -80,8 +81,9 @@ export class TelaVeredito implements Tela {
   }
 
   /** Traços que as redes julgaram (já sem os apagados), vindos da tela de desenho. */
-  definirTracos(tracos: readonly Traco[]): void {
+  definirTracos(tracos: readonly Traco[], estilos: readonly EstiloDoTraco[] = []): void {
     this.tracos = tracos.map((traco) => [...traco]);
+    this.estilos = [...estilos];
   }
 
   /** O Zé desta tela, para o vigia do tédio. */
@@ -153,6 +155,6 @@ export class TelaVeredito implements Tela {
     const contexto = this.meuDesenho.getContext("2d");
     if (contexto === null) return; // sem 2D (DOM de teste): só a contagem de traços
     contexto.clearRect(0, 0, LADO_DO_DESENHO, LADO_DO_DESENHO);
-    desenharTracos(contexto, this.tracos);
+    desenharTracos(contexto, this.tracos, this.estilos);
   }
 }

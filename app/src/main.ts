@@ -37,6 +37,7 @@ import { instalarAtalhoDeZerarPlacar } from "./presentation/atalho-de-zerar";
 import { criarBotaoDaVoz } from "./presentation/botao-da-voz";
 import { criar } from "./presentation/dom";
 import { mostrarErroDeCarregamento } from "./presentation/erro-de-carregamento";
+import { PreferenciasDoDesenhoLocalStorage } from "./infrastructure/preferencias-do-desenho";
 import { FundoDeRabiscos } from "./presentation/fundo-de-rabiscos";
 import { InterfaceDoJogo, type InformacoesDoJogo } from "./presentation/interface-do-jogo";
 import { PainelTecnico } from "./presentation/painel-tecnico";
@@ -98,8 +99,15 @@ function ligarTela(
   conversa: ConversaComOZe,
   informacoes: InformacoesDoJogo,
 ): InterfaceDoJogo {
+  const preferencias = new PreferenciasDoDesenhoLocalStorage(window.localStorage);
   const tela = new InterfaceDoJogo(raiz, partida, informacoes, conversa, {
     atrasoDaTrocaMs: ATRASO_DA_TROCA_DE_TELA_MS,
+    desenho: {
+      somLigado: preferencias.somLigado(),
+      aoMudarSom: (ligado) => {
+        preferencias.gravarSomLigado(ligado);
+      },
+    },
   });
   partida.aoMudar((estado) => {
     tela.mostrar(estado);

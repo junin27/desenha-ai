@@ -3,13 +3,15 @@ import { describe, expect, it } from "vitest";
 import { botaoComIcone, criarIcone, NOMES_DOS_ICONES } from "../../src/presentation/icones";
 
 describe("Requisito: Ícones desenhados (spec identidade-visual)", () => {
-  it("test_os_14_icones_da_spec_existem", () => {
+  it("test_os_16_icones_existem", () => {
     expect([...NOMES_DOS_ICONES].sort()).toEqual(
       [
         "balao",
+        "balde",
         "borracha",
         "casinha",
         "chapeu",
+        "contagotas",
         "enviar",
         "estrela",
         "jogar",

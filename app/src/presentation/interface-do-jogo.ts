@@ -5,7 +5,7 @@ import { criar } from "./dom";
 import type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo, Tela } from "./telas/tela";
 import { TelaAbertura } from "./telas/tela-abertura";
 import { TelaCharada } from "./telas/tela-charada";
-import { TelaDesenho } from "./telas/tela-desenho";
+import { type OpcoesDaTelaDeDesenho, TelaDesenho } from "./telas/tela-desenho";
 import { TelaInicio } from "./telas/tela-inicio";
 import { TelaPlacar } from "./telas/tela-placar";
 import { TelaVeredito } from "./telas/tela-veredito";
@@ -16,6 +16,8 @@ import { VigiaDoTedio } from "./ze/vigia-do-tedio";
 export type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo } from "./telas/tela";
 
 export interface OpcoesDaInterface extends OpcoesDoPersonagem {
+  /** Som e preferências do quadro de desenho. */
+  readonly desenho?: Omit<OpcoesDaTelaDeDesenho, "esperar">;
   /** Quando a pincelada cobre a tela e a troca acontece; 0 (padrão, testes) troca na hora. */
   readonly atrasoDaTrocaMs?: number;
 }
@@ -72,7 +74,7 @@ export class InterfaceDoJogo {
     this.abertura = new TelaAbertura(informacoes, irPara("inicio"), opcoesDoZe);
     this.inicio = new TelaInicio(comandos, conversa, irPara("placar"), opcoesDoZe);
     this.charada = new TelaCharada(comandos, opcoesDoZe);
-    this.desenho = new TelaDesenho(comandos, informacoes, opcoesDoZe);
+    this.desenho = new TelaDesenho(comandos, informacoes, { ...opcoesDoZe, ...opcoes.desenho });
     this.veredito = new TelaVeredito(comandos, informacoes, {
       ...opcoesDoZe,
       comemorar: () => {
@@ -100,7 +102,7 @@ export class InterfaceDoJogo {
 
   mostrar(estado: EstadoDaPartida): void {
     if (estado.etapa === "julgando" && this.partida.etapa !== "julgando")
-      this.veredito.definirTracos(this.desenho.tracos);
+      this.veredito.definirTracos(this.desenho.tracos, this.desenho.estilos);
     this.partida = estado;
     const atual = estado.etapa === "inicio" ? this.telaDoInicio : TELA_DA_ETAPA[estado.etapa];
     if (atual === "inicio" && !this.conversaAberta) this.conversa.abrir();

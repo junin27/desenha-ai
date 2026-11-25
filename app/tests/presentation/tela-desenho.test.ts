@@ -19,7 +19,7 @@ function ferramentaAtiva(): string | undefined {
 }
 
 function ponteiro(tipo: string, x: number, y: number): void {
-  const canvas = tela.raiz.querySelector("canvas");
+  const canvas = tela.raiz.querySelector("canvas.quadro");
   canvas?.dispatchEvent(new PointerEvent(tipo, { clientX: x, clientY: y, pointerId: 1, bubbles: true }));
 }
 

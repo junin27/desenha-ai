@@ -194,7 +194,7 @@ describe("tela do desenho", () => {
 
   it("o traço no canvas vira desenho para a partida", () => {
     tela.mostrar(estado({ etapa: "desenhando" }));
-    const canvas = raiz.querySelector("canvas");
+    const canvas = raiz.querySelector("canvas.quadro");
     for (const [tipo, x] of [
       ["pointerdown", 10],
       ["pointerup", 50],

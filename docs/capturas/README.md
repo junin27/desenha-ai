@@ -69,3 +69,7 @@ Problemas que as capturas pegaram e já foram corrigidos:
 Não coberto aqui: o momento "Pensando…" da charada (sem o `llama-server` a reserva responde na hora), o Zé respondendo com o modelo de verdade e o FPS das animações no notebook do evento (fica para o ensaio de 29/11).
 
 **Atualização (25/11, tarefa 8.5):** as capturas foram refeitas com as fontes Gochi Hand (títulos) e Patrick Hand (texto), títulos e botões em maiúsculas e os ícones desenhados. Continuam sem rolagem nas 9 telas, a 1366×768, a 1920×1080 e com movimento reduzido.
+
+## Lápis de cor, partículas, som e painel (change desenho-com-a-mao, tarefa 1B.6)
+
+Tiradas em 25/11/2026 na pasta `desenho-com-a-mao/`, no jogo de verdade (build, redes treinadas, sem `llama-server`), com eventos de mouse reais do Edge headless a 1366×768: casa em tinta, porta em vermelho grosso (lápis vermelho e pó vermelho), balde azul dentro da casa, conta-gotas na porta (a cor atual virou `#b3261e` e a ferramenta voltou ao Lápis) e borracha passando no telhado: o traço do telhado saiu, **a pintura do balde ficou** (como pede a spec `paleta-de-desenho`) e as redes reclassificaram (casa 56% → celeiro 37%). As 9 telas seguem sem rolagem a 1366×768 e 1920×1080. O som não foi ouvido (o ambiente das capturas não reproduz áudio).

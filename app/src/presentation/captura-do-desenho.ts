@@ -1,48 +1,76 @@
 import { tracosForaDaBorracha } from "../domain/desenho/borracha";
 import type { Ponto, Traco } from "../domain/desenho/desenho";
 
-/** Lápis desenha; borracha apaga traços inteiros (spec `ferramentas-de-desenho`). */
-export type Ferramenta = "lapis" | "borracha";
+/**
+ * Lápis desenha; borracha apaga traços inteiros (spec `ferramentas-de-desenho`); balde e conta-gotas não
+ * mexem nos traços (spec `paleta-de-desenho`): quem cuida deles é o `QuadroDeDesenho`.
+ */
+export type Ferramenta = "lapis" | "borracha" | "balde" | "contagotas";
+
+/** Cor e espessura com que um traço foi feito: só visual, as redes recebem só os pontos. */
+export interface EstiloDoTraco {
+  readonly cor: string;
+  readonly espessura: number;
+}
 
 export type OuvinteDoDesenho = (tracos: readonly Traco[], tracoTerminado: boolean) => void;
 
-const ESPESSURA_DA_LINHA = 8;
-const COR_DA_LINHA = "#2b1a0a";
+/** O que acabou de acontecer no quadro, para o lápis, as partículas e o som reagirem. */
+export interface AcaoNoQuadro {
+  readonly tipo: "encostar" | "arrastar" | "soltar" | "tocar";
+  readonly ferramenta: Ferramenta;
+  readonly ponto: Ponto;
+  /** Distância desde o ponto anterior (px do quadro): a "velocidade" do traço. */
+  readonly distancia: number;
+  readonly dx: number;
+}
+
+export const ESTILO_PADRAO: EstiloDoTraco = { cor: "#2b1a0a", espessura: 8 };
 
 /**
  * Captura o desenho no canvas com Pointer Events: mouse, toque e caneta pelo mesmo caminho (spec
- * `interface-do-jogo`). Os pontos ficam nas coordenadas internas do canvas; a normalização do domínio
- * cuida da escala. `touch-action: none` impede que o dedo role a página.
+ * `interface-do-jogo`). Os mesmos passos (`comecarEm`, `continuarEm`, `terminar`) servem à mão pela câmera
+ * (D5 do design de `desenho-com-a-mao`). Os pontos ficam nas coordenadas internas do canvas.
  *
  * @example
  * new CapturaDoDesenho(canvas, (tracos, terminado) => partida.registrarTraco(...));
  */
 export class CapturaDoDesenho {
   private tracosCapturados: Ponto[][] = [];
+  private estilosDosTracos: EstiloDoTraco[] = [];
+  private estiloAtual: EstiloDoTraco = ESTILO_PADRAO;
   private desenhando = false;
   private apagando = false;
   private ferramentaAtual: Ferramenta = "lapis";
   private ligada = true;
+  private ultimo: Ponto | undefined;
   private readonly contexto: CanvasRenderingContext2D | null;
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
     private readonly aoMudar: OuvinteDoDesenho,
+    private readonly aoAgir: (acao: AcaoNoQuadro) => void = () => undefined,
   ) {
     this.contexto = canvas.getContext("2d");
     canvas.style.touchAction = "none";
     canvas.addEventListener("pointerdown", (evento) => {
-      this.comecarTraco(evento);
+      if (!this.ligada) return;
+      evento.preventDefault();
+      canvas.setPointerCapture(evento.pointerId);
+      this.comecarEm(this.pontoDo(evento));
     });
     canvas.addEventListener("pointermove", (evento) => {
-      this.continuarTraco(evento);
+      if (this.desenhando) evento.preventDefault();
+      this.continuarEm(this.pontoDo(evento));
     });
     canvas.addEventListener("pointerup", (evento) => {
-      this.terminarTraco(evento);
+      // o último ponto entra no traço sem aviso próprio: o aviso é o do traço terminado
+      if (this.desenhando) this.adicionar(this.pontoDo(evento));
+      this.terminar();
     });
     for (const tipo of ["pointercancel", "pointerleave"] as const) {
       canvas.addEventListener(tipo, () => {
-        this.encerrar();
+        this.terminar();
       });
     }
   }
@@ -51,14 +79,22 @@ export class CapturaDoDesenho {
     return this.tracosCapturados;
   }
 
+  get estilos(): readonly EstiloDoTraco[] {
+    return this.estilosDosTracos;
+  }
+
   get ferramenta(): Ferramenta {
     return this.ferramentaAtual;
   }
 
   usar(ferramenta: Ferramenta): void {
+    this.terminar();
     this.ferramentaAtual = ferramenta;
-    this.desenhando = false;
-    this.apagando = false;
+  }
+
+  /** Cor e espessura dos próximos traços (o traço em andamento não muda). */
+  definirEstilo(estilo: EstiloDoTraco): void {
+    this.estiloAtual = estilo;
   }
 
   ligar(): void {
@@ -66,67 +102,83 @@ export class CapturaDoDesenho {
   }
 
   desligar(): void {
+    this.terminar();
     this.ligada = false;
-    this.desenhando = false;
   }
 
   limpar(): void {
     this.tracosCapturados = [];
+    this.estilosDosTracos = [];
     this.desenhando = false;
+    this.apagando = false;
     this.contexto?.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  private comecarTraco(evento: PointerEvent): void {
+  /** Encosta no ponto: começa um traço (lápis), apaga (borracha) ou avisa o toque (balde, conta-gotas). */
+  comecarEm(ponto: Ponto): void {
     if (!this.ligada) return;
-    evento.preventDefault();
-    this.canvas.setPointerCapture(evento.pointerId);
-    if (this.ferramentaAtual === "borracha") {
+    this.ultimo = ponto;
+    if (this.ferramentaAtual === "lapis") {
+      this.desenhando = true;
+      this.tracosCapturados.push([ponto]);
+      this.estilosDosTracos.push(this.estiloAtual);
+      this.aoMudar(this.tracosCapturados, false);
+    } else if (this.ferramentaAtual === "borracha") {
       this.apagando = true;
-      this.apagarEm(this.pontoDo(evento));
-      return;
+      this.apagarEm(ponto);
     }
-    this.desenhando = true;
-    this.tracosCapturados.push([this.pontoDo(evento)]);
-    this.aoMudar(this.tracosCapturados, false);
+    this.agir(
+      this.ferramentaAtual === "balde" || this.ferramentaAtual === "contagotas" ? "tocar" : "encostar",
+      ponto,
+    );
   }
 
-  private continuarTraco(evento: PointerEvent): void {
+  continuarEm(ponto: Ponto): void {
     if (this.apagando) {
-      this.apagarEm(this.pontoDo(evento));
+      this.agir("arrastar", ponto);
+      this.apagarEm(ponto);
       return;
     }
     if (!this.desenhando) return;
-    evento.preventDefault();
-    this.adicionar(this.pontoDo(evento));
+    this.agir("arrastar", ponto);
+    this.adicionar(ponto);
     this.aoMudar(this.tracosCapturados, false);
   }
 
-  private terminarTraco(evento: PointerEvent): void {
+  /** Levanta o lápis (ou a borracha): o traço em andamento termina e as redes reclassificam. */
+  terminar(): void {
+    const estava = this.desenhando || this.apagando;
     this.apagando = false;
-    if (!this.desenhando) return;
-    this.adicionar(this.pontoDo(evento));
-    this.encerrar();
-  }
-
-  private encerrar(): void {
-    this.apagando = false;
+    if (estava && this.ultimo !== undefined) this.agir("soltar", this.ultimo);
     if (!this.desenhando) return;
     this.desenhando = false;
     this.aoMudar(this.tracosCapturados, true);
   }
 
   /** Remove os traços tocados e, se algum saiu, redesenha e avisa o desenho que sobrou (D3 do design). */
-  private apagarEm(ponto: Ponto): void {
+  apagarEm(ponto: Ponto): void {
     const restantes = tracosForaDaBorracha(this.tracosCapturados, ponto);
     if (restantes.length === this.tracosCapturados.length) return;
-    this.tracosCapturados = restantes.map((traco) => [...traco]);
+    const ficam = new Set(restantes);
+    this.estilosDosTracos = this.estilosDosTracos.filter((_, indice) =>
+      ficam.has(this.tracosCapturados[indice] ?? []),
+    );
+    this.tracosCapturados = this.tracosCapturados.filter((traco) => ficam.has(traco));
     this.redesenhar();
     this.aoMudar(this.tracosCapturados, true);
   }
 
+  private agir(tipo: AcaoNoQuadro["tipo"], ponto: Ponto): void {
+    const anterior = this.ultimo ?? ponto;
+    const dx = ponto[0] - anterior[0];
+    const distancia = Math.hypot(dx, ponto[1] - anterior[1]);
+    this.ultimo = ponto;
+    this.aoAgir({ tipo, ferramenta: this.ferramentaAtual, ponto, distancia, dx });
+  }
+
   private redesenhar(): void {
     this.contexto?.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    if (this.contexto !== null) desenharTracos(this.contexto, this.tracosCapturados);
+    if (this.contexto !== null) desenharTracos(this.contexto, this.tracosCapturados, this.estilosDosTracos);
   }
 
   private adicionar(ponto: Ponto): void {
@@ -134,12 +186,8 @@ export class CapturaDoDesenho {
     const anterior = traco?.at(-1);
     if (traco === undefined || anterior === undefined) return;
     traco.push(ponto);
-    this.desenharSegmento(anterior, ponto);
-  }
-
-  private desenharSegmento(inicio: Ponto, fim: Ponto): void {
     if (this.contexto === null) return; // sem 2D (ex.: DOM de teste): captura sem pintar
-    desenharTracos(this.contexto, [[inicio, fim]]);
+    desenharTracos(this.contexto, [[anterior, ponto]], [this.estilosDosTracos.at(-1) ?? ESTILO_PADRAO]);
   }
 
   /** Converte a posição na tela para as coordenadas internas do canvas (o CSS pode redimensioná-lo). */
@@ -151,19 +199,24 @@ export class CapturaDoDesenho {
   }
 }
 
-/** Pinta traços com o traço do jogo (usado também pelo veredito para mostrar o desenho julgado). */
-export function desenharTracos(contexto: CanvasRenderingContext2D, tracos: readonly Traco[]): void {
-  contexto.lineWidth = ESPESSURA_DA_LINHA;
+/** Pinta traços, cada um no seu estilo (usado também pelo veredito para mostrar o desenho julgado). */
+export function desenharTracos(
+  contexto: CanvasRenderingContext2D,
+  tracos: readonly Traco[],
+  estilos: readonly EstiloDoTraco[] = [],
+): void {
   contexto.lineCap = "round";
   contexto.lineJoin = "round";
-  contexto.strokeStyle = COR_DA_LINHA;
-  for (const traco of tracos) {
+  tracos.forEach((traco, indice) => {
     const [primeiro, ...resto] = traco;
-    if (primeiro === undefined) continue;
+    if (primeiro === undefined) return;
+    const estilo = estilos[indice] ?? ESTILO_PADRAO;
+    contexto.lineWidth = estilo.espessura;
+    contexto.strokeStyle = estilo.cor;
     contexto.beginPath();
     contexto.moveTo(...primeiro);
     for (const ponto of resto) contexto.lineTo(...ponto);
     if (resto.length === 0) contexto.lineTo(...primeiro);
     contexto.stroke();
-  }
+  });
 }
