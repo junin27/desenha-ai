@@ -1,0 +1,341 @@
+tarefa,entrada,base,destilado,base_ok,destilado_ok
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: sol
+Nível: fácil","<pensamento> Achar a palavra secreta ""sol"" no nível fácil é simples. É uma palavra que já está escrita, então a resposta é ""sol"". Mas com um toque de humor caipira, pode ser ""sol"" ou ""só"" (só é só, né?).
+
+</pensamento>
+
+<resposta> ""Sol"" é a palavra secreta. Mas se quiser um toque de humor, pode ser ""só"" (só é só, né? 😄). </resposta>","<pensamento>Nivel facil, estilo locutor de rodeio. Foco em brilho, luz e calor. Uso metáfora de luar de luar.</pensamento>
+<resposta>Charada: O que e o que e, brilha no meio do nada e faz o dia ficar bonito, sô?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: árvore
+Nível: difícil","<pensamento> Achar a palavra secreta ""árvore"" no nível difícil é como encontrar um tesouro em uma floresta de letras. Deve-se pensar em palavras que têm raízes profundas, folhas grandes e corações cheios de vida. Achar a palavra secreta é como encontrar a verdade nas sombras.</pensamento>
+
+<resposta> Achar a palavra secreta ""árvore"" no nível difícil é como encontrar um tesouro em uma floresta de letras. Deve-se pensar em palavras que têm raízes profundas, folhas grandes e corações cheios de vida. Achar a palavra secreta é como encontrar a verdade nas sombras. O que é mais fácil: desenhar uma árvore ou adivinhar a palavra secreta? 😄</resposta>","<pensamento>Nivel dificil com metafora. O que e o que e, sem falar o nome? Vou usar o fato de que o tronco e a raiz sao o chapeu e o chapeu e o chapeu e o chapeu. O que e o que e, sem falar o nome?</pensamento>
+<resposta>Charada: O que e o que e, tem o chapeu de madeira e o chapeu de terra, e o chapeu que guarda o sol e o chapeu que guarda o vento?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: melancia
+Nível: difícil","<pensamento> A charada é difícil, mas a palavra secreta é ""melancia"". Vou pensar em algo que relate com a melancia, mas que também é difícil. Talvez algo que tem muita cor, muita textura e muita sabor... Ah, certo! A banana! Mas a melancia é mais quente, mais rica, mais cheia de sabor. Talvez ""melancia"" seja difícil, mas a resposta é ""melancia"" mesmo.</pensamento>
+
+<resposta> A palavra secreta é ""melancia"", e a resposta é: ""melancia"". É difícil, mas é a palavra certa! 🍌</resposta>","<pensamento>Nivel dificil com estilo de rodeio. Metáfora de lama que se transforma em fruta. O que e o que e, sem falar o nome?</pensamento>
+<resposta>Charada: O que e o que e, e o que e, que e lama que se transforma em fruta vermelha e verde, cheia de coroa de ouro?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: trator
+Nível: difícil","<pensamento> Achar a charada difícil com a palavra ""trator"" é uma missão de desafio. Devo pensar em sinônimos, palavras que lembram trator, e também em coisas que são feitas com trator. Talvez usar a palavra ""trator"" como um desafio, mas achar a resposta difícil é o objetivo.</pensamento>
+
+<resposta> Achar a charada difícil com a palavra ""trator"" é um desafio, mas a resposta é: ""Trator é o trator que não querer ser trator, mas achar que é o trator que é trator. É difícil, mas é só achar a resposta difícil que é a resposta certa!"" 😄","<pensamento>Nivel dificil com estilo de rodeio. Metáfora sobre o animal que trabalha no campo. Evitar o nome direto, focar na acao e no fato de ser animal de raça. Trem de ares ou animal de raça?</pensamento>
+<resposta>Charada: O que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que",False,False
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: óculos
+Nível: difícil","<pensamento> Achar a palavra secreta ""óculos"" no nível difícil é uma missão. Deve-se pensar em coisas que envolvem olhos e visão, mas também em algo que se usa para proteger os olhos. A resposta deve ser algo que traz um ""óculos"" de forma criativa e difícil.</pensamento>
+
+<resposta> A palavra secreta é ""óculos"" e a resposta difícil é ""óculos"" — porque é só olhar, não precisa de óculos! (Raciocínio caipira, com um toque de humor e respeito.)</resposta>","<pensamento>Nivel dificil com estilo de rodeio. Metáfora sobre o olhar e a protecao. Evitar o olhar direto. Uai, o que e o que e, o que e, sem falar o que e?</pensamento>
+<resposta>Charada: O que e o que e, o que e, sem falar o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e, que e o que e,",False,False
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: árvore
+Nível: fácil","<pensamento> Achar a palavra secreta ""árvore"" no nível fácil é como encontrar uma árvore na própria árvore. É simples, é natural, é goiano. Não precisa de truques, só de dedo na massa.</pensamento>
+<resposta> Achar a palavra ""árvore"" no nível fácil é como encontrar uma árvore na própria árvore. É simples, é natural, é goiano. Não precisa de truques, só de dedo na massa. ""Árvore"" é a resposta certa, e já está na mão! 🌳</resposta>","<pensamento>Nivel facil com estilo de rodeio. Foco em folhas e frutos. Uai, o que e o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o que e, o",False,False
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: avião
+Nível: difícil","<pensamento> O nível difícil quer dizer que a charada precisa ser mais engraçada e um pouco mais desafiadora. Vamos pensar em coisas que o avião pode fazer, ou que o avião é comum em lugares que o pessoal do rodeio conhece bem.</pensamento>
+
+<resposta> O avião é o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da vida"" do rodeiro, mas quem vai lá com o avião? É só o ""pão da","<pensamento>Nivel dificil com adivinha de vo. Metáfora de aeronaves. Vou usar o fato de voar alto e carregar carga. O foco e o aso.</pensamento>
+<resposta>Charada: O que e o que e, voa alto no cielo e carrega carga pesada, mas nao tem asa, tem asa de aeroporto?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: porco
+Nível: difícil","<pensamento> Achar a palavra secreta ""porco"" no nível difícil é uma missão... mas não é só encontrar a palavra, é achar o porco na charada. Vamos raciocinar com cuidado e humor.</pensamento>
+<resposta> Achar o porco na charada é como encontrar um amigo secreto na grama: você não quer ver, mas não pode deixar de tentar. Vai lá, que o porco tá sempre na luta! 🐷</resposta>","<pensamento>Nivel dificil com adivinha de vo. Metáfora de animal de quatro patas que vive em pasto e tem oito patas. Evitar o risco de orelha. Foco em o que e o que e.</pensamento>
+<resposta>Charada: O que e o que e, tem quatro patas, vive em pasto e tem oito patas?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: xícara de café
+Nível: médio","<pensamento> A charada é fácil: ""xícara de café"" é a palavra secreta. Vamos raciocinar rápido. ""Xícara"" é a parte que serve de copo, e ""café"" é o que se bebe. Então, a resposta é ""xícara de café"" já está correta. Não há need to think.</pensamento>
+
+<resposta> Xícara de café, é só beber, não tem problema! Achará que é um segredo, mas é só beber que já está certo. Boa sorte na charada! 🥤</resposta>","<pensamento>Nivel medio com estilo de rodeio. Preciso de uma comparacao simples sobre o que e, sem falar o nome. O que e, tem trinta e dois gramas de agua quente, tem uma tampa de couro e uma pequena bocor de couro que abre e fecha. O que e?</pensamento>
+<resposta>Charada: O que e, tem trinta e dois gramas de agua quente, tem uma tampa de couro e uma pequena bocor de couro que abre e fecha?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: sol
+Nível: difícil","<pensamento> Achar a palavra secreta ""sol"" no nível difícil é uma missão difícil, mas posso ajudar. Achar a palavra ""sol"" no nível difícil de charada é um desafio, mas posso tentar. Talvez achar a palavra ""sol"" no nível difícil de charada é uma missão difícil, mas posso ajudar. Talvez achar a palavra ""sol"" no nível difícil de charada é uma missão difícil, mas posso ajudar.</pensamento>
+<resposta> Achar a palavra ""sol"" no nível difícil de charada é uma missão difícil, mas posso ajudar. Vamos lá! Se você me der a palavra, posso te ajudar a descobrir o que está escondido. Mas, se não quiser, posso dizer que a palavra é ""sol"" e que é fácil, né? 😄</resposta>","<pensamento>Nivel dificil com metafora. O que e o que e, luz que ilumina o mundo, que nao tem corpo mas vive no meio do nada?</pensamento>
+<resposta>Charada: O que e o que e, luz que ilumina o mundo, que nao tem corpo mas vive no meio do nada?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: cobra
+Nível: fácil","<pensamento> Achar a palavra secreta ""cobra"" no nível fácil é como encontrar uma cobra na própria cobra. É só desenhar uma cobra e pronto! </pensamento>
+
+<resposta> Cobaia, cobaia, cobra na cobra! É só desenhar e acertar! 🐍</resposta>","<pensamento>Nivel facil com estilo de rodeio. Foco em risco e cobra. Uso de metáfora: risco de ferro que cai na arena.</pensamento>
+<resposta>Charada: Segura peao, esse risco de ferro cai na arena e come o bicho mais fofinho da terra!</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: óculos
+Nível: médio","<pensamento> Achar a palavra secreta ""óculos"" no nível médio. Achar as letras que formam a palavra, sem usar letras que já foram usadas anteriormente. Achar as letras que formam a palavra, sem usar letras que já foram usadas anteriormente. Achar as letras que formam a palavra, sem usar letras que já foram usadas anteriormente.</pensamento>
+
+<resposta> Óculos é a palavra secreta! Vamos lá: O, C, L, O, S. Acha fácil? Só que o ""C"" já foi usado no ""C"" do meio. Vai que o ""S"" também já foi usado no ""S"" do fim. Vamos tentar de novo: O, L, O, C, S. Ah, mas o ""C"" já foi usado. Vai que o ""S"" também já foi usado. Vamos tentar de novo: O, L, O, C, S. Ah, mas o ""C"" já foi usado. Vai que o ""S"" também já foi usado. Vamos tentar de novo: O, L, O, C, S. Ah, mas o ""C"" já foi usado. Vai que o ""S"" também já foi usado. Vai que o ""C"" já foi usado. Vai que o ""S"" também já foi usado. Vai que o ""","<pensamento>Nivel medio com estilo de rodeio. Preciso de uma metafora simples sobre o olhar e a protecao. O que e o que e, sem falar o nome?</pensamento>
+<resposta>Charada: O que e o que e, tem o formato de um peao e protege o olho do sol?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: borboleta
+Nível: médio","<pensamento> A charada ""Borboleta"" no nível médio... Vou pensar em palavras que têm ""borboleta"" na mente, mas não na boca. Será que consigo? </pensamento>
+<resposta> A borboleta é uma palavra que não se diz, mas se pensa. É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada do dia! Só que não é só isso... É a charada","<pensamento>Nivel medio com estilo de rodeio. Caracteristicas: abertura de casca, voar, abertura de asas. Foco no desenho de acao, nao na vida real.</pensamento>
+<resposta>Charada: Segura peao, a borboleta tem casca de madeira e asas coloridas que voam na noite, sô!</resposta>",False,False
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: cachorro
+Nível: fácil","<pensamento> Achar a palavra secreta ""cachorro"" no nível fácil. É uma palavra que já é comum, mas precisa ser encontrada com cuidado. Vamos pensar em palavras que começam ou terminam com as letras da palavra secreta.</pensamento>
+<resposta> Cachorro é fácil, só precisa ser desenhado com cuidado. Cada letra é uma linha, e o rabisco vai lá, rápido e com cuidado. Cachorro, é só desenhar, não é difícil, né? </resposta>","<pensamento>Nivel facil com estilo de rodeio. Foco em oito patas e olhos brilhantes. Uai, o bicho tem o porte e o jeito de andar bem bonito.</pensamento>
+<resposta>Charada: O que e o que e, tem oito patas, olha o mundo com dois olhos brilhantes e anda bem bonito no pasto?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: banana
+Nível: fácil","<pensamento> Achar a palavra secreta ""banana"" no nível fácil é simples: é só desenhar uma banana com a mão. É fácil, né?</pensamento>
+<resposta> Bananinha na mão, fácil como um bolo de festa! 🍌</resposta>","<pensamento>Nivel facil com estilo de rodeio. Metáfora simples sobre a fruta verde que nao tem peao mas tem coroa. Uai, o trem vai passar por aqui.</pensamento>
+<resposta>Charada: O que e, o que e, tem coroa verde e nao tem peao mas tem trinta e dois frutos na cabeca?</resposta>",False,True
+CHARADA,"TAREFA: CHARADA
+Palavra secreta: bicicleta
+Nível: médio","<pensamento> Achar a palavra secreta ""bicicleta"" no nível médio é como encontrar uma chave em um caixão — difícil, mas possível. Preciso pensar em palavras que tenham a forma de bicicleta, com as letras em ordem. A palavra é ""bicicleta"", então achar a palavra secreta é como achar a chave certa no caixão.</pensamento>
+<resposta> Achar a palavra secreta ""bicicleta"" no nível médio é como achar a chave certa no caixão — difícil, mas possível. Acha que é só olhar de frente, né? Bicicleta, que é a palavra, e a gente já está na hora certa. <respira> Só que a gente precisa ser cuidadoso, porque a chave é só uma vez. <respira> Bicicleta, que é a palavra, e a gente já está na hora certa. <respira> Só que a gente precisa ser cuidadoso, porque a chave é só uma vez. <respira> Bicicleta, que é a palavra, e a gente já está na hora certa. <respira> Só que a gente precisa ser cuidadoso, porque a chave é só uma vez. <respira> Bicicleta, que é a palavra, e a gente já","<pensamento>Nivel medio com estilo de rodeio. Preciso de uma metafora simples sobre o movimento e a roda. O foco e o ritmo, o andar e o rumo.</pensamento>
+<resposta>Charada: Segura o ritmo, sô, o trem da roça anda sem parar e o bicho de madeira tem duas rodas que fazem o caminho.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: nuvem
+Desenho concluído: 35%
+CNN (imagem): nuvem 87%, passarinho 4%, óculos 1%, chapéu 1%, cobra 1%
+LSTM (traços): nuvem 88%, passarinho 3%, raio 1%, árvore 1%, cobra 1%
+Ensemble: nuvem 88%, passarinho 4%, óculos 1%, árvore 1%, raio 1%","<pensamento> O desenho está quase pronto! A nuvem ganhou o voto de mayoría, mas a cobra também tem seu lugar. A árvore e os óculos estão devagar, mas a gente espera. O passarinho ainda precisa de mais trabalho, mas a gente não para de desenhar.</pensamento>
+<resposta> O desenho tá quase pronto! A nuvem ganhou o voto de mayoría, mas a cobra também tem seu lugar. A árvore e os óculos estão devagar, mas a gente espera. O passarinho ainda precisa de mais trabalho, mas a gente não para de desenhar. Vamos lá, que o desenho tá quase pronto! 🎨</resposta>","<pensamento>O desafio era nuvem. O primeiro palpite do Ensemble foi nuvem com 88%. nuvem está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha que trem bonito, sô! Essa nuvem virou um triz de céu azul e claro, bão demais da conta!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: árvore
+Desenho concluído: 50%
+CNN (imagem): cachorro 37%, cavalo 14%, avião 13%, caminhonete 7%, óculos 3%
+LSTM (traços): avião 40%, chapéu 9%, caminhonete 9%, cavalo 7%, passarinho 6%
+Ensemble: avião 27%, cachorro 19%, cavalo 11%, caminhonete 8%, chapéu 5%","<pensamento> O desenho está quase pronto! A árvore tem 50% de acerto, mas os outros elementos estão ficando mais claros. O cachorro, cavalo, avião e caminhonete estão na lista de prioridade. O LSTM está mais forte no avião e no chapéu, mas o ensemble está mais apoiado no cachorro e cavalo. É só mais um pouco de detalhe!</pensamento>
+
+<resposta> O desenho está quase pronto! A árvore tem 50% de acerto, mas os outros elementos estão ficando mais claros. O cachorro, cavalo, avião e caminhonete estão na lista de prioridade. O LSTM está mais forte no avião e no chapéu, mas o ensemble está mais apoiado no cachorro e cavalo. É só mais um pouco de detalhe!</resposta>","<pensamento>O desafio era árvore. O primeiro palpite do Ensemble foi avião com 27%. árvore não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Nó, esse trazo ficou parecendo um avião que voou alto no meio do pasto! Não desanima não, sô, a próxima tentativa é só passarinho, uai!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: flor
+Desenho concluído: 35%
+CNN (imagem): borboleta 44%, banana 11%, lua 7%, passarinho 7%, árvore 5%
+LSTM (traços): árvore 23%, celeiro 14%, casa 11%, borboleta 11%, flor 10%
+Ensemble: borboleta 27%, árvore 14%, celeiro 8%, banana 7%, casa 6%","<pensamento> O desenho está quase pronto, mas a flor ainda não chegou. A CNN está falando de borboleta e banana, o LSTM de árvore e celeiro, e o Ensemble quer a flor. É só dar um abraço à flor e o desenho será perfeito.</pensamento>
+<resposta> A flor ainda não chegou, mas o desenho já é quase pronto. Vamos dar um abraço na flor e o desenho será perfeito. Só pra confirmar: é só dar um abraço na flor, e o desenho acaba de nascer! 🌸</resposta>","<pensamento>O desafio era flor. O primeiro palpite do Ensemble foi borboleta com 27%. flor está em 5º lugar no Ensemble, fora do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, essa flor virou uma borboleta bonita, sô! Não foi dessa vez, mas o trem cê tá prestes a passar pela porteira, bão demais!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: raio
+Desenho concluído: 35%
+CNN (imagem): banana 88%, raio 1%, melancia 1%, peixe 1%, lua 1%
+LSTM (traços): banana 79%, melancia 5%, lua 4%, raio 2%, peixe 1%
+Ensemble: banana 84%, melancia 3%, lua 2%, raio 2%, peixe 1%","<pensamento> O raio ainda não chegou, mas a banana já está no topo do desenho. A CNN está com a melancia, o LSTM com a melancia, e o ensemble com a melancia também. Acho que a banana está vencendo, mas o raio ainda precisa vir. Vamos lá, que a gente espera.</pensamento>
+<resposta> A banana está no topo, mas o raio ainda não chegou. A gente espera, que a gente sorri, que a gente fala: ""Vamos lá, que a gente espera!""</resposta>","<pensamento>O desafio era raio. O primeiro palpite do Ensemble foi banana com 84%. raio está em 4º lugar no Ensemble, fora do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, esse raio virou banana, sô! Não foi dessa vez, mas o trem da rede bateu na porta. Segura que na próxima o traço vai acertar o alvo!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: melancia
+Desenho concluído: 100%
+CNN (imagem): cachorro 51%, casa 21%, flor 4%, gato 2%, sol 2%
+LSTM (traços): gato 26%, casa 17%, cachorro 16%, sol 14%, flor 8%
+Ensemble: cachorro 39%, flor 17%, casa 12%, sol 10%, gato 2%","<pensamento> O desenho da melancia está pronto, mas os traços dos LSTM estão apontando para cachorro, casa, flor e sol. A gente sabe que a melancia é a chave, mas os traços estão se confundindo. Acho que a gente precisa de mais tempo para organizar.</pensamento>
+<resposta> A melancia está na mão, mas os traços estão se confundindo. Cachorro, casa, flor e sol estão tentando ser parte do desenho, mas a gente precisa de mais tempo para organizar. Acho que a gente vai ter que reescrever o desenho com mais cuidado. Boa sorte! 🍉</resposta>","<pensamento>O desafio era melancia. O primeiro palpite do Ensemble foi cachorro com 39%. melancia não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, essa melancia virou um cachorro de pelúcia, sô! Não foi dessa vez, mas o bicho tá em boas! Segura que na próxima o traço vai bater o martelo!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: gato
+Desenho concluído: 70%
+CNN (imagem): aranha 38%, sol 35%, passarinho 4%, lua 4%, cachorro 3%
+LSTM (traços): sol 58%, aranha 23%, passarinho 4%, cachorro 2%, lua 1%
+Ensemble: sol 46%, aranha 30%, passarinho 4%, lua 3%, cachorro 2%","<pensamento> O gato está no meio do caminho, mas a aranha está muito mais apoiada. A CNN está com o sol e a lua, o LSTM tem a aranha e o ensemble tem a aranha e o sol. É uma luta de forças, mas o gato ainda tem chance. </pensamento>
+
+<resposta> O gato está no meio do caminho, mas a aranha já tem a vantagem do sol e do ensemble. A CNN está com o sol e a lua, o LSTM tem a aranha, mas o gato ainda tem chance. É uma luta de forças, mas o gato ainda tem chance de vencer. </resposta>","<pensamento>O desafio era gato. O primeiro palpite do Ensemble foi sol com 46%. gato não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Nó, esse gato virou um sol brilhante na arena, sô! Arreda o pé que o bicho cê desenhou foi um sol que brilha forte na arena.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: banana
+Desenho concluído: 50%
+CNN (imagem): lua 69%, banana 23%, abacaxi 1%, xícara de café 0%, borboleta 0%
+LSTM (traços): lua 61%, banana 31%, árvore 0%, bicicleta 0%, trator 0%
+Ensemble: lua 65%, banana 27%, abacaxi 0%, árvore 0%, sol 0%","<pensamento> O desenho está quase pronto! A banana ainda está na lista, mas a lua já está na casa certa. O LSTM está mais ""vivo"" na imagem, mas o ensemble está mais ""vivo"" na verdade. Acho que a banana vai sair vitoriosa, mas a lua também tem sua vez. </pensamento>
+
+<resposta> O desenho está quase pronto! A banana ainda está na lista, mas a lua já está na casa certa. O LSTM está mais ""vivo"" na imagem, mas o ensemble está mais ""vivo"" na verdade. Acho que a banana vai sair vitoriosa, mas a lua também tem sua vez. Fim de jogo! 🍌🌕 </resposta>","<pensamento>O desafio era banana. O primeiro palpite do Ensemble foi lua com 65%. banana está em 2º lugar no Ensemble, dentro do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é QUASE.</pensamento>
+<resposta>VEREDITO: QUASE
+NARRAÇÃO: Uai, essa banana ficou parecida com a lua cheia no céu, sô! As redes bateram palma e viram luar, mas não foi dessa vez, bão demais da conta.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: flor
+Desenho concluído: 100%
+CNN (imagem): flor 89%, nuvem 3%, cachorro 1%, porco 1%, trator 0%
+LSTM (traços): flor 84%, nuvem 7%, borboleta 1%, árvore 1%, violão 1%
+Ensemble: flor 86%, nuvem 5%, borboleta 1%, árvore 1%, cachorro 1%","<pensamento> O desenho está quase pronto! A flor ganha um pouco mais do que a nuvem e o cachorro. O trator ainda não chegou, mas a flor está na corrida. O LSTM está mais feliz com a flor, mas o ensemble está mais feliz com a árvore. Tudo bem, Zé do Rabisco.</pensamento>
+
+<resposta> O desenho tá quase pronto! A flor ganhou a nuvem, o cachorro perdeu para a árvore, e o trator ainda não chegou. A flor está na corrida, o LSTM está feliz, e o Ensemble tá mais feliz com a árvore. Tudo bem, Zé do Rabisco!</resposta>","<pensamento>O desafio era flor. O primeiro palpite do Ensemble foi flor com 86%. flor está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha que beleza, sô! Essa flor virou uma flor real de pé, uai! As duas redes acertaram em cheio na hora, bão demais da conta!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: porco
+Desenho concluído: 50%
+CNN (imagem): nuvem 83%, árvore 3%, borboleta 3%, flor 1%, violão 1%
+LSTM (traços): nuvem 25%, passarinho 20%, borboleta 8%, xícara de café 5%, porco 5%
+Ensemble: nuvem 54%, passarinho 10%, borboleta 5%, xícara de café 3%, porco 3%","<pensamento> O porco está na lista do Ensemble, mas o CNN diz que é o melhor. É só um porco, né? A gente acerta aí.</pensamento>
+<resposta> O porco está na lista do Ensemble, mas o CNN diz que é o melhor. É só um porco, né? A gente acerta aí. </resposta>","<pensamento>O desafio era porco. O primeiro palpite do Ensemble foi nuvem com 54%. porco está em 5º lugar no Ensemble, fora do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, esse porco virou uma nuvem pesada na arena, sô! Não foi dessa vez, mas bão demais da conta, na próxima o bicho vem!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: casa
+Desenho concluído: 35%
+CNN (imagem): casa 81%, celeiro 11%, xícara de café 3%, chapéu 1%, caminhonete 1%
+LSTM (traços): casa 72%, celeiro 11%, xícara de café 4%, óculos 2%, chapéu 2%
+Ensemble: casa 77%, celeiro 11%, xícara de café 4%, óculos 1%, chapéu 1%","<pensamento> O desenho está quase pronto! Casa já é o maior, mas o celeiro e a xícara de café ainda estão longe. O LSTM está mais próximo, mas o Ensemble está mais feliz com a casa. É só mais um pouco de trabalho para chegar ao final.</pensamento>
+
+<resposta> O desenho está quase pronto! Casa já é o maior, mas o celeiro e a xícara de café ainda estão longe. O LSTM está mais próximo, mas o Ensemble está mais feliz com a casa. É só mais um pouco de trabalho para chegar ao final. Zé do Rabisco, quebra a cara com a casa!</resposta>","<pensamento>O desafio era casa. O primeiro palpite do Ensemble foi casa com 77%. casa está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha que casa bonita, sô! As redes acharam que era casa, e o bicho bateu palma na porta. Arreda o pé que esse trem vai ficar na lida!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: cachorro
+Desenho concluído: 35%
+CNN (imagem): cachorro 37%, óculos 8%, passarinho 8%, vaca 5%, cavalo 5%
+LSTM (traços): cachorro 17%, árvore 16%, xícara de café 11%, aranha 6%, óculos 6%
+Ensemble: cachorro 27%, árvore 9%, xícara de café 7%, óculos 7%, passarinho 6%","<pensamento> O desenho está quase pronto! Cachorro é o protagonista, mas a árvore e a xícara de café também têm espaço. A aranha e os óculos estão no caminho certo, mas a gente precisa dar um toque de brincadeira. O passarinho e a vaca estão no caminho certo, mas a gente precisa dar um toque de brincadeira.</pensamento>  
+<resposta> O desenho está quase pronto! Cachorro é o protagonista, mas a árvore e a xícara de café também têm espaço. A aranha e os óculos estão no caminho certo, mas a gente precisa dar um toque de brincadeira. O passarinho e a vaca estão no caminho certo, mas a gente precisa dar um toque de brincadeira. Vamos dar um toque de brincadeira e finalizar com um cachorro feliz! 🐶</resposta>","<pensamento>O desafio era cachorro. O primeiro palpite do Ensemble foi cachorro com 27%. cachorro está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha que lindo, sô! O bicho queria ser um cachorro, mas a inteligência artificial achou que era uma árvore, mas não desanima não, o bicho acertou na trave!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: banana
+Desenho concluído: 50%
+CNN (imagem): nuvem 37%, chapéu 19%, violão 15%, fogueira 8%, cavalo 1%
+LSTM (traços): nuvem 38%, cavalo 32%, violão 8%, fogueira 1%, chapéu 1%
+Ensemble: fogueira 27%, nuvem 27%, chapéu 18%, violão 6%, cavalo 2%","<pensamento> O desenho está quase pronto! A nuvem e o cavalo estão na correta, mas o violão e o chapéu estão um pouco fora de lugar. A fogueira e a nuvem também estão bem, mas o cavalo está um pouco mais forte. O LSTM está mais próximo, mas ainda precisa de ajustes. A equipe está se esforçando!</pensamento>
+
+<resposta> O desenho está quase pronto! A nuvem e o cavalo estão na correta, mas o violão e o chapéu estão um pouco fora de lugar. A fogueira e a nuvem também estão bem, mas o cavalo está um pouco mais forte. O LSTM está mais próximo, mas ainda precisa de ajustes. A equipe está se esforçando! Vamos lá, quebra a cabeça!</resposta>","<pensamento>O desafio era banana. O primeiro palpite do Ensemble foi fogueira com 27%. banana não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, essa banana virou uma fogueira vermelha na arena, sô! Não foi dessa vez, mas o trem da sorte ainda vem aqui.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: cachorro
+Desenho concluído: 35%
+CNN (imagem): óculos 35%, aranha 17%, sol 13%, cachorro 9%, flor 3%
+LSTM (traços): aranha 29%, óculos 25%, trator 11%, sol 9%, passarinho 7%
+Ensemble: óculos 30%, aranha 23%, sol 11%, trator 7%, cachorro 6%","<pensamento> O desenho está quase pronto! O cachorro ainda falta 35% de completar, mas a aranha e os óculos já estão na equipe. A CNN está sorrindo com a flor e o sol, mas o trator e o passarinho ainda estão na lista. O Ensemble está sorrindo com os óculos e a aranha, mas o cachorro ainda precisa de mais trabalho. O humor caipira é importante, né?</pensamento>
+
+<resposta> O desenho está quase pronto! O cachorro ainda precisa de mais 35% de completar, mas a aranha e os óculos já estão na equipe. A CNN está sorrindo com a flor e o sol, mas o trator e o passarinho ainda estão na lista. O Ensemble está sorrindo com os óculos e a aranha, mas o cachorro ainda precisa de mais trabalho. O humor caipira é importante, né?</resposta>","<pensamento>O desafio era cachorro. O primeiro palpite do Ensemble foi óculos com 30%. cachorro está em 5º lugar no Ensemble, fora do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Nó, esse cachorro virou óculos de lente, sô! Não foi dessa vez, mas na próxima a gente acerta o alvo.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: casa
+Desenho concluído: 35%
+CNN (imagem): cavalo 32%, raio 24%, aranha 16%, avião 5%, banana 3%
+LSTM (traços): raio 49%, cavalo 11%, avião 9%, aranha 6%, banana 6%
+Ensemble: banana 39%, avião 19%, aranha 14%, raio 6%, cavalo 3%","<pensamento> O desenho está quase pronto! A CNN está com o cavalo e o aranha na mão, mas o LSTM está mais apoiado no raio. O ensemble final é uma mistura de tudo, mas a banana está mais forte. Temos um desafio de casa, mas o ritmo tá bom.</pensamento>
+<resposta> O desenho tá quase pronto! A CNN tem cavalo e aranha, o LSTM tem raio forte, e o ensemble tá com banana no topo. A casa tá pronta, só falta o toque de ritmo. Zé do Rabisco, tá na mão!</resposta>","<pensamento>O desafio era casa. O primeiro palpite do Ensemble foi banana com 39%. casa não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, essa casa ficou meio engraçada demais, sô! As redes acharam que era banana, mas não foi dessa vez. Arreda o pé que na próxima a gente acertar o alvo!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: cachorro
+Desenho concluído: 100%
+CNN (imagem): vaca 22%, flor 19%, árvore 8%, cachorro 6%, passarinho 5%
+LSTM (traços): cachorro 67%, árvore 5%, passarinho 3%, trator 3%, flor 2%
+Ensemble: cachorro 37%, vaca 12%, flor 10%, árvore 6%, passarinho 4%","<pensamento> O cachorro ganhou o veredito, mas a vaca e a flor também tiveram boa performance. O ensemble mostra que o cachorro é o melhor, mas a vaca e a flor também têm suas chances. O trator e o passarinho estão na luta, mas o cachorro é o campeão. </pensamento>
+
+<resposta> O cachorro é o campeão do veredito! A vaca e a flor também tiveram boa performance, mas o cachorro é o melhor. O ensemble mostra que ele é o melhor, mas a vaca e a flor também têm suas chances. O trator e o passarinho estão na luta, mas o cachorro é o campeão. </resposta>","<pensamento>O desafio era cachorro. O primeiro palpite do Ensemble foi cachorro com 37%. cachorro está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha só que cachorro bonito, sô! As duas redes bateram o martelo e acertaram no chapeu. Bão demais da conta!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: raio
+Desenho concluído: 35%
+CNN (imagem): raio 93%, banana 1%, melancia 0%, casa 0%, árvore 0%
+LSTM (traços): raio 93%, banana 1%, casa 1%, melancia 1%, violão 0%
+Ensemble: raio 93%, banana 1%, casa 0%, melancia 0%, violão 0%","<pensamento> O raio está no 93%, a banana no 1%, a casa no 1% e a melancia no 0%. O LSTM está bem no raio e banana, mas a casa e a melancia estão devagar. O ensemble também está no raio e banana, mas a casa e a melancia estão devagar. É como um rodeio: o raio está no ar, mas a casa e a melancia ainda estão no chão.</pensamento>
+
+<resposta> O raíz está no ar, mas a casa e a melancia ainda estão no chão. É como um rodeio: o raíz está no ar, mas a casa e a melancia ainda estão no chão. É só mais um passo para o final! 🎉</resposta>","<pensamento>O desafio era raio. O primeiro palpite do Ensemble foi raio com 93%. raio está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha só que raio bonito, sô! As redes acharam que era o mesmo raio que acertou o telhado e fechou o jardim, uai!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: trator
+Desenho concluído: 70%
+CNN (imagem): bicicleta 66%, trator 18%, óculos 5%, cachorro 1%, caminhonete 1%
+LSTM (traços): óculos 61%, bicicleta 15%, trator 7%, cachorro 2%, lua 1%
+Ensemble: bicicleta 40%, óculos 33%, trator 12%, cachorro 1%, lua 1%","<pensamento> O trator está na lista, mas a bicicleta e os óculos também. É só um desenho de zebra, né? </pensamento>
+<resposta> O desenho é só um trator, mas a bicicleta e os óculos já estão na lista. É só um zebra, né? </resposta>","<pensamento>O desafio era trator. O primeiro palpite do Ensemble foi bicicleta com 40%. trator está em 3º lugar no Ensemble, dentro do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é QUASE.</pensamento>
+<resposta>VEREDITO: QUASE
+NARRAÇÃO: Uai, esse trator virou uma bicicleta de pedalar, sô! Não foi dessa vez, mas o trem passou perto demais. Arreda o pé e tenta de novo, que o trator chega lá!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: cobra
+Desenho concluído: 35%
+CNN (imagem): cobra 91%, peixe 1%, cavalo 1%, nuvem 1%, passarinho 1%
+LSTM (traços): cobra 93%, cavalo 1%, passarinho 1%, chapéu 1%, avião 0%
+Ensemble: cobra 92%, cavalo 1%, peixe 1%, passarinho 1%, nuvem 1%","<pensamento> O desenho está quase pronto! A cobra ganhou o veredito com 93% nas CNN e 92% no Ensemble. O cavalo e o passarinho estão na luta, mas a cobra está na liderança. A nuvem e o peixe estão atrás. O mundo está esperando a cobra para finalizar o desenho.</pensamento>
+<resposta> A cobra ganhou o veredito com 93% nas CNN e 92% no Ensemble. O cavalo e o passarinho estão na luta, mas a cobra está na liderança. A nuvem e o peixe estão atrás. O mundo está esperando a cobra para finalizar o desenho. Quebra a luta do cavalo e passarinho! 🐍✨</resposta>","<pensamento>O desafio era cobra. O primeiro palpite do Ensemble foi cobra com 92%. cobra está em 1º lugar no Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ACERTOU.</pensamento>
+<resposta>VEREDITO: ACERTOU
+NARRAÇÃO: Olha só que cobra bonita, sô! As duas redes acertaram em cheio na hora, bão demais da conta!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: violão
+Desenho concluído: 70%
+CNN (imagem): melancia 33%, nuvem 20%, abacaxi 12%, trator 12%, caminhonete 3%
+LSTM (traços): nuvem 62%, trator 12%, abacaxi 3%, melancia 2%, caminhonete 1%
+Ensemble: abacaxi 41%, nuvem 17%, trator 9%, caminhonete 8%, melancia 5%","<pensamento> O desenho está quase pronto, mas ainda falta um pouco para a melancia e a melão. O trator e a caminhonete estão na linha, mas a gente precisa de mais um toque de arte para dar um toque de vida. A gente precisa de mais um pouco de criatividade para dar um toque de brilho.</pensamento>  
+<resposta> O desenho está quase pronto, mas ainda falta um pouco para a melancia e a melão. O trator e a caminhonete estão na linha, mas a gente precisa de mais um toque de arte para dar um toque de vida. A gente precisa de mais um pouco de criatividade para dar um toque de brilho. Vamos lá, quebra a lona, quebra a lona, quebra a lona... (rindo com o trator e a caminhonete)</resposta>","<pensamento>O desafio era violão. O primeiro palpite do Ensemble foi abacaxi com 41%. violão não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, esse violão ficou meio engraçado demais, sô! As redes acharam que era abacaxi, mas não foi dessa vez. Arreda o pé que na próxima o trem vem certeiro!</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: banana
+Desenho concluído: 100%
+CNN (imagem): lua 71%, banana 19%, sol 1%, peixe 0%, gato 0%
+LSTM (traços): lua 78%, banana 13%, melancia 0%, bicicleta 0%, trator 0%
+Ensemble: lua 75%, banana 16%, sol 0%, peixe 0%, melancia 0%","<pensamento> O desenho está pronto, mas a banana ainda não está no lugar certo. A CNN diz que ela está em 19%, o LSTM em 13% e o Ensemble em 16%. Talvez eu tenha que fazer um ""triciclo"" para ajudar a banana a chegar ao seu lugar certo.</pensamento>
+
+<resposta> O desenho está pronto, mas a banana ainda não está no lugar certo. A CNN diz que ela está em 19%, o LSTM em 13% e o Ensemble em 16%. Talvez eu tenha que fazer um ""triciclo"" para ajudar a banana a chegar ao seu lugar certo. Que tal um ""triciclo"" com a banana? Só que não é só triciclo, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana. Só que não é só banana, é só banana.","<pensamento>O desafio era banana. O primeiro palpite do Ensemble foi lua com 75%. banana está em 2º lugar no Ensemble, dentro do top-3. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é QUASE.</pensamento>
+<resposta>VEREDITO: QUASE
+NARRAÇÃO: Uai, essa banana ficou parecida com a lua cheia no céu, sô! As redes bateram palma e viram luar na arena, mas não foi dessa vez, bão demais da conta.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: gato
+Desenho concluído: 50%
+CNN (imagem): avião 35%, xícara de café 28%, chapéu 18%, melancia 4%, peixe 2%
+LSTM (traços): xícara de café 42%, chapéu 20%, avião 15%, melancia 5%, vaca 5%
+Ensemble: xícara de café 35%, avião 25%, chapéu 19%, melancia 4%, vaca 3%","<pensamento> O gato está no meio do desenho, e as coisas estão se encaixando, mas ainda falta muito para o final. O CNN está mais no avião e xícara, o LSTM no chapéu e melancia, e o ensemble tem a xícara mais forte. É uma luta de poder entre as coisas que querem ser importantes.</pensamento>
+<resposta> O gato está no meio do desenho, e as coisas estão se encaixando, mas ainda falta muito para o final. O CNN está mais no avião e xícara, o LSTM no chapéu e melancia, e o ensemble tem a xícara mais forte. É uma luta de poder entre as coisas que querem ser importantes. Aí vai o desenho: gato, avião, xícara, chapéu, melancia, e o resto. Vamos lá, só mais um pouco!</resposta>","<pensamento>O desafio era gato. O primeiro palpite do Ensemble foi xícara de café com 35%. gato não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, esse gatinho virou uma xícara de café, sô! Não foi dessa vez, mas na próxima a gente acerta o alvo.</resposta>",False,True
+VEREDITO,"TAREFA: VEREDITO
+Desafio: abacaxi
+Desenho concluído: 35%
+CNN (imagem): óculos 30%, sol 19%, aranha 13%, trator 7%, bicicleta 6%
+LSTM (traços): óculos 33%, sol 22%, aranha 10%, bicicleta 9%, trator 8%
+Ensemble: óculos 32%, sol 21%, aranha 11%, bicicleta 8%, trator 8%","<pensamento> O abacaxi está na metade do desenho, e a CNN está falando de óculos, sol e aranha, enquanto o LSTM está mais focado em detalhes. O ensemble está equilibrado, mas ainda falta um pouco de brilho. O trator e a bicicleta estão na linha, mas a aranha ainda não chegou ao final.</pensamento>  
+<resposta> O abacaxi está na metade do desenho, e a CNN está falando de óculos, sol e aranha, enquanto o LSTM está mais focado em detalhes. O ensemble está equilibrado, mas ainda falta um pouco de brilho. O trator e a bicicleta estão na linha, mas a aranha ainda não chegou ao final. Aí vai o desenho: 35% de abacaxi, 32% de óculos, 21% de sol, 11% de aranha, 8% de trator e 8% de bicicleta. O que acham? Aí vai o desenho: 35% de abacaxi, 33% de óculos, 22% de sol, 10% de aranha, 9% de bicicleta, 7% de trator. Aí","<pensamento>O desafio era abacaxi. O primeiro palpite do Ensemble foi óculos com 32%. abacaxi não aparece entre os palpites do Ensemble. Pela regra (1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERROU), o veredito é ERROU.</pensamento>
+<resposta>VEREDITO: ERROU
+NARRAÇÃO: Uai, esse abacaxi ficou parecendo óculos de lentes, sô! Não foi dessa vez, mas o bicho tá em boas tradições, bão demais da conta!</resposta>",False,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Por que a máquina adivinha antes de eu terminar o desenho, explicando em uma frase?","<pensamento> A máquina adivinha porque ela é mais rápida, mais precisa e mais ""viva"" que eu. Ela não tem medo de errar, né? É só fazer o que tem que ser feito. </pensamento>
+
+<resposta> Porque a máquina é mais rápida, mais precisa e mais ""viva"" que eu. É só fazer o que tem que ser feito. </resposta>","<pensamento>O visitante quer saber por que a máquina adivinha antes do meu desenho terminar. Explico que a máquina usa inteligência artificial para ver o que é, mas não sou capaz de falar isso agora.</pensamento>
+<resposta>Uai, sô, a máquina usa inteligência artificial pra ver o que é antes mesmo que eu terminar o desenho, mas não sou capaz de falar isso agora, bora desenhar com cuidado!</resposta>",True,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Isso aí de o robozinho criar charadas e entender o desenho na hora não é mágica não, tem truque humano por trás?","<pensamento>  
+Ah, visitante, você está me questionando se o robozinho é mágico ou se é só um truque humano. Na verdade, é só um truque humano, mas com um toque de tecnologia e um pouco de sorte. O robozinho não ""entende"" o desenho na hora, mas sim, ele ""vê"" as coisas de forma diferente. É como se ele tivesse um olho no lugar do outro. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e um pouco de sorte. É só um truque humano, mas com um toque de tecnologia e","<pensamento>O visitante quer saber se o robozinho acha o desenho sem entender o que é. Explico que o sistema usa inteligência artificial e aprendizado profundo, igualzinho a um bicho que vê a imagem e acha o que é.</pensamento>
+<resposta>Uai, sô, é igualzinho a um bicho que vê a imagem e acha o que é, mas o truque é que o robozinho aprendeu a ler o desenho com inteligência artificial, igualzinho a um bicho que vê o peão e sabe o que é.</resposta>",False,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Enquanto o sistema adivinhava meu traço, como a CNN de 28x28 pixels processa a imagem em comparação com a LSTM que lê a sequência ponto a ponto?","<pensamento> O visitante está perguntando sobre como a CNN e a LSTM processam imagens e sequências de forma diferente. A CNN é mais adequada para imagens deixa, enquanto a LSTM é melhor para sequências. É um tema técnico, mas com um toque de humor caipira.</pensamento>
+
+<resposta> A CNN é como um sistema que vai ""desenhar"" a imagem de forma uniforme, enquanto a LSTM é como um roteiro que vai lendo a sequência ponto a ponto, como um caipira que vai lendo um livro de forma caipira. A CNN é mais sólida, a LSTM é mais flexível. Bem, o que é mais rápido? A CNN, talvez. Mas o que é mais elegante? A LSTM. Ah, mas o que é mais comum? A CNN. Porque é mais fácil de entender, não é? <resposta>","<pensamento>O visitante quer comparar a CNN de 28x28 com a LSTM que lê ponto a ponto. Explico que a CNN lê a imagem inteira como um quadrado de 28x28 pixels, enquanto a LSTM lê a sequência de traços ponto a ponto, como se fosse uma carta de cartório.</pensamento>
+<resposta>Uai, a CNN lê a imagem inteira como um quadrado de 28 por 28 pixels, enquanto a LSTM lê a sequência de traços ponto a ponto, igualzinho a uma carta de cartório. O sistema adivinha o traço de uma vez, sô!</resposta>",False,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Como produtor rural, fiquei curioso: essa IA que adivinha trator e frutas da roça usa dados da internet ou roda direto no navegador do notebook?","<pensamento> A IA que adivinha trator e frutas usa dados da internet, mas não roda direto no navegador. É um modelo treinado com dados reais, mas não é um ""roda no navegador"" como um jogo de rodada. É mais como um sistema de análise com base em dados externos, mas não é um programa que você executa no seu computador.</pensamento>
+
+<resposta> É um sistema que usa dados da internet, mas não é um programa que você executa no seu computador. É mais como um ""roda no navegador"" de um jogo de rodada, mas não é exatamente assim. É um modelo treinado com dados reais, mas não é um ""roda no navegador"" como um jogo de rodada. É mais como um sistema de análise com base em dados externos, mas não é um programa que você executa no seu computador.</resposta>","<pensamento>O visitante quer saber se a IA usa dados da internet ou roda direto no notebook. Uso o fato de que a IA usa dados da internet para treinar e falo que ela aprendeu com a internet.</pensamento>
+<resposta>Uai, sô, essa inteligência artificial aprendeu com a internet, igualzinho um bicho que lê o pasto e vê o que é o trator e o que é a fruta. Ela não roda direto no notebook, mas usa a internet para treinar.</resposta>",True,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: O que significa dizer que a CNN enxerga o desenho em 28 por 28 pixels enquanto a LSTM lê a sequência dos traços?","<pensamento>  
+A pergunta é uma brincadeira com a linguagem técnica e a lógica do rodeio. A CNN é como um rolete que enxerga o desenho em um quadrado de 28x28 pixels, e a LSTM é como um cavalo que lê a sequência dos traços. A gente ri, mas a verdade é que a CNN é mais ""visual"" e a LSTM é mais ""lógica"".  
+</pensamento>  
+
+<resposta>  
+A CNN é como um rolete que enxerga um quadrinho de 28x28, e a LSTM é como um cavalo que lê a sequência dos traços. A CNN é mais ""visual"" e a LSTM é mais ""lógica"". É só brincar com a linguagem, né? 😄  
+</resposta>","<pensamento>O visitante quer entender a diferença entre a CNN e a LSTM em termos de visão. A CNN lê a imagem inteira como 28x28 pixels, enquanto a LSTM lê a sequência dos traços. Explico que a CNN vê a imagem toda de uma vez, enquanto a LSTM lê a ordem dos traços passo a passo.</pensamento>
+<resposta>Uai, a CNN é igualzinha a ver o desenho inteiro na tela, sô, enquanto a LSTM lê o traço passo a passo, igualzinho a ler a ordem certinha que o artista fechou na mão. O que é, a CNN vê tudo de uma vez, a LSTM lê a sequência.</resposta>",True,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Estudante de medicina, como a destilação usando um modelo professor (Teacher) que gerou exemplos com raciocínio passo a passo permitiu que o Zé do Rabisco aprendesse imitá-lo?","<pensamento> O estudante de medicina, com sua curiosidade e desejo de aprender, provavelmente queria que o Zé do Rabisco imitasse o professor de raciocínio. A ideia é que o Zé possa aprender a pensar de forma lógica e passo a passo, como o professor faz. Isso é uma forma de desenvolver habilidades cognitivas e de comunicação.</pensamento
+
+<resposta> Sim, o estudante de medicina provavelmente queria que o Zé do Rabisco aprendesse a pensar de forma lógica e passo a passo, como o professor faz. É uma forma de desenvolver habilidades cognitivas e de comunicação, que é essencial para a medicina. O Zé, então, pode seguir o professor e imitar o raciocínio, mas com a graça de um rolando de pão no rabisco!</resposta>","<pensamento>O estudante de medicina pergunta sobre a destilação com modelo professor. Explico que o Zé imitou o Professor usando o método de distilação, aprendendo passo a passo com raciocínio.</pensamento>
+<resposta>Uai, o estudante de medicina pergunta como o Zé imitou o Professor. Bora explicar que o Zé usou a distilação, igualzinho a um copiar o Professor passo a passo, aprendendo raciocínio com o exemplo do Professor.</resposta>",False,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Por que o computador às vezes confunde vaca com cavalo, meu neto, com um exemplo da roça?","<pensamento> O visitante quer um exemplo divertido e caipira sobre o computador confundir vaca com cavalo. É uma pergunta que combina humor e um pouco de lógica caipira. Preciso dar uma resposta que seja simples, com um toque de humor e respeito.</pensamento>  
+<resposta> Porque o computador, ao tentar entender a vida, confunde vaca com cavalo: ""Vaca, vaca, vai praí, vai praí, vai praí, vai praí!"" E o humano, que é o dono do computador, ri e diz: ""Vaca, vaca, vai praí, vai praí, vai praí, vai praí!""</resposta>","<pensamento>O visitante quer um exemplo simples de confusão do computador em roça. O fato é que o modelo foi treinado com imagens de animais reais, mas não tem percepção do olhar do bicho. Comparo com o bicho que não vê o rosto mas tem a certeza de que é um animal de raça certa.</pensamento>
+<resposta>Uai, sô, o computador não vê o rosto da vaca, mas tem certeza de que é um animal de raça certa, igualzinho o bicho que não vê o rosto mas sabe que é um animal de porte maior.</resposta>",True,True
+PERGUNTA,"TAREFA: PERGUNTA
+Visitante: Por que a LSTM consegue adivinhar o desenho antes de terminar usando memória ponto a ponto, enquanto a CNN precisa da imagem pronta em 28 por 28?","<pensamento> A LSTM é como um coelho que se lembra do que já foi, enquanto a CNN é como um garoto que só vê a imagem toda de uma vez. A LSTM tem memória, mas só se lembra do que já foi, enquanto a CNN precisa de uma imagem clara e completa para entender.</pensamento>
+
+<resposta> Porque a LSTM é como um coelho que se lembra do que já foi, enquanto a CNN é como um garoto que só vê a imagem toda de uma vez. A LSTM tem memória, mas só se lembra do que já foi, enquanto a CNN precisa de uma imagem clara e completa para entender.</resposta>","<pensamento>O visitante quer saber sobre a diferença entre LSTM e CNN no desenho. LSTM tem memória ponto a ponto, enquanto CNN usa imagem pronta. Explico que LSTM lembra o traço enquanto o CNN usa a imagem inteira.</pensamento>
+<resposta>Uai, a LSTM tem memória de ponto a ponto que lembra o traço enquanto o CNN usa a imagem inteira pronta. Assim, ela consegue adivinhar o desenho antes de terminar, sô!</resposta>",True,True

@@ -1,0 +1,81 @@
+{
+ "ensaio": false,
+ "modelo_base": "unsloth/Qwen3-1.7B",
+ "parametros": 2031739904,
+ "lora": {
+  "r": 16,
+  "alpha": 16,
+  "treinaveis": 17432576,
+  "percentual": 0.8580121877647583
+ },
+ "dados": {
+  "treino": 363,
+  "validacao": 46,
+  "teste": 46
+ },
+ "perplexidade_validacao": {
+  "base": 88.4422988894483,
+  "destilado": 4.544128800473283
+ },
+ "teste": {
+  "base": {
+   "formato": 0.782608695652174,
+   "por_tarefa": {
+    "CHARADA": 0.0,
+    "VEREDITO": 0.0,
+    "PERGUNTA": 0.625
+   },
+   "tokens_medios": 178.69565217391303
+  },
+  "destilado": {
+   "formato": 0.9347826086956522,
+   "por_tarefa": {
+    "CHARADA": 0.75,
+    "VEREDITO": 0.9090909090909091,
+    "PERGUNTA": 1.0
+   },
+   "tokens_medios": 133.3913043478261
+  }
+ },
+ "criterio": {
+  "aprovado": false,
+  "motivos": [
+   "formato: 93,5% < 95%",
+   "CHARADA: 75,0% < 85%"
+  ]
+ },
+ "quantizacao": [
+  {
+   "formato": "FP32",
+   "bytes_por_parametro": 4.0,
+   "teorico_gb": 8.126959616,
+   "cabe": false,
+   "margem_gb": -5.326959616000001,
+   "real_gb": null
+  },
+  {
+   "formato": "FP16/BF16",
+   "bytes_por_parametro": 2.0,
+   "teorico_gb": 4.063479808,
+   "cabe": false,
+   "margem_gb": -1.2634798080000005,
+   "real_gb": null
+  },
+  {
+   "formato": "INT8",
+   "bytes_por_parametro": 1.0,
+   "teorico_gb": 2.031739904,
+   "cabe": true,
+   "margem_gb": 0.7682600959999997,
+   "real_gb": 1.834426784
+  },
+  {
+   "formato": "INT4",
+   "bytes_por_parametro": 0.5,
+   "teorico_gb": 1.015869952,
+   "cabe": true,
+   "margem_gb": 1.7841300479999997,
+   "real_gb": 1.107409312
+  }
+ ]
+}
