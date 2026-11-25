@@ -36,3 +36,16 @@ Feito em 23/11/2026 com o llama.cpp `b12651` e o Qwen3-1.7B Q4_K_M **base** (mod
 **Segunda rodada, pelo `.bat`** (com a RAM liberada: 3,8 GiB livres): arquivos ✓, portas ✗ (Apache na 8080), memória ✓ (precisa de 1,9 GiB), voz ✓, modelos ⚠ e fala real "não testada: a porta 8080 está ocupada por outro programa" (achado do ensaio: antes o servidor temporário falhava com um erro confuso; agora o item explica). Saída "Não pronto: Portas, Fala real do Zé", código 1 propagado pelo `.bat`.
 
 **Ajustes feitos depois do ensaio** (aprovados na conversa): o limiar do Qwen3 base subiu de 1,5 para 2 GB livres (ele ocupa ~1,9 GiB); no modo ensaio a fala fora do formato do Zé é ⚠ (esperado sem fine-tuning) e não impede o "Pronto para o evento"; e o checklist manual ganhou o item das portas 8080/8081 livres. Fica para depois do notebook 3: conferir com o Zé treinado o limite de 25 s por fala e voltar a exigir o formato (✗).
+
+## Ensaio com o Zé treinado (v7, GGUF Q8_0) — 25/11/2026, madrugada
+
+Preparação: `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf` (base `Qwen3-1.7B-Q8_0.gguf` baixado e conferido por tamanho e SHA-256; métricas da v7 copiadas para o painel com `copiar_modelos.sh`).
+
+- **Checklist (`conferir_demo.py`):** com o `httpd.exe` do EDB PEM na 8080, deu "Não pronto" (Portas ✗ e fala não testada), como deve. Com o serviço `PEMHTTPD-x64` parado: todos os itens ✓ e **"Pronto para o evento"**; fala real do Zé: charada em 7,7 s, 10,7 tokens/s. Fora do modo ensaio o formato errado volta a ser ✗ (o item seguiu o manifesto, `modo_ensaio: false`).
+- **Memória com os dois servidores (Zé e base, Q8_0):** 1,99 GiB de *working set* cada; 7,9 GiB livres na máquina (23,7 GiB).
+- **Partida completa no navegador (3 rodadas):**
+  - rodada 1 (melancia, fácil): a charada do Zé foi recusada (o jogo usou a reserva); o Zé destilado julgou ERROU e narrou, aceito pela regra;
+  - rodada 2 (óculos, médio): charada do Zé destilado aceita ("Olha o peão com o nariz e vê o protetor que ajuda a ver melhor, sô!"); as redes puseram óculos em 1º; ACERTOU, +132 pontos, narração do Zé aceita;
+  - rodada 3 com o **Qwen3 base** narrando: charada e narração fora do formato, as duas pela reserva.
+  - Painel (F2): Zé destilado 3 falas aceitas e 1 reserva; Qwen3 base 0 e 2; CNN 8 ms e LSTM 2,3 ms por palpite; tela "Pensando…" sem o raciocínio durante a charada.
+- **Não conferido aqui:** a janela em tela cheia aberta pelo `Iniciar Desenha Aí.bat` (o ensaio usou o navegador do app em `127.0.0.1:8080`), Wi-Fi desligado e a máquina do evento.
