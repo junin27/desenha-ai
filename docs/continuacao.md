@@ -134,3 +134,24 @@ O usuário vai trabalhar no **design, na experiência do usuário e em funcional
 - Os **GGUF de todas as rodadas** (v3 a v7, Q4_K_M e o **Q8_0 do evento** em `notebooks/resultados/rodada5/`) e o zip baixado do Drive estão no GitHub por **Git LFS** (~7,4 GB). Na outra máquina: `git lfs install` uma vez; `git clone`/`git pull` baixa tudo. Para o trabalho só de visual, dá para pular os modelos: `GIT_LFS_SKIP_SMUDGE=1 git pull` (os GGUF ficam como ponteiros) e, quando precisar do Zé, `git lfs pull --include "notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf"`.
 - O wheel do `desenha_ml` está versionado em `ml/dist/` e as cópias do dataset do Drive em `drive/dataset_ze/`; o diagnóstico do Codex que orientou as rodadas v6 e v7 está em `docs/diagnostico_codex.md`.
 - **Fora do Git de propósito:** `PROJETOS VALIDADOS - 24_11.xlsx` (tem nome e e-mail de outros alunos e o repositório é público; o padrão de aprovação está resumido em `docs/cadastro.md`), `demo/` (gerada por `preparar_demo.py`), `.venv` e `node_modules`.
+
+## Estado em 25/11/2026 (tarde): visual e experiência do usuário — LEIA PRIMEIRO
+
+**Feito hoje no jogo (testado, verificação verde):**
+- A fala de reserva aparece **sem selo** para o visitante (o painel técnico continua contando as reservas); a spec `comparacao-base-destilado` (bancada-do-ze) foi ajustada.
+- Narrações de reserva **sem artigo fixo** antes do desafio ("o banana", "o cobra" erravam o gênero) e com maiúscula no início de cada frase; um teste reprova se voltar.
+- Tela de desenho: o **quadro encolhe** para a coluna da direita e o botão Pronto caberem (conferido a 1024×640, 1366×768 e 1920×1080).
+
+**O que o usuário quer (pedido de 25/11), ainda não feito — passa por proposta no OpenSpec e aprovação dele:**
+1. **Tela de introdução** antes de tudo: explicar o jogo e o objetivo com pegada de marketing, para atrair quem passa no estande, com uma **demonstração** rodando; um botão **Jogar** leva para a tela de apelido, que também tem o **Pergunte ao Zé** (a tela inicial de hoje).
+2. **Zé como personagem** (hoje é só texto), **veredito** com o desenho do visitante, o que as redes acharam e comemoração no acerto, **palpites** com barras animadas, **cronômetro** visual, **tela inicial/placar** com top 5 e medalhas.
+3. **Placar** com ordenar e pesquisar.
+4. **Borracha** no desenho (hoje só há "Limpar", que apaga tudo).
+5. Pediu para usar o **Impeccable** (github.com/pbakaus/impeccable: regras de craft e anti-padrões de "AI slop"; licença Apache 2.0) pensando em UX, e a skill **site-motion-director** para pensar o design.
+
+**Direções já mostradas e REJEITADAS pelo usuário ("não gostei de nenhum"; protótipos apagados):**
+- A "Rodeio de Feira": creme/terracota/mostarda, moldura de madeira, mascote geométrico do Zé com balão, corrida de barras, anel do tempo, confete de fitas, placar com fivelas.
+- B "Caderno do Zé": caderno aberto, papel pautado, letra à mão, marca-texto, lápis que encurta, nota carimbada.
+- C "Show de TV": palco escuro, letreiro dourado e magenta, barra de LEDs, placar eletrônico, holofote.
+- Próximo passo: **não propor de novo essas três**. Fazer a **descoberta guiada** da skill site-motion-director (perguntar o que ele não gostou em cada uma, pedir referências de sites ou jogos de que ele gosta, contrastes como claro/escuro e sóbrio/divertido) antes de prototipar outra vez.
+- **Voz do Zé:** o usuário decidiu manter a voz do Windows por enquanto. Pesquisa feita: não existe voz caipira pronta e offline; o viável é Piper pt-BR no navegador (sotaque neutro); caipira de verdade exige gravar 30–60 min de alguém com o sotaque (com consentimento) e treinar a voz.

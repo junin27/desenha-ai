@@ -6,12 +6,6 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "app", "run", "dev", "--", "--port", "5173", "--strictPort"],
       "port": 5173
-    },
-    {
-      "name": "prototipos",
-      "runtimeExecutable": "ml/.venv/Scripts/python",
-      "runtimeArgs": ["-m", "http.server", "5180", "--bind", "127.0.0.1", "--directory", "docs/prototipos"],
-      "port": 5180
     }
   ]
 }
