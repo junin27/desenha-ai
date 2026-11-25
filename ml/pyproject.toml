@@ -29,6 +29,11 @@ strict = true
 python_version = "3.11"
 mypy_path = "src"
 
+# Pillow só é usado pelo script das figuras do banner (scripts/figuras_do_banner.py), não pelo pacote.
+[[tool.mypy.overrides]]
+module = ["PIL", "PIL.*"]
+ignore_missing_imports = true
+
 [tool.ruff]
 line-length = 110
 target-version = "py311"
