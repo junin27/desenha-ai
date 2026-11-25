@@ -14,8 +14,8 @@
 
 ## 3. Borracha na captura
 
-- [ ] 3.1 `captura-do-desenho.ts`: modo lápis/borracha; teste em jsdom com Pointer Events simulados: com a borracha sobre um traço, o ouvinte recebe os traços restantes com `terminado = true`; sem traço restante, a tela chama `limparDesenho()`; o cronômetro não é tocado. Verifica: `npm --prefix app test -- captura`
-- [ ] 3.2 `tela-desenho.ts`: botões Lápis/Borracha/Limpar com a ferramenta ativa destacada e Lápis selecionado no começo da rodada (teste da tela). Verifica: `npm --prefix app test -- tela-desenho`
+- [x] 3.1 `captura-do-desenho.ts`: modo lápis/borracha; teste em jsdom com Pointer Events simulados: com a borracha sobre um traço, o ouvinte recebe os traços restantes com `terminado = true`; sem traço restante, a tela chama `limparDesenho()`; o cronômetro não é tocado. Verifica: `npm --prefix app test -- captura`
+- [x] 3.2 `tela-desenho.ts`: botões Lápis/Borracha/Limpar com a ferramenta ativa destacada e Lápis selecionado no começo da rodada (teste da tela). Verifica: `npm --prefix app test -- tela-desenho`
 
 ## 4. Telas
 

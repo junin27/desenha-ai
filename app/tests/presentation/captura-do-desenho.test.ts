@@ -102,3 +102,55 @@ describe("captura do desenho", () => {
     expect(captura.tracos).toEqual([]);
   });
 });
+
+describe("borracha na captura (spec ferramentas-de-desenho)", () => {
+  function desenharDoisTracos(): void {
+    ponteiro("pointerdown", 0, 0);
+    ponteiro("pointerup", 100, 0);
+    ponteiro("pointerdown", 0, 100);
+    ponteiro("pointerup", 100, 100);
+    avisos = [];
+  }
+
+  it("test_borracha_sobre_um_traco_avisa_os_restantes_como_traco_terminado", () => {
+    desenharDoisTracos();
+    captura.usar("borracha");
+    ponteiro("pointerdown", 50, 5);
+    ponteiro("pointerup", 50, 5);
+    expect(captura.tracos).toEqual([
+      [
+        [0, 100],
+        [100, 100],
+      ],
+    ]);
+    expect(avisos).toEqual([{ tracos: captura.tracos, tracoTerminado: true }]);
+  });
+
+  it("test_borracha_longe_dos_tracos_nao_avisa_nada", () => {
+    desenharDoisTracos();
+    captura.usar("borracha");
+    ponteiro("pointerdown", 50, 50);
+    ponteiro("pointermove", 60, 50);
+    ponteiro("pointerup", 60, 50);
+    expect(captura.tracos).toHaveLength(2);
+    expect(avisos).toEqual([]);
+  });
+
+  it("test_borracha_que_apaga_tudo_avisa_desenho_vazio", () => {
+    ponteiro("pointerdown", 0, 0);
+    ponteiro("pointerup", 100, 0);
+    avisos = [];
+    captura.usar("borracha");
+    ponteiro("pointerdown", 50, 0);
+    expect(avisos).toEqual([{ tracos: [], tracoTerminado: true }]);
+  });
+
+  it("test_lapis_volta_a_desenhar_depois_da_borracha", () => {
+    captura.usar("borracha");
+    captura.usar("lapis");
+    ponteiro("pointerdown", 1, 1);
+    ponteiro("pointerup", 2, 2);
+    expect(captura.tracos).toHaveLength(1);
+    expect(captura.ferramenta).toBe("lapis");
+  });
+});
