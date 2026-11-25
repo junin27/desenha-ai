@@ -97,3 +97,14 @@ export interface PreferenciasDoEstande {
   vozLigada(): boolean | undefined;
   gravarVozLigada(ligada: boolean): void;
 }
+
+/** Modo de desenho do visitante (spec `desenho-com-a-mao`, "Modo de desenho"). */
+export type ModoDeDesenho = "mouse" | "mao";
+
+/** Preferências do desenho no navegador do estande: som do lápis e modo Mouse/Mão. */
+export interface PreferenciasDoDesenho {
+  somLigado(): boolean;
+  gravarSomLigado(ligado: boolean): void;
+  modo(): ModoDeDesenho;
+  gravarModo(modo: ModoDeDesenho): void;
+}
