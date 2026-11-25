@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   limparNome,
+  ordemOficialDoPlacar,
   ordenarPlacar,
   pontosDaPartida,
   pontosDaRodada,
@@ -61,5 +62,11 @@ describe("Requisito: Ordem do placar", () => {
     const placar = ordenarPlacar(Array.from({ length: 12 }, (_, i) => partida(`J${i}`, i * 10, i)));
     expect(placar).toHaveLength(10);
     expect(placar[0]?.nome).toBe("J11");
+  });
+
+  it("test_ordem_oficial_numera_todas_as_12_partidas", () => {
+    const ordem = ordemOficialDoPlacar(Array.from({ length: 12 }, (_, i) => partida(`J${i}`, i * 10, i)));
+    expect(ordem).toHaveLength(12);
+    expect(ordem[11]?.nome).toBe("J0");
   });
 });

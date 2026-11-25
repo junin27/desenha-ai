@@ -2,9 +2,9 @@
 
 ## 1. Domínio (TDD, funções puras)
 
-- [ ] 1.1 `domain/desenho/borracha.ts`: testes de `tracosForaDaBorracha` (apaga a porta e mantém telhado, paredes, janela na ordem; nada sai a 40 px; usa distância ao segmento, não só aos pontos) falhando → implementar. Verifica: `npm --prefix app test -- borracha`
-- [ ] 1.2 `domain/rodada/pontuacao.ts`: extrair `ordemOficialDoPlacar` (sem corte) e manter `ordenarPlacar` = ordem cortada em 10; teste de contrato e testes atuais continuam verdes, novo teste "12 partidas numeradas de 1º a 12º". Verifica: `npm --prefix app test -- pontuacao contrato-regras`
-- [ ] 1.3 `domain/rodada/listagem-do-placar.ts`: testes de `listarPlacar` (10 sem busca; busca "peao" acha "Peão Veloz"; busca alcança a 12ª com posição 12º; ordens Pontos/A–Z/Recentes; partida recém-jogada fora do top 10 anexada abaixo da 10ª; sem resultado devolve lista vazia) → implementar. Verifica: `npm --prefix app test -- listagem-do-placar`
+- [x] 1.1 `domain/desenho/borracha.ts`: testes de `tracosForaDaBorracha` (apaga a porta e mantém telhado, paredes, janela na ordem; nada sai a 40 px; usa distância ao segmento, não só aos pontos) falhando → implementar. Verifica: `npm --prefix app test -- borracha`
+- [x] 1.2 `domain/rodada/pontuacao.ts`: extrair `ordemOficialDoPlacar` (sem corte) e manter `ordenarPlacar` = ordem cortada em 10; teste de contrato e testes atuais continuam verdes, novo teste "12 partidas numeradas de 1º a 12º". Verifica: `npm --prefix app test -- pontuacao contrato-regras`
+- [x] 1.3 `domain/rodada/listagem-do-placar.ts`: testes de `listarPlacar` (10 sem busca; busca "peao" acha "Peão Veloz"; busca alcança a 12ª com posição 12º; ordens Pontos/A–Z/Recentes; partida recém-jogada fora do top 10 anexada abaixo da 10ª; sem resultado devolve lista vazia) → implementar. Verifica: `npm --prefix app test -- listagem-do-placar`
 
 ## 2. Humor do Zé (TDD)
 

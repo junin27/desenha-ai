@@ -8,7 +8,7 @@ export const RODADAS_POR_PARTIDA = 3;
 const PONTOS_ACERTOU = 100;
 const PONTOS_QUASE = 30;
 const BONUS_MAXIMO = 50;
-const TAMANHO_DO_PLACAR = 10;
+export const TAMANHO_DO_PLACAR = 10;
 const TAMANHO_MAXIMO_DO_NOME = 16;
 
 export interface PartidaNoPlacar {
@@ -46,9 +46,12 @@ export function limparNome(nome: string): Resultado<string, ErroDeRegra> {
   return ok(limpo);
 }
 
-/** Mais pontos primeiro; empate fica com quem terminou antes; corta nas 10 melhores. */
+/** Ordem oficial, sem corte: mais pontos primeiro; empate fica com quem terminou antes. */
+export function ordemOficialDoPlacar(partidas: readonly PartidaNoPlacar[]): PartidaNoPlacar[] {
+  return [...partidas].sort((a, b) => b.pontos - a.pontos || a.terminadaEmMs - b.terminadaEmMs);
+}
+
+/** A ordem oficial cortada nas 10 melhores (o mesmo contrato do `ordenar_placar` do Python). */
 export function ordenarPlacar(partidas: readonly PartidaNoPlacar[]): PartidaNoPlacar[] {
-  return [...partidas]
-    .sort((a, b) => b.pontos - a.pontos || a.terminadaEmMs - b.terminadaEmMs)
-    .slice(0, TAMANHO_DO_PLACAR);
+  return ordemOficialDoPlacar(partidas).slice(0, TAMANHO_DO_PLACAR);
 }
