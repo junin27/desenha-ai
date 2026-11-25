@@ -56,6 +56,17 @@ A avaliação SHALL calcular a memória teórica dos pesos (parâmetros × bytes
 - **WHEN** a tabela é calculada para 2,03 × 10⁹ parâmetros
 - **THEN** FP32 = 8,12 GB (não cabe), FP16 = 4,06 GB (não cabe), INT8 = 2,03 GB (cabe, margem 0,77 GB) e INT4 = 1,015 GB (cabe, margem 1,785 GB)
 
+### Requirement: Contagem de parâmetros sem pesos amarrados em dobro
+O total de parâmetros da tabela e do percentual do LoRA SHALL somar as formas dos tensores do checkpoint original e, quando a configuração amarra os embeddings de entrada e saída, SHALL contar `lm_head.weight` uma vez só (no Qwen3-1.7B o arquivo guarda as duas cópias da mesma matriz).
+
+#### Scenario: Qwen3-1.7B com embeddings amarrados
+- **WHEN** os tensores somam 2.031.739.904 valores, `lm_head.weight` tem forma 151.936 × 2.048 e os embeddings são amarrados
+- **THEN** o total é 1.720.574.976 parâmetros
+
+#### Scenario: Embeddings não amarrados
+- **WHEN** a configuração não amarra os embeddings
+- **THEN** `lm_head.weight` entra na soma
+
 ### Requirement: Artefatos do modelo
 O notebook SHALL entregar o GGUF Q4_K_M do Zé destilado (o que roda no evento), `metricas_slm.json` (métricas por modelo e tarefa, perplexidade de validação base × destilado, critério de aprovação, tabela de quantização, parâmetros treináveis do LoRA) e as saídas de teste dos dois modelos lado a lado, para conferência e para o banner.
 

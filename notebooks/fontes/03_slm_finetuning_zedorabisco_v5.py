@@ -154,7 +154,7 @@ from trl import SFTConfig, SFTTrainer
 from desenha_ml.avaliacao_do_ze import avaliar_criterio_do_ze, avaliar_saida, resumir
 from desenha_ml.ficha_tecnica import montar_ficha
 from desenha_ml.prompt_qwen import INICIO_DA_RESPOSTA, PARADA, prompt_de_inferencia, texto_de_treino
-from desenha_ml.quantizacao import tabela_de_quantizacao
+from desenha_ml.quantizacao import contar_parametros_unicos, tabela_de_quantizacao
 
 MODO_ENSAIO = False                  # False = rodada completa (gera o GGUF); True = só testa as etapas (~10 min)
 MODELO_BASE = "unsloth/Qwen3-1.7B"   # plano B mais rápido em CPU: "unsloth/Qwen3-0.6B" (D3 do design)
@@ -192,8 +192,12 @@ print(ds_treino[0]["text"])
 # %%
 model, tokenizer = FastLanguageModel.from_pretrained(MODELO_BASE, max_seq_length=MAX_SEQ, load_in_4bit=True)
 print("VRAM após carregar em 4 bits:", round(torch.cuda.memory_allocated() / 1e9, 2), "GB")
-N_PARAMETROS = sum(get_safetensors_metadata(MODELO_ORIGINAL).parameter_count.values())
-print(f"Parâmetros do {MODELO_ORIGINAL} (metadados safetensors): {N_PARAMETROS:,}")
+# Soma as formas dos tensores do checkpoint original; o Qwen3 amarra embeddings e lm_head (mesma matriz, conta 1 vez)
+METADADOS = get_safetensors_metadata(MODELO_ORIGINAL)
+FORMAS = {nome: tensor.shape for arquivo in METADADOS.files_metadata.values() for nome, tensor in arquivo.tensors.items()}
+N_PARAMETROS = contar_parametros_unicos(FORMAS, embeddings_amarrados=bool(model.config.tie_word_embeddings))
+print(f"Parâmetros do {MODELO_ORIGINAL}: {N_PARAMETROS:,} (soma bruta dos metadados: "
+      f"{sum(METADADOS.parameter_count.values()):,}; embeddings amarrados: {model.config.tie_word_embeddings})")
 
 model = FastLanguageModel.get_peft_model(
     model, r=16, lora_alpha=16, lora_dropout=0, bias="none",

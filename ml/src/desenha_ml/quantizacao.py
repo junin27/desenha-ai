@@ -8,7 +8,8 @@ Exemplo:
     ['INT8', 'INT4']
 """
 
-from collections.abc import Mapping
+import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 MEMORIA_TOTAL_GB = 4.0
@@ -40,3 +41,21 @@ def tabela_de_quantizacao(parametros: float, tamanhos_reais_gb: Mapping[str, flo
             )
         )
     return linhas
+
+
+SAIDA_AMARRADA = "lm_head.weight"
+
+
+def contar_parametros_unicos(formas: Mapping[str, Sequence[int]], *, embeddings_amarrados: bool) -> int:
+    """Soma as formas dos tensores; com embeddings amarrados, o `lm_head` é a mesma matriz e conta uma vez.
+
+    O checkpoint do Qwen3-1.7B guarda as duas cópias, e somar os metadados dava 2,03 bilhões em vez de 1,72.
+
+    >>> contar_parametros_unicos({"embed": (4, 2), "lm_head.weight": (4, 2)}, embeddings_amarrados=True)
+    8
+    """
+    return sum(
+        math.prod(forma)
+        for nome, forma in formas.items()
+        if not (embeddings_amarrados and nome == SAIDA_AMARRADA)
+    )

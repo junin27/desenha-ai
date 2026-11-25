@@ -340,3 +340,11 @@ def test_notebook_3_baixa_tudo_em_vez_de_usar_o_drive() -> None:
     # o GGUF tem célula própria: dá para repetir só o download se o navegador falhar
     celula_do_gguf = next(c for c in celulas if "baixar_com_menu(GGUF_DO_ZE)" in c)
     assert "zipfile" not in celula_do_gguf
+
+
+def test_notebook_3_conta_parametros_sem_duplicar_embeddings_amarrados() -> None:
+    """Diagnóstico de 25/11: somar `parameter_count` dava 2,03 bi em vez de 1,72 bi (spec modelo-do-ze)."""
+    codigo = "\n".join(_celulas_de_codigo("03_slm_finetuning_zedorabisco_v5"))
+
+    assert "N_PARAMETROS = sum(" not in codigo
+    assert "contar_parametros_unicos(" in codigo and "tie_word_embeddings" in codigo

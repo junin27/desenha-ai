@@ -2,7 +2,7 @@
 
 import pytest
 
-from desenha_ml.quantizacao import MEMORIA_LIVRE_GB, tabela_de_quantizacao
+from desenha_ml.quantizacao import MEMORIA_LIVRE_GB, contar_parametros_unicos, tabela_de_quantizacao
 
 DOIS_BILHOES = 2.03e9
 
@@ -36,3 +36,20 @@ def test_cenario_da_atividade_1() -> None:
     linhas = {linha.formato: linha for linha in tabela_de_quantizacao(3.2e9, {})}
     assert [linhas[f].cabe for f in ("FP32", "FP16/BF16", "INT8", "INT4")] == [False, False, False, True]
     assert linhas["INT4"].margem_gb == pytest.approx(1.2)
+
+
+def test_contagem_qwen3_com_embeddings_amarrados_conta_o_lm_head_uma_vez() -> None:
+    lado = 151_936 * 2_048
+    formas = {
+        "model.embed_tokens.weight": (151_936, 2_048),
+        "lm_head.weight": (151_936, 2_048),
+        "model.layers.pesos": (2_031_739_904 - 2 * lado,),
+    }
+
+    assert contar_parametros_unicos(formas, embeddings_amarrados=True) == 1_720_574_976
+
+
+def test_contagem_com_embeddings_nao_amarrados_soma_o_lm_head() -> None:
+    formas = {"model.embed_tokens.weight": (10, 4), "lm_head.weight": (10, 4), "camada": (3, 2)}
+
+    assert contar_parametros_unicos(formas, embeddings_amarrados=False) == 86
