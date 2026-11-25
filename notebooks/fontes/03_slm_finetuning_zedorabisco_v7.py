@@ -20,7 +20,7 @@
 # **mesmo** que o jogo envia ao `llama-server` (contrato Python ↔ TypeScript).
 #
 # > **Antes de rodar:** GPU **T4** (ou L4). A célula de instalação abre um menu de upload para o `desenha_ml-*.whl`, o
-# > `dataset_slm.zip` **revisado** (`notebooks/resultados/dataset_slm_v2/`) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
+# > `dataset_slm.zip` **revisado** (`notebooks/resultados/dataset_slm_v3/`) e o `modelos_redes.zip` (Parte 1). O notebook já vem em **`MODO_ENSAIO = False`**
 # > (rodada completa, ≈ 40–60 min, gera o GGUF do Zé). O ensaio (`True`, ≈ 10 min) só testa as etapas e não vale para o
 # > critério de aprovação.
 
@@ -172,11 +172,13 @@ print(torch.cuda.get_device_name(0), "| VRAM", round(torch.cuda.get_device_prope
 # %%
 exigir_arquivos("dataset_slm.zip", "modelos_redes.zip")
 with zipfile.ZipFile("/content/dataset_slm.zip") as arquivo_zip:
-    # A v6 treina com o treino revisado (raciocínio do veredito pela regra, charada sem a palavra no pensamento)
-    if "relatorio_revisao.json" not in arquivo_zip.namelist():
-        raise RuntimeError("Este dataset_slm.zip é o antigo. Suba o de notebooks/resultados/dataset_slm_v2/ "
+    # A v7 treina com o treino revisado: veredito pela regra, charada sem a palavra e sem "o que é, o que é"
+    REVISAO = (json.loads(arquivo_zip.read("relatorio_revisao.json"))
+               if "relatorio_revisao.json" in arquivo_zip.namelist() else {})
+    if "charada_sem_repeticao" not in REVISAO.get("motivos", {}):
+        raise RuntimeError("Este dataset_slm.zip é antigo. Suba o de notebooks/resultados/dataset_slm_v3/ "
                            "(Ambiente de execução → Desconectar e excluir, e rode de novo).")
-    print("Revisão do treino:", json.loads(arquivo_zip.read("relatorio_revisao.json")))
+    print("Revisão do treino:", REVISAO)
     arquivo_zip.extractall("/content/dataset_slm")
 with zipfile.ZipFile("/content/modelos_redes.zip") as arquivo_zip:
     FICHA = montar_ficha(json.loads(arquivo_zip.read("metricas_redes.json")))
@@ -345,9 +347,12 @@ display(pd.DataFrame([vars(linha) for linha in quantizacao]).style.format(precis
 
 # %%
 q4 = next(g for g in arquivos_gguf if "Q4_K_M" in Path(g).name.upper())
+q8 = next(g for g in arquivos_gguf if "Q8_0" in Path(g).name.upper())
 GGUF_DO_ZE = SAIDA / "zedorabisco-1.7b-Q4_K_M.gguf"
+GGUF_Q8_DO_ZE = SAIDA / "zedorabisco-1.7b-Q8_0.gguf"
 if not MODO_ENSAIO:
     shutil.copy(q4, GGUF_DO_ZE)
+    shutil.copy(q8, GGUF_Q8_DO_ZE)
 metricas = {
     "ensaio": MODO_ENSAIO, "modelo_base": MODELO_BASE, "parametros": N_PARAMETROS,
     "lora": {"r": 16, "alpha": 16, "treinaveis": TREINAVEIS, "percentual": 100 * TREINAVEIS / N_PARAMETROS},
@@ -375,17 +380,26 @@ if MODO_ENSAIO:
 else:
     baixar_com_menu(GGUF_DO_ZE)
 
+# %%
+# Download do GGUF Q8_0 (~1,8 GB). Serve para medir, fora do Colab, se a perda de formato da v6 era da
+# quantização em 4 bits. Se falhar, rode só esta célula de novo.
+if MODO_ENSAIO:
+    print("Ensaio: o GGUF não é baixado (só a rodada completa gera o Zé final).")
+else:
+    baixar_com_menu(GGUF_Q8_DO_ZE)
+
 # %% [markdown]
 # ## 8. Próximos passos (fora do Colab)
 # 1. Baixe também este notebook já rodado (*Arquivo → Fazer download → .ipynb*).
 # 2. Crie uma pasta em `notebooks/resultados/` do projeto e coloque nela o `resultados_ze.zip`, o
-#    `zedorabisco-1.7b-Q4_K_M.gguf` e o notebook rodado.
+#    `zedorabisco-1.7b-Q4_K_M.gguf`, o `zedorabisco-1.7b-Q8_0.gguf` e o notebook rodado.
 # 3. Só siga para a demo se o critério acima disser **APROVADO**.
 
 # %%
 print("Rodada completa" if not MODO_ENSAIO else "ENSAIO (não gera o GGUF final)")
 print("Critério de aprovação:", "APROVADO" if criterio.aprovado else ("ENSAIO" if criterio.aprovado is None else "REPROVADO"), criterio.motivos)
-print("Baixados: resultados_ze.zip e zedorabisco-1.7b-Q4_K_M.gguf (mais o notebook: Arquivo → Fazer download).")
-print("Coloque os três numa pasta em notebooks/resultados/ do projeto e me avise.")
+print("Baixados: resultados_ze.zip, zedorabisco-1.7b-Q4_K_M.gguf e zedorabisco-1.7b-Q8_0.gguf "
+      "(mais o notebook: Arquivo → Fazer download).")
+print("Coloque os quatro numa pasta em notebooks/resultados/ do projeto e me avise.")
 if criterio.aprovado is False:
     print("ATENÇÃO: critério REPROVADO. Não use este GGUF na demo; mande esta saída para ajustar o treino.")

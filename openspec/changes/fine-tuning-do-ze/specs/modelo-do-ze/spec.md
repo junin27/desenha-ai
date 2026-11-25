@@ -68,11 +68,11 @@ O total de parâmetros da tabela e do percentual do LoRA SHALL somar as formas d
 - **THEN** `lm_head.weight` entra na soma
 
 ### Requirement: Artefatos do modelo
-O notebook SHALL entregar o GGUF Q4_K_M do Zé destilado (o que roda no evento), `metricas_slm.json` (métricas por modelo e tarefa, perplexidade de validação base × destilado, critério de aprovação, tabela de quantização, parâmetros treináveis do LoRA) e as saídas de teste dos dois modelos lado a lado, para conferência e para o banner.
+O notebook SHALL entregar os GGUF Q4_K_M e Q8_0 do Zé destilado (a versão do evento é escolhida medindo os dois na validação), `metricas_slm.json` (métricas por modelo e tarefa, perplexidade de validação base × destilado, critério de aprovação, tabela de quantização, parâmetros treináveis do LoRA) e as saídas de teste dos dois modelos lado a lado, para conferência e para o banner.
 
 #### Scenario: Entrega completa
 - **WHEN** o notebook termina a rodada completa
-- **THEN** o Drive contém o GGUF Q4_K_M, `metricas_slm.json` e o CSV de saídas base × destilado
+- **THEN** o notebook baixa o GGUF Q4_K_M, o GGUF Q8_0 e um zip com `metricas_slm.json` e o CSV de saídas base × destilado, cada GGUF numa célula que pode ser repetida
 
 ### Requirement: Modo ensaio
 O notebook SHALL ter um modo ensaio que treina por poucos passos e avalia poucos exemplos de teste, percorrendo todas as etapas (inclusive a exportação GGUF), para descobrir erros de ambiente em minutos antes da rodada completa. Resultados do modo ensaio SHALL ser marcados como ensaio e não valem para o critério de aprovação.
