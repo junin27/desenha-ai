@@ -735,7 +735,7 @@ textarea {
   top: 34%;
   left: 50%;
   padding: 0.05em 0.5em;
-  font-size: clamp(56px, 6vw, 92px);
+  font-size: clamp(44px, 4.6vw, 88px);
   font-weight: 900;
   text-transform: uppercase;
   background: rgb(255 253 246 / 85%);
@@ -1009,6 +1009,11 @@ textarea {
   pointer-events: none;
 }
 
+/* Fora da animação a pincelada nem é desenhada (a ponta do traço ficava na borda da tela). */
+.pincelada:not(.vai) {
+  display: none;
+}
+
 .pincelada svg {
   width: 100%;
   height: 100%;
@@ -1017,8 +1022,8 @@ textarea {
 .pincelada path {
   fill: none;
   stroke: var(--terracota);
-  stroke-width: 560;
-  stroke-linecap: round;
+  stroke-width: 1100;
+  stroke-linecap: butt;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
 }

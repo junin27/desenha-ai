@@ -49,3 +49,21 @@ Preparação: `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedora
   - rodada 3 com o **Qwen3 base** narrando: charada e narração fora do formato, as duas pela reserva.
   - Painel (F2): Zé destilado 3 falas aceitas e 1 reserva; Qwen3 base 0 e 2; CNN 8 ms e LSTM 2,3 ms por palpite; tela "Pensando…" sem o raciocínio durante a charada.
 - **Não conferido aqui:** a janela em tela cheia aberta pelo `Iniciar Desenha Aí.bat` (o ensaio usou o navegador do app em `127.0.0.1:8080`), Wi-Fi desligado e a máquina do evento.
+
+## Interface Tinta cinética (change visual-tinta-cinetica, tarefas 6.1 e 6.2)
+
+Tiradas em 25/11/2026 na pasta `tinta-cinetica/` pelo `scripts/capturar_telas.mjs`: o Edge do Windows em modo headless, comandado pelo protocolo de depuração, joga uma partida inteira no build (`vite preview`, porta 4173) com as **redes treinadas** (`modelos_redes.zip`) e **sem** o `llama-server` (charadas e narrações da reserva). As imagens estão no tamanho real do viewport.
+
+O roteiro é sempre o mesmo: abertura → apelido (com o Pergunte ao Zé) → charada → desenho de uma casa (3 traços) com a borracha selecionada → veredito → rodada 2 apertando "Pronto" sem desenhar → rodada 3 com a casa de novo → placar. O desafio é sorteado, então o veredito varia entre as execuções; numa delas o desafio foi "casa" e a captura mostra o ACERTOU com o Zé comemorando.
+
+O que foi conferido em cada execução (o script grava um `*-relatorio.json` ao lado das imagens):
+- **1366×768 e 1920×1080:** nenhuma das 9 telas tem rolagem vertical ou horizontal (`scrollHeight <= innerHeight` e `scrollWidth <= innerWidth`).
+- **Humores do Zé no momento certo:** torcendo no desenho, coçando a cabeça no ERROU, bravo na rodada sem traço e comemorando no ACERTOU.
+- **Movimento reduzido** (`prefers-reduced-motion: reduce` emulado pelo navegador, arquivos `1366x768-reduzido-*`): a partida inteira chega ao placar sem nenhum rabisco de fundo e sem pincelada.
+
+Problemas que as capturas pegaram e já foram corrigidos:
+- A ponta arredondada da pincelada ficava desenhada na borda direita da tela depois da animação e escondia as porcentagens dos palpites. Agora a ponta é reta, o caminho passa das bordas e a pincelada some ao terminar.
+- O selo "ACERTOU!" encostava na borda esquerda a 1366×768 e foi reduzido.
+- O título da abertura ficava pequeno porque o `h1` encolhia dentro do grid.
+
+Não coberto aqui: o momento "Pensando…" da charada (sem o `llama-server` a reserva responde na hora), o Zé respondendo com o modelo de verdade e o FPS das animações no notebook do evento (fica para o ensaio de 29/11).

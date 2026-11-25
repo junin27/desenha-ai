@@ -34,8 +34,8 @@
 
 ## 6. Conferência no navegador
 
-- [ ] 6.1 Rodar `npm --prefix app run dev` com os modelos de `copiar_modelos.sh` (Zé de reserva) e jogar uma partida inteira a 1366×768 e a 1920×1080: nenhuma tela com rolagem, humores no momento certo, borracha reclassificando, veredito com o desenho certo, placar com pesquisa. Registrar capturas em `docs/capturas/`.
-- [ ] 6.2 Mesma partida com movimento reduzido ligado (emulação do navegador): sem pincelada nem confete, partida completa.
+- [x] 6.1 Rodar `npm --prefix app run dev` com os modelos de `copiar_modelos.sh` (Zé de reserva) e jogar uma partida inteira a 1366×768 e a 1920×1080: nenhuma tela com rolagem, humores no momento certo, borracha reclassificando, veredito com o desenho certo, placar com pesquisa. Registrar capturas em `docs/capturas/`.
+- [x] 6.2 Mesma partida com movimento reduzido ligado (emulação do navegador): sem pincelada nem confete, partida completa.
 
 ## 7. Verificação
 

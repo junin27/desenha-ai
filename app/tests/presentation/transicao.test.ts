@@ -37,3 +37,12 @@ describe("Requisito: Transição entre telas (spec identidade-visual)", () => {
     expect(transicao.raiz.querySelector("svg")?.getAttribute("aria-hidden")).toBe("true");
   });
 });
+
+describe("Requisito: Transição entre telas — fim da pincelada", () => {
+  it("test_pincelada_some_ao_terminar_a_animacao", () => {
+    const transicao = new TransicaoPorPincelada(450);
+    transicao.trocar(() => undefined);
+    transicao.raiz.dispatchEvent(new Event("animationend"));
+    expect(transicao.raiz.classList.contains("vai")).toBe(false);
+  });
+});

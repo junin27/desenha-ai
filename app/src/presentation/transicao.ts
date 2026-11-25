@@ -19,10 +19,14 @@ export class TransicaoPorPincelada {
     const modelo = document.createElement("template");
     modelo.innerHTML =
       '<svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">' +
-      '<path pathLength="1" d="M-300 450 C 400 80, 1200 820, 1900 450"/></svg>';
+      '<path pathLength="1" d="M-900 450 C 400 80, 1200 820, 2500 450"/></svg>';
     this.raiz = criar("div", { classe: "pincelada", dados: { parte: "pincelada" } }, [
       ...modelo.content.childNodes,
     ]);
+    // Terminada a pincelada, ela some de vez (spec identidade-visual: a tela nova fica visível).
+    this.raiz.addEventListener("animationend", () => {
+      this.raiz.classList.remove("vai");
+    });
   }
 
   trocar(mostrarTelaNova: () => void): void {
