@@ -93,11 +93,11 @@ def test_pedido_da_charada_usa_o_prompt_do_qwen_e_a_parada() -> None:
 
 
 def test_pedido_da_charada_gera_como_o_jogo() -> None:
-    """A fala real do checklist usa a mesma geração do jogo (jogo-web D8: 0,3 e penalidade 1,1)."""
+    """A fala real do checklist usa a mesma geração do jogo (jogo-web D8: 0,3 e sem penalidade)."""
     corpo = json.loads(_carregar_script().corpo_do_pedido_da_charada())
 
     assert corpo["temperature"] == 0.3
-    assert corpo["repeat_penalty"] == 1.1
+    assert corpo["repeat_penalty"] == 1.0
 
 
 def test_pedir_charada_sem_servidor_devolve_none(tmp_path: Path) -> None:

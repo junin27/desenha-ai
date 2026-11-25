@@ -20,9 +20,10 @@ export interface ConfiguracaoDoNarrador {
 
 const CONFIGURACAO_PADRAO: ConfiguracaoDoNarrador = { endereco: "http://127.0.0.1:8080", limiteMs: 25_000 };
 const MAXIMO_DE_TOKENS_NOVOS = 300;
-// Medido com o Zé treinado (design D8): 0,3 + penalidade 1,1 evita o laço da geração gulosa e erra menos o veredito.
+// Medido com o Zé treinado (design D8): 0,3 erra menos o veredito que 0,7. Sem penalidade de repetição (1,0):
+// o raciocínio termina com "o veredito é ERROU" e a penalidade fazia o Zé trocar o rótulo ("VEREDITO: PELADO").
 const TEMPERATURA = 0.3;
-const PENALIDADE_DE_REPETICAO = 1.1;
+const PENALIDADE_DE_REPETICAO = 1.0;
 
 /**
  * Zé rodando no `llama-server` (D5 do design): pedido com *streaming*, leitura parcial a cada pedaço e

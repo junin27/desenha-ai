@@ -59,10 +59,10 @@ describe("chamada ao llama-server", () => {
     });
   });
 
-  it("gera com temperatura 0,3 e repeat_penalty 1,1 (medido com o Zé treinado: sem laço, mais vereditos certos)", async () => {
+  it("gera com temperatura 0,3 e sem penalidade de repetição (a penalidade troca o rótulo do veredito)", async () => {
     const { buscar, pedidos } = servidorFalso([FIM]);
     await new NarradorLlamaServer(buscar, new RelogioFalso()).falar(ENTRADA, () => undefined);
-    expect(pedidos[0]?.corpo).toMatchObject({ temperature: 0.3, repeat_penalty: 1.1 });
+    expect(pedidos[0]?.corpo).toMatchObject({ temperature: 0.3, repeat_penalty: 1.0 });
   });
 
   it("usa o endereço configurado", async () => {

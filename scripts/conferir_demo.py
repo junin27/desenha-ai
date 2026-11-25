@@ -62,7 +62,7 @@ CHAVES_DE_VOZES = (
     r"SOFTWARE\Microsoft\Speech\Voices\Tokens",
 )
 TEMPERATURA_DA_CHARADA = 0.3  # a mesma do jogo (narrador-llama-server.ts)
-PENALIDADE_DE_REPETICAO = 1.1  # idem
+PENALIDADE_DE_REPETICAO = 1.0  # idem: sem penalidade
 ACAO_REFAZER = "rode a preparação de novo"
 SEGUNDOS_MAXIMOS_DO_PEDIDO = 60
 SEGUNDOS_DA_CONEXAO = 0.5
