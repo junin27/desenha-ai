@@ -90,3 +90,22 @@ Rodado em 25/11/2026 no Edge headless (build + `preview`, redes treinadas, sem `
 - A liberação da câmera para `localhost` no navegador do evento (fica no checklist).
 - A faixa de botões "Voz pt-BR" e "Bastidores" encosta de leve no balão do Zé a 1366×768 (visível na `4c`); não afeta a rolagem e não foi mexido.
 
+**Teste com webcam e mão reais (tarefa 5.1, parcial)** — 25/11/2026, feito pelo usuário no próprio notebook, no build servido em `localhost:4173`: ele relatou que o modo Mão **"ficou bom"**. O relato é um aprovado geral: não veio o detalhe de cada gesto (lápis, borracha, mão aberta por 3 s, troca Mouse↔Mão) nem o número de quadros por segundo. Por isso a 5.1 **continua aberta**: falta medir o FPS com as redes ligadas (meta ≥ 10), desenhando com a mão visível. Para medir, abra o console (F12) e cole:
+
+```js
+(() => {
+  let n = 0;
+  const original = CanvasRenderingContext2D.prototype.clearRect;
+  CanvasRenderingContext2D.prototype.clearRect = function (...a) {
+    if (this.canvas.classList.contains("pontos-da-mao")) n++;
+    return original.apply(this, a);
+  };
+  setTimeout(() => {
+    CanvasRenderingContext2D.prototype.clearRect = original;
+    console.log(`Detecções por segundo: ${(n / 10).toFixed(1)} (meta ≥ 10; o limite do código é 20)`);
+  }, 10000);
+})();
+```
+
+O trecho conta quantas vezes a miniatura é atualizada em 10 s, que é o ritmo da detecção da mão. Registrar o número aqui no ensaio de 29/11, no notebook do evento.
+

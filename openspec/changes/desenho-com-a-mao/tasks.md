@@ -36,7 +36,7 @@
 
 ## 5. Conferência real
 
-- [ ] 5.1 Na máquina com webcam: desenhar uma casa com o dedo, apagar com a mão fechada, limpar com a mão aberta parada 3 s, trocar Mouse↔Mão no meio da rodada; medir quadros por segundo com as redes ligadas (meta ≥ 10). Registrar em `docs/capturas/README.md`.
+- [ ] 5.1 Na máquina com webcam: desenhar uma casa com o dedo, apagar com a mão fechada, limpar com a mão aberta parada 3 s, trocar Mouse↔Mão no meio da rodada; medir quadros por segundo com as redes ligadas (meta ≥ 10). Registrar em `docs/capturas/README.md`. **Parcial (25/11/2026):** o usuário testou com webcam e mão reais e relatou que "ficou bom"; os gestos e a fluidez foram aprovados por ele, mas sem o número de quadros por segundo nem o detalhe de cada gesto. **Falta só medir o FPS com as redes ligadas** (trecho de console em `docs/capturas/README.md`), no ensaio de 29/11; só então marcar esta tarefa.
 - [x] 5.2 Capturas novas (`scripts/capturar_telas.mjs`) do modo Mouse com o lápis no quadro; nenhuma tela com rolagem; `bash scripts/verificar.sh` verde. Feito em 25/11/2026: 20 capturas (10 telas a 1366×768 e a 1920×1080, incluindo a 4c com o modo Mão ligado) em `docs/capturas/desenho-com-a-mao/`, nenhuma com rolagem; verificação verde (472 testes Python, 622 TypeScript)
 
 ## Workflow follow-up
