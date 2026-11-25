@@ -27,13 +27,13 @@ def _revisar_linhas(
     novas_chatml, novas_sharegpt, motivos = [], [], Counter[str]()
     for linha_chatml, linha_sharegpt in zip(chatml, sharegpt, strict=True):
         mensagens = linha_chatml["messages"]
-        revisada, motivo = revisar_saida(
+        revisada, motivos_da_linha = revisar_saida(
             linha_chatml["tarefa"],
             mensagens[1]["content"],
             linha_chatml["meta"],
             mensagens[2]["content"],
         )
-        motivos[motivo] += 1
+        motivos.update(motivos_da_linha)
         if revisada is None:
             continue
         mensagens[2]["content"] = revisada
@@ -70,9 +70,7 @@ def revisar_zip(entrada: Path, saida: Path) -> dict[str, Any]:
         destino.writestr(TREINO_SHAREGPT, "\n".join(novas_sharegpt) + "\n")
         relatorio = {
             "treino": {"antes": len(chatml), "depois": len(novas_chatml)},
-            "motivos": {
-                motivo: n for motivo, n in motivos.items() if motivo != "sem_mudanca"
-            },
+            "motivos": dict(motivos),
         }
         destino.writestr(RELATORIO, json.dumps(relatorio, ensure_ascii=False, indent=1))
     return relatorio

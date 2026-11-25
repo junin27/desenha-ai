@@ -139,3 +139,10 @@ No treino, as frases do `<pensamento>` de CHARADA em que a palavra secreta vaza 
 #### Scenario: Frase que cita a palavra
 - **WHEN** o pensamento é "A palavra é sol. Vou falar do calor e da luz que aquece o peão na roça bem cedinho."
 - **THEN** o pensamento revisado é "Vou falar do calor e da luz que aquece o peão na roça bem cedinho."
+
+### Requirement: Abertura da charada sem repetição
+No treino, cada "o que é, o que é" de uma CHARADA (com ou sem acento, vírgula ou dois-pontos entre as duas partes) SHALL virar um só "O que é", mantendo a maiúscula inicial e a pontuação seguinte. A fórmula repetida, presente em 36 das 129 charadas, é a que o Zé repete em laço na geração gulosa (rodadas v5 e v6).
+
+#### Scenario: Fórmula repetida no começo da charada
+- **WHEN** a resposta é "Charada: O que e, o que e, mastiga o dia inteiro o verde do pasto"
+- **THEN** ela vira "Charada: O que é, mastiga o dia inteiro o verde do pasto"

@@ -1,6 +1,7 @@
 """Requisitos "Raciocínio do veredito pela regra" e "Pensamento da charada sem a palavra" (dataset-do-ze)."""
 
 from desenha_ml.revisao_do_treino import (
+    abertura_sem_repeticao,
     pensamento_do_veredito,
     pensamento_sem_a_palavra,
     revisar_saida,
@@ -41,9 +42,9 @@ def test_veredito_pela_regra_divergente_da_amostra_nao_e_trocado() -> None:
 
 
 def test_veredito_pela_regra_mantem_a_narracao_do_teacher() -> None:
-    revisada, motivo = revisar_saida("VEREDITO", ENTRADA_CHAPEU, {"regra": "QUASE"}, SAIDA_DO_TEACHER)
+    revisada, motivos = revisar_saida("VEREDITO", ENTRADA_CHAPEU, {"regra": "QUASE"}, SAIDA_DO_TEACHER)
 
-    assert motivo == "veredito_pela_regra"
+    assert motivos == ("veredito_pela_regra",)
     assert revisada is not None
     assert "dentro do top-3" in revisada
     assert revisada.endswith("<resposta>VEREDITO: QUASE\nNARRAÇÃO: Quase, sô!</resposta>")
@@ -67,8 +68,35 @@ def test_charada_sem_vazamento_no_pensamento_fica_igual() -> None:
         "<resposta>Charada: Esquenta a roça.</resposta>"
     )
 
-    assert revisar_saida("CHARADA", "", {"palavra": "sol"}, saida) == (saida, "sem_mudanca")
+    assert revisar_saida("CHARADA", "", {"palavra": "sol"}, saida) == (saida, ())
 
 
 def test_pergunta_nao_e_revisada() -> None:
-    assert revisar_saida("PERGUNTA", "", {}, SAIDA_DO_TEACHER) == (SAIDA_DO_TEACHER, "sem_mudanca")
+    assert revisar_saida("PERGUNTA", "", {}, SAIDA_DO_TEACHER) == (SAIDA_DO_TEACHER, ())
+
+
+def test_abertura_da_charada_sem_repeticao_no_comeco() -> None:
+    assert abertura_sem_repeticao("Charada: O que e, o que e, mastiga o dia inteiro o verde do pasto") == (
+        "Charada: O que é, mastiga o dia inteiro o verde do pasto"
+    )
+
+
+def test_abertura_da_charada_sem_repeticao_mantem_pontuacao_e_minuscula() -> None:
+    assert abertura_sem_repeticao("Vou usar o classico o que e o que e: folhas e raizes.") == (
+        "Vou usar o classico o que é: folhas e raizes."
+    )
+
+
+def test_abertura_da_charada_sem_repeticao_conta_junto_com_a_palavra() -> None:
+    saida = (
+        "<pensamento>A palavra é sol. Vou falar do calor e da luz que aquece o peão na roça bem cedinho."
+        "</pensamento>\n<resposta>Charada: O que é, o que é, esquenta a roça?</resposta>"
+    )
+
+    revisada, motivos = revisar_saida("CHARADA", "", {"palavra": "sol"}, saida)
+
+    assert revisada == (
+        "<pensamento>Vou falar do calor e da luz que aquece o peão na roça bem cedinho.</pensamento>\n"
+        "<resposta>Charada: O que é, esquenta a roça?</resposta>"
+    )
+    assert motivos == ("charada_sem_repeticao", "charada_sem_palavra")

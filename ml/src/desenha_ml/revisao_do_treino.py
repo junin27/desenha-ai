@@ -23,6 +23,7 @@ ROTEIRO_DA_REGRA = "1º lugar = ACERTOU; 2º ou 3º = QUASE; fora do top-3 = ERR
 _PALPITE = re.compile(r"(.+?) (\d+)%")
 _PENSAMENTO = re.compile(r"<pensamento>.*?</pensamento>", flags=re.DOTALL)
 _FIM_DE_FRASE = re.compile(r"(?<=[.!?])\s+")
+_ABERTURA_REPETIDA = re.compile(r"\b([Oo]) que [eé][\s,:;]*o que [eé]\b", flags=re.IGNORECASE)
 
 
 def pensamento_do_veredito(entrada: str, regra: Veredito) -> str | None:
@@ -69,24 +70,42 @@ def pensamento_sem_a_palavra(pensamento: str, palavra: str) -> str | None:
     return revisado if len(revisado.split()) >= PALAVRAS_DO_PENSAMENTO[0] else None
 
 
-def revisar_saida(tarefa: str, entrada: str, meta: Mapping[str, Json], saida: str) -> tuple[str | None, str]:
-    """Saída revisada (None = sai do treino) e o motivo, para o relatório."""
-    pensamento = _PENSAMENTO.search(saida)
-    if pensamento is None or tarefa == "PERGUNTA":
-        return saida, "sem_mudanca"
-    atual = pensamento.group(0)[len("<pensamento>") : -len("</pensamento>")]
+Motivos = tuple[str, ...]
+
+
+def abertura_sem_repeticao(texto: str) -> str:
+    """Troca "o que é, o que é" por um só "O que é": a repetição vira laço na geração gulosa."""
+    return _ABERTURA_REPETIDA.sub(lambda achado: f"{achado.group(1)} que é", texto)
+
+
+def revisar_saida(
+    tarefa: str, entrada: str, meta: Mapping[str, Json], saida: str
+) -> tuple[str | None, Motivos]:
+    """Saída revisada (None = sai do treino) e os motivos das mudanças, para o relatório."""
+    if _PENSAMENTO.search(saida) is None or tarefa == "PERGUNTA":
+        return saida, ()
     if tarefa == "VEREDITO":
-        regra = meta.get("regra")
-        novo = pensamento_do_veredito(entrada, regra) if _e_veredito(regra) else None
-        return (_trocar(saida, novo), "veredito_pela_regra") if novo else (saida, "veredito_divergente")
-    sem_palavra = pensamento_sem_a_palavra(atual, str(meta.get("palavra", "")))
+        return _revisar_veredito(entrada, meta, saida)
+    return _revisar_charada(str(meta.get("palavra", "")), saida)
+
+
+def _revisar_veredito(entrada: str, meta: Mapping[str, Json], saida: str) -> tuple[str | None, Motivos]:
+    regra = meta.get("regra")
+    novo = pensamento_do_veredito(entrada, regra) if _e_veredito(regra) else None
+    return (_trocar(saida, novo), ("veredito_pela_regra",)) if novo else (saida, ("veredito_divergente",))
+
+
+def _revisar_charada(palavra: str, saida: str) -> tuple[str | None, Motivos]:
+    sem_repeticao = abertura_sem_repeticao(saida)
+    motivos: Motivos = ("charada_sem_repeticao",) if sem_repeticao != saida else ()
+    pensamento = _PENSAMENTO.search(sem_repeticao)
+    atual = pensamento.group(0)[len("<pensamento>") : -len("</pensamento>")] if pensamento else ""
+    sem_palavra = pensamento_sem_a_palavra(atual, palavra)
     if sem_palavra is None:
-        return None, "charada_curta"
-    return (
-        (saida, "sem_mudanca")
-        if sem_palavra == atual
-        else (_trocar(saida, sem_palavra), "charada_sem_palavra")
-    )
+        return None, (*motivos, "charada_curta")
+    if sem_palavra == atual:
+        return sem_repeticao, motivos
+    return _trocar(sem_repeticao, sem_palavra), (*motivos, "charada_sem_palavra")
 
 
 def _e_veredito(valor: Json) -> TypeGuard[Veredito]:
