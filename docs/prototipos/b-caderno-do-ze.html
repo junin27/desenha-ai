@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo B — Caderno do Zé</title>
+<!--
+  Direção B, "Caderno do Zé": tudo acontece num caderno aberto em cima da mesa.
+  Momento assinatura: a página vira (efeito 3D) ao passar de uma tela para a outra.
+  Palpites viram marca-texto: a faixa amarela cresce com a porcentagem. Tudo offline (HTML, CSS e SVG).
+-->
+<style>
+  :root {
+    --mesa: #E9DFCC;
+    --papel: #FBF8F1;
+    --pauta: #D7E3F4;
+    --grafite: #2E2E2E;
+    --caneta: #2F5DA8;
+    --correcao: #D9483B;
+    --marca-texto: #FFE266;
+    --verde: #4C9A5B;
+    --mao: "Ink Free", "Segoe Print", "Comic Sans MS", cursive;
+    --texto: "Segoe UI", "Trebuchet MS", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--mesa); color: var(--grafite); font-family: var(--texto); }
+  :focus-visible { outline: 4px solid var(--caneta); outline-offset: 3px; }
+  .rotulo-do-prototipo { position: fixed; top: 12px; right: 16px; z-index: 9; font: 600 14px var(--texto);
+    background: var(--grafite); color: var(--papel); padding: 6px 12px; border-radius: 8px; }
+  .navegacao { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 9; display: flex; gap: 8px; }
+  .navegacao button { font: 600 16px var(--texto); border: 2px solid var(--grafite); background: var(--papel); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  .navegacao button[aria-current="true"] { background: var(--marca-texto); }
+
+  /* ---------- Caderno aberto: duas páginas com espiral no meio ---------- */
+  .palco { height: 100vh; display: grid; place-items: center; perspective: 2200px; padding: 28px; }
+  .caderno { width: min(1280px, 96vw); height: min(700px, 88vh); display: grid; grid-template-columns: 1fr 1fr; position: relative;
+    filter: drop-shadow(0 22px 30px rgba(60,45,20,.28)); }
+  .pagina { background: var(--papel); padding: 40px 48px; position: relative; overflow: hidden;
+    background-image: linear-gradient(transparent 39px, var(--pauta) 40px); background-size: 100% 40px; }
+  .pagina.esquerda { border-radius: 14px 0 0 14px; }
+  .pagina.direita { border-radius: 0 14px 14px 0; }
+  .pagina.esquerda::after { content: ""; position: absolute; left: 64px; top: 0; bottom: 0; width: 2px; background: #F2B6B0; }
+  .espiral { position: absolute; left: 50%; top: 24px; bottom: 24px; width: 28px; transform: translateX(-50%); z-index: 2;
+    background: radial-gradient(circle at 50% 50%, #9AA3AD 0 6px, transparent 7px) 0 0 / 28px 34px; }
+
+  /* Página virando: a tela atual gira sobre a espiral e a próxima aparece por baixo. */
+  .tela { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; transform-origin: 50% 50%;
+    transition: transform .9s cubic-bezier(.6,.05,.25,1), opacity .9s; }
+  .tela[hidden] { display: grid; opacity: 0; pointer-events: none; transform: rotateY(-90deg); }
+
+  h1, h2, .manuscrito { font-family: var(--mao); color: var(--caneta); }
+  h1 { font-size: 72px; line-height: 1; margin: 0 0 8px 40px; transform: rotate(-2deg); }
+  .sublinha { display: inline; background: linear-gradient(transparent 60%, var(--marca-texto) 60%); }
+  p { font-size: 22px; line-height: 40px; margin: 0 0 0 40px; max-width: 32ch; }
+  .lista { list-style: none; margin: 12px 0 0 40px; padding: 0; font: 26px/40px var(--mao); color: var(--grafite); }
+  .lista li::before { content: "✓ "; color: var(--verde); }
+  .botao { font: 700 26px var(--mao); background: var(--caneta); color: var(--papel); border: 0; border-radius: 12px;
+    padding: 12px 30px; cursor: pointer; margin: 24px 0 0 40px; transform: rotate(-1deg);
+    box-shadow: 0 6px 0 #1E3F75; transition: transform .15s, box-shadow .15s; }
+  .botao:active { transform: translateY(4px) rotate(-1deg); box-shadow: 0 2px 0 #1E3F75; }
+
+  /* Polaroide da demonstração colada com fita */
+  .polaroide { background: #fff; padding: 14px 14px 44px; width: 80%; margin: 30px auto 0; transform: rotate(3deg);
+    box-shadow: 0 10px 20px rgba(0,0,0,.15); position: relative; }
+  .fita { position: absolute; top: -14px; left: 50%; width: 110px; height: 30px; transform: translateX(-50%) rotate(-4deg);
+    background: rgba(255,226,102,.75); }
+  .polaroide svg { width: 100%; display: block; background-image: linear-gradient(#E6EDF7 1px, transparent 1px), linear-gradient(90deg, #E6EDF7 1px, transparent 1px);
+    background-size: 20px 20px; }
+  .polaroide path { fill: none; stroke: var(--grafite); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 900; stroke-dashoffset: 900;
+    animation: tracar 5s ease-in-out infinite; }
+  @keyframes tracar { 60%, 100% { stroke-dashoffset: 0; } }
+  .legenda { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font: 22px var(--mao); }
+
+  /* Marca-texto: a faixa amarela cresce com a porcentagem do palpite */
+  .palpites { list-style: none; padding: 0; margin: 8px 0 0 40px; font: 28px/40px var(--mao); }
+  .palpites li { position: relative; width: fit-content; padding: 0 6px; isolation: isolate; min-width: 260px; }
+  .palpites li span.faixa { position: absolute; left: 0; top: 10px; height: 22px; background: var(--marca-texto); z-index: -1;
+    transition: width .6s cubic-bezier(.2,.8,.2,1); border-radius: 4px; }
+  .palpites li.alvo { color: var(--correcao); }
+
+  /* Lápis que encurta: o cronômetro */
+  .lapis { margin: 18px 0 0 40px; display: flex; align-items: center; gap: 0; }
+  .corpo-lapis { height: 26px; width: 280px; background: var(--marca-texto); border: 2px solid var(--grafite); border-right: 0;
+    border-radius: 6px 0 0 6px; transition: width 1s linear; }
+  .ponta { width: 0; height: 0; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-left: 30px solid #E9C49A; }
+  .tempo { font: 32px var(--mao); margin-left: 16px; color: var(--correcao); }
+
+  .quadro { position: absolute; inset: 28px; background: #fff; border-radius: 6px;
+    background-image: linear-gradient(#E6EDF7 1px, transparent 1px), linear-gradient(90deg, #E6EDF7 1px, transparent 1px); background-size: 24px 24px; }
+  .ferramentas { position: absolute; right: 44px; bottom: 44px; display: flex; gap: 10px; }
+  .ferramenta { font: 22px var(--mao); border: 2px solid var(--grafite); background: var(--papel); border-radius: 10px; padding: 6px 14px; cursor: pointer; }
+  .ferramenta[aria-pressed="true"] { background: var(--marca-texto); }
+
+  /* Veredito: nota de professor carimbada em vermelho */
+  .carimbo { font: 92px var(--mao); color: var(--correcao); border: 6px solid var(--correcao); border-radius: 50%;
+    width: 220px; height: 220px; display: grid; place-items: center; transform: rotate(-12deg); margin: 10px 0 0 60px;
+    animation: carimbar .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes carimbar { from { transform: scale(1.6) rotate(-20deg); opacity: 0; } to { transform: scale(1) rotate(-12deg); opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; }
+    .polaroide path { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+<span class="rotulo-do-prototipo">Protótipo B · Caderno do Zé</span>
+<nav class="navegacao" aria-label="Telas do protótipo">
+  <button type="button" data-ir="0" aria-current="true">Introdução</button>
+  <button type="button" data-ir="1">Desenho</button>
+  <button type="button" data-ir="2">Veredito</button>
+</nav>
+
+<main class="palco">
+  <div class="caderno">
+    <div class="espiral" aria-hidden="true"></div>
+
+    <!-- 1. Introdução -->
+    <section class="tela" aria-label="Introdução">
+      <div class="pagina esquerda">
+        <h1>Desenha Aí, <span class="sublinha">Sô!</span></h1>
+        <p>O Zé do Rabisco escreve uma charada no caderno. Você desenha a resposta. Duas redes neurais tentam adivinhar enquanto o lápis corre.</p>
+        <ul class="lista">
+          <li>charada inventada por uma IA caipira</li>
+          <li>palpites ao vivo, traço a traço</li>
+          <li>o Zé dá a nota e você vai pro placar</li>
+        </ul>
+        <button class="botao" type="button" data-ir="1">Abrir o caderno</button>
+      </div>
+      <div class="pagina direita">
+        <div class="polaroide">
+          <span class="fita" aria-hidden="true"></span>
+          <svg viewBox="0 0 300 220" aria-label="Demonstração de um desenho sendo feito"><path d="M60 130 Q60 80 110 80 L190 80 Q235 80 235 125 L235 150 Q235 170 215 170 L85 170 Q60 170 60 150 Z M90 170 L90 200 M205 170 L205 200 M110 80 L100 55 M130 80 L140 56"/></svg>
+          <span class="legenda">“é vaca!”, gritaram as redes</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Desenho -->
+    <section class="tela" hidden aria-label="Tela de desenho">
+      <div class="pagina esquerda">
+        <h2 style="font-size:40px;margin:0 0 8px 40px">Charada do Zé</h2>
+        <p class="manuscrito" style="font-size:26px">“Dá leite, muge no pasto e tem malhado no couro.”</p>
+        <div class="lapis" aria-label="Tempo restante"><div class="corpo-lapis" id="corpo-lapis"></div><div class="ponta"></div><span class="tempo" id="tempo">20</span></div>
+        <h2 style="font-size:32px;margin:18px 0 0 40px">As redes acham que é…</h2>
+        <ol class="palpites" id="palpites"></ol>
+      </div>
+      <div class="pagina direita">
+        <div class="quadro" aria-label="Quadro de desenho">
+          <svg viewBox="0 0 300 300" width="100%" height="100%" aria-hidden="true"><path d="M70 170 Q70 115 125 115 L195 115 Q240 115 240 160 L240 185 Q240 208 218 208 L95 208 Q70 208 70 185 Z M100 208 L100 245 M210 208 L210 245" fill="none" stroke="#2E2E2E" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="ferramentas">
+          <button class="ferramenta" type="button" aria-pressed="true">lápis</button>
+          <button class="ferramenta" type="button" aria-pressed="false">borracha</button>
+          <button class="ferramenta" type="button">apagar tudo</button>
+          <button class="ferramenta" type="button" data-ir="2" style="background:var(--caneta);color:var(--papel)">pronto!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Veredito -->
+    <section class="tela" hidden aria-label="Veredito">
+      <div class="pagina esquerda">
+        <div class="carimbo">10!</div>
+        <p class="manuscrito" style="font-size:28px;margin-top:20px">Ô trem bão! Era vaca e as redes cravaram de primeira. — Zé</p>
+        <p>+132 pontos · 1º vaca 81% · 2º cavalo 9%</p>
+        <button class="botao" type="button" data-ir="0">Virar a página</button>
+      </div>
+      <div class="pagina direita">
+        <div class="polaroide"><span class="fita" aria-hidden="true"></span>
+          <svg viewBox="0 0 300 220" aria-label="Seu desenho"><path style="animation:none;stroke-dashoffset:0" d="M60 130 Q60 80 110 80 L190 80 Q235 80 235 125 L235 150 Q235 170 215 170 L85 170 Q60 170 60 150 Z M90 170 L90 200 M205 170 L205 200"/></svg>
+          <span class="legenda">seu rabisco, rodada 1</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  // Navegação entre telas: a tela atual "vira" (rotateY) e a próxima aparece.
+  const telas = [...document.querySelectorAll(".tela")];
+  const botoesDaNavegacao = [...document.querySelectorAll(".navegacao button")];
+  function irPara(indice) {
+    telas.forEach((tela, i) => (tela.hidden = i !== indice));
+    botoesDaNavegacao.forEach((b, i) => b.setAttribute("aria-current", String(i === indice)));
+  }
+  document.querySelectorAll("[data-ir]").forEach((b) => b.addEventListener("click", () => irPara(Number(b.dataset.ir))));
+
+  // Marca-texto dos palpites: a faixa cresce até a porcentagem; o desafio fica em vermelho quando lidera.
+  const QUADROS = [{ cavalo: 34, vaca: 26, cachorro: 18 }, { vaca: 58, cavalo: 20, cachorro: 9 }, { vaca: 81, cavalo: 9, cachorro: 4 }];
+  const lista = document.getElementById("palpites");
+  let passo = 0;
+  setInterval(() => {
+    const quadro = Object.entries(QUADROS[passo++ % QUADROS.length]).sort((a, b) => b[1] - a[1]);
+    lista.innerHTML = quadro.map(([nome, valor], i) =>
+      `<li class="${i === 0 && nome === "vaca" ? "alvo" : ""}"><span class="faixa" style="width:${valor * 2.4}px"></span>${nome} ${valor}%</li>`).join("");
+  }, 1300);
+
+  // Lápis que encurta a cada segundo (20 s).
+  let restante = 20;
+  setInterval(() => {
+    restante = restante <= 0 ? 20 : restante - 1;
+    document.getElementById("corpo-lapis").style.width = (280 * restante / 20) + "px";
+    document.getElementById("tempo").textContent = restante + " s";
+  }, 1000);
+</script>
+</body>
+</html>

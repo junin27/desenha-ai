@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo A — Rodeio de Feira</title>
+<!--
+  Direção A, "Rodeio de Feira": o jogo é uma arena de rodeio e cada rodada é uma montaria.
+  Momento assinatura: os palpites das redes correm como numa disputa, e o Zé reage quando o desafio assume a frente.
+  Tudo offline: só HTML, CSS e SVG; as fontes são do Windows (no jogo, uma fonte livre de cartaz iria embutida no build).
+-->
+<style>
+  :root {
+    --terracota: #B5452A;
+    --mostarda: #E0A526;
+    --couro: #5A3A22;
+    --creme: #FFF6E3;
+    --pasto: #3E7C3A;
+    --tinta: #2A1A10;
+    --madeira: #8A5A33;
+    --cartaz: "Rockwell Extra Bold", "Rockwell", "Bookman Old Style", "Georgia", serif;
+    --texto: "Segoe UI", "Trebuchet MS", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y mandatory; }
+  body { margin: 0; background: var(--creme); color: var(--tinta); font-family: var(--texto); }
+  ::selection { background: var(--mostarda); color: var(--tinta); }
+  :focus-visible { outline: 4px solid var(--mostarda); outline-offset: 3px; }
+  .tela { min-height: 100vh; scroll-snap-align: start; padding: 32px 48px; position: relative; overflow: hidden; }
+  .rotulo-do-prototipo { position: fixed; top: 12px; right: 16px; z-index: 9; font: 600 14px var(--texto);
+    background: var(--tinta); color: var(--creme); padding: 6px 12px; border-radius: 8px; }
+
+  /* ---------- Faixa de cartaz: a moldura de madeira que aparece em todas as telas ---------- */
+  .faixa { position: absolute; inset: 0 0 auto 0; height: 14px;
+    background: repeating-linear-gradient(90deg, var(--terracota) 0 40px, var(--mostarda) 40px 80px); }
+
+  /* ---------- 1. Introdução ---------- */
+  .intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center;
+    background: radial-gradient(120% 90% at 80% 20%, #FFE9B8 0%, var(--creme) 55%); }
+  .intro h1 { font-family: var(--cartaz); font-size: clamp(48px, 5.4vw, 84px); line-height: .92; margin: 0;
+    color: var(--terracota); letter-spacing: -0.02em; }
+  .intro h1 span { display: block; color: var(--couro); font-size: .55em; letter-spacing: 0; margin-top: 10px; }
+  .intro p.chamada { font-size: 22px; line-height: 1.4; max-width: 34ch; margin: 18px 0 6px; }
+  .passos { list-style: none; padding: 0; margin: 16px 0 24px; display: grid; gap: 10px; font-size: 20px; }
+  .passos li { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 14px; }
+  .passos svg { width: 44px; height: 44px; }
+  .botao { font: 800 26px var(--cartaz); background: var(--terracota); color: var(--creme); border: 0;
+    padding: 18px 40px; border-radius: 14px; cursor: pointer; box-shadow: 0 8px 18px rgba(90,58,34,.28);
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s; }
+  .botao:hover { transform: translateY(-3px); box-shadow: 0 14px 24px rgba(90,58,34,.32); }
+  .botao.secundario { background: var(--couro); font-size: 20px; padding: 14px 26px; }
+  .acoes { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+  /* Demonstração: um desenho se traça sozinho enquanto as barras disputam a frente. */
+  .demo { background: #fff; border: 6px solid var(--madeira); border-radius: 16px; padding: 20px;
+    box-shadow: 0 18px 40px rgba(90,58,34,.25); display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .demo .quadro-demo { aspect-ratio: 1; background: var(--creme); border-radius: 10px; }
+  .demo path.traco { fill: none; stroke: var(--tinta); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 900; stroke-dashoffset: 900; animation: tracar 5s ease-in-out infinite; }
+  @keyframes tracar { 0% { stroke-dashoffset: 900; } 60%, 100% { stroke-dashoffset: 0; } }
+  .demo h3 { margin: 0 0 12px; font: 700 18px var(--texto); color: var(--couro); }
+
+  /* Corrida de barras: largura animada, o desafio ganha a cor terracota quando assume a frente. */
+  .corrida { display: grid; gap: 10px; }
+  .raia { display: grid; grid-template-columns: 92px 1fr 52px; align-items: center; gap: 8px; font-size: 18px; }
+  .trilho { height: 22px; background: #F1E4C8; border-radius: 11px; overflow: hidden; }
+  .barra { height: 100%; width: 0; background: var(--couro); border-radius: 11px;
+    transition: width .6s cubic-bezier(.2,.8,.2,1), background-color .3s; }
+  .raia.alvo .barra { background: var(--terracota); }
+  .raia .pct { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+
+  /* ---------- 2. Desenho ---------- */
+  .desenho { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; background: var(--creme); }
+  .arena { width: min(78vh, 640px); aspect-ratio: 1; background: #fff; border: 8px solid var(--madeira);
+    border-radius: 18px; position: relative; box-shadow: inset 0 0 0 4px #F1E4C8, 0 14px 30px rgba(90,58,34,.22); }
+  .ferramentas { position: absolute; left: 14px; bottom: 14px; display: flex; gap: 10px; }
+  .ferramenta { width: 56px; height: 56px; border-radius: 14px; border: 3px solid var(--couro); background: var(--creme);
+    display: grid; place-items: center; cursor: pointer; }
+  .ferramenta[aria-pressed="true"] { background: var(--mostarda); }
+  .ferramenta svg { width: 28px; height: 28px; }
+  .lado { display: grid; gap: 22px; align-content: center; max-width: 560px; }
+  .topo-lado { display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: center; }
+
+  /* Cronômetro em anel: o traço esvazia e a cor esquenta nos últimos segundos. */
+  .anel { width: 150px; height: 150px; }
+  .anel circle.fundo { fill: none; stroke: #F1E4C8; stroke-width: 14; }
+  .anel circle.tempo { fill: none; stroke: var(--pasto); stroke-width: 14; stroke-linecap: round;
+    transform: rotate(-90deg); transform-origin: 50% 50%; stroke-dasharray: 377; transition: stroke-dashoffset 1s linear, stroke .3s; }
+  .anel text { font: 800 46px var(--cartaz); fill: var(--tinta); text-anchor: middle; dominant-baseline: central; font-variant-numeric: tabular-nums; }
+  .charada { font-size: 24px; font-style: italic; line-height: 1.35; margin: 0; }
+
+  /* ---------- Mascote do Zé: geométrico e chapado (chapéu, rosto, bigode, lenço) ---------- */
+  .ze { display: grid; grid-template-columns: 110px 1fr; gap: 14px; align-items: end; }
+  .ze svg { width: 110px; }
+  .balao { background: #fff; border: 3px solid var(--couro); border-radius: 18px; padding: 14px 18px; font-size: 22px;
+    position: relative; line-height: 1.35; }
+  .balao::before { content: ""; position: absolute; left: -16px; bottom: 18px; border: 10px solid transparent;
+    border-right-color: var(--couro); }
+  .balao.reagindo { animation: pulo .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pulo { 40% { transform: translateY(-8px); } }
+
+  /* ---------- 3. Veredito ---------- */
+  .veredito { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+    background: radial-gradient(90% 80% at 30% 40%, #FFE9B8 0%, var(--creme) 60%); }
+  .moldura { background: #fff; border: 10px solid var(--madeira); border-radius: 18px; padding: 14px;
+    transform: rotate(-2deg); box-shadow: 0 20px 40px rgba(90,58,34,.3); }
+  .moldura svg { width: 100%; display: block; background: var(--creme); border-radius: 8px; }
+  .resultado h2 { font: 800 96px var(--cartaz); margin: 0; color: var(--pasto); line-height: 1; }
+  .pontos { font: 800 40px var(--cartaz); color: var(--terracota); margin: 6px 0 18px; }
+  .podio { display: grid; gap: 8px; font-size: 22px; margin: 18px 0 26px; }
+  .podio b { color: var(--couro); }
+  .confete { position: absolute; top: -20px; width: 12px; height: 26px; border-radius: 3px; opacity: 0; pointer-events: none; }
+  .confete.caindo { animation: cair 2.4s cubic-bezier(.3,.6,.4,1) forwards; }
+  @keyframes cair { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0; transform: translateY(105vh) rotate(720deg); } }
+
+  /* ---------- Placar com fivelas ---------- */
+  .placar { display: grid; gap: 10px; margin-top: 8px; }
+  .linha-placar { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; font-size: 20px;
+    background: #fff; border-radius: 12px; padding: 8px 14px; border: 2px solid #F1E4C8; }
+  .fivela { width: 40px; height: 30px; border-radius: 8px; display: grid; place-items: center; font: 800 16px var(--cartaz); color: var(--tinta); }
+  .ouro { background: #E8B931; } .prata { background: #C9CDD2; } .bronze { background: #C98B4E; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .demo path.traco { stroke-dashoffset: 0; }
+  }
+  @media (max-width: 900px) {
+    .intro, .desenho, .veredito { grid-template-columns: 1fr; }
+    .tela { padding: 28px 18px; }
+  }
+</style>
+</head>
+<body>
+<span class="rotulo-do-prototipo">Protótipo A · Rodeio de Feira</span>
+
+<!-- ===================== 1. INTRODUÇÃO ===================== -->
+<section class="tela intro" aria-label="Introdução">
+  <div class="faixa"></div>
+  <div>
+    <h1>Desenha Aí, Sô!<span>A máquina adivinha seu rabisco</span></h1>
+    <p class="chamada">O Zé do Rabisco solta uma charada. Você desenha a resposta em 20 segundos. Duas redes neurais tentam adivinhar <em>enquanto</em> você risca.</p>
+    <ol class="passos">
+      <li><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#E0A526"/><text x="22" y="29" text-anchor="middle" font-family="Rockwell" font-weight="800" font-size="20" fill="#2A1A10">1</text></svg>Ouça a charada do Zé, um locutor de rodeio feito de IA</li>
+      <li><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#E0A526"/><text x="22" y="29" text-anchor="middle" font-family="Rockwell" font-weight="800" font-size="20" fill="#2A1A10">2</text></svg>Desenhe e veja as redes disputando o palpite ao vivo</li>
+      <li><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#E0A526"/><text x="22" y="29" text-anchor="middle" font-family="Rockwell" font-weight="800" font-size="20" fill="#2A1A10">3</text></svg>O Zé julga, narra e você entra no placar do dia</li>
+    </ol>
+    <div class="acoes">
+      <button class="botao" type="button">Jogar agora</button>
+      <button class="botao secundario" type="button">Pergunte ao Zé</button>
+    </div>
+  </div>
+
+  <!-- Demonstração rodando sozinha: atrai quem passa pelo estande sem ninguém jogando -->
+  <div class="demo" aria-label="Demonstração: um desenho de vaca sendo reconhecido">
+    <svg class="quadro-demo" viewBox="0 0 300 300" aria-hidden="true">
+      <path class="traco" d="M60 170 Q60 110 120 110 L200 110 Q250 110 250 160 L250 190 Q250 215 225 215 L90 215 Q60 215 60 190 Z M95 215 L95 255 M215 215 L215 255 M250 140 Q285 130 280 105 M120 110 L110 80 M140 110 L150 82 M120 150 a12 10 0 1 0 1 0"/>
+    </svg>
+    <div>
+      <h3>As redes acham que é…</h3>
+      <div class="corrida" id="corrida-demo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2. DESENHO ===================== -->
+<section class="tela desenho" aria-label="Tela de desenho">
+  <div class="faixa"></div>
+  <div class="arena" aria-label="Quadro de desenho">
+    <svg viewBox="0 0 300 300" width="100%" height="100%" aria-hidden="true">
+      <path d="M70 170 Q70 115 125 115 L195 115 Q240 115 240 160 L240 185 Q240 208 218 208 L95 208 Q70 208 70 185 Z M100 208 L100 245 M210 208 L210 245" fill="none" stroke="#2A1A10" stroke-width="5" stroke-linecap="round"/>
+    </svg>
+    <div class="ferramentas">
+      <button class="ferramenta" type="button" aria-pressed="true" title="Lápis">
+        <svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z" fill="none" stroke="#2A1A10" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="ferramenta" type="button" aria-pressed="false" title="Borracha">
+        <svg viewBox="0 0 24 24"><path d="M3 15l8-8 8 8-5 5H8z M7 11l8 8" fill="none" stroke="#2A1A10" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="ferramenta" type="button" title="Apagar tudo">
+        <svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13" fill="none" stroke="#2A1A10" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="lado">
+    <div class="topo-lado">
+      <svg class="anel" viewBox="0 0 150 150" aria-label="Tempo restante">
+        <circle class="fundo" cx="75" cy="75" r="60"/>
+        <circle class="tempo" id="anel-tempo" cx="75" cy="75" r="60"/>
+        <text x="75" y="77" id="numero-tempo">20</text>
+      </svg>
+      <p class="charada">“Dá leite, muge no pasto e tem malhado no couro. Desenha aí!”</p>
+    </div>
+    <div class="corrida" id="corrida-jogo"></div>
+    <div class="ze">
+      <svg viewBox="0 0 110 120" aria-label="Zé do Rabisco">
+        <!-- chapéu: aba e copa -->
+        <ellipse cx="55" cy="34" rx="52" ry="10" fill="#8A5A33"/>
+        <path d="M30 34 L36 8 Q55 0 74 8 L80 34 Z" fill="#A0693D"/>
+        <rect x="30" y="26" width="50" height="6" fill="#B5452A"/>
+        <!-- rosto -->
+        <circle cx="55" cy="64" r="28" fill="#E9B48A"/>
+        <circle cx="45" cy="60" r="3.5" fill="#2A1A10"/><circle cx="65" cy="60" r="3.5" fill="#2A1A10"/>
+        <!-- bigode -->
+        <path d="M38 74 Q47 68 55 73 Q63 68 72 74 Q63 80 55 76 Q47 80 38 74 Z" fill="#5A3A22"/>
+        <!-- lenço -->
+        <path d="M30 88 L80 88 L55 112 Z" fill="#B5452A"/>
+      </svg>
+      <div class="balao" id="balao">Risca com vontade, sô! Tô de olho…</div>
+    </div>
+    <button class="botao" type="button">Pronto!</button>
+  </div>
+</section>
+
+<!-- ===================== 3. VEREDITO ===================== -->
+<section class="tela veredito" aria-label="Veredito" id="tela-veredito">
+  <div class="faixa"></div>
+  <div class="moldura" aria-label="Seu desenho">
+    <svg viewBox="0 0 300 300" aria-hidden="true">
+      <path d="M60 170 Q60 110 120 110 L200 110 Q250 110 250 160 L250 190 Q250 215 225 215 L90 215 Q60 215 60 190 Z M95 215 L95 255 M215 215 L215 255" fill="none" stroke="#2A1A10" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="resultado">
+    <h2>Acertou!</h2>
+    <p class="pontos">+132 pontos · fivela de ouro</p>
+    <div class="balao">Ô trem bão! Era vaca e as redes cravaram de primeira. Esse rabisco merece fivela!</div>
+    <div class="podio">
+      <span><b>1º</b> vaca 81% · <b>2º</b> cavalo 9% · <b>3º</b> cachorro 4%</span>
+    </div>
+    <div class="acoes">
+      <button class="botao" type="button" id="soltar-confete">Próxima montaria</button>
+    </div>
+    <h3 style="margin:28px 0 6px;font:800 22px var(--cartaz);color:var(--couro)">Placar do dia</h3>
+    <div class="placar">
+      <div class="linha-placar"><span class="fivela ouro">1</span>Maria Clara<b>412</b></div>
+      <div class="linha-placar"><span class="fivela prata">2</span>Junior<b>398</b></div>
+      <div class="linha-placar"><span class="fivela bronze">3</span>Prof. Sandro<b>350</b></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Dados de exemplo: o desafio (vaca) começa atrás e assume a frente, como numa disputa.
+  const QUADROS_DA_CORRIDA = [
+    { vaca: 8, cavalo: 30, cachorro: 22, porco: 12 },
+    { vaca: 26, cavalo: 34, cachorro: 18, porco: 10 },
+    { vaca: 58, cavalo: 20, cachorro: 9, porco: 6 },
+    { vaca: 81, cavalo: 9, cachorro: 4, porco: 2 },
+  ];
+  const ALVO = "vaca";
+
+  // Monta as raias de uma corrida (nome, trilho, porcentagem).
+  function montarCorrida(elemento) {
+    for (const nome of Object.keys(QUADROS_DA_CORRIDA[0])) {
+      elemento.insertAdjacentHTML("beforeend",
+        `<div class="raia" data-nome="${nome}"><span>${nome}</span><div class="trilho"><div class="barra"></div></div><span class="pct">0%</span></div>`);
+    }
+  }
+
+  // Atualiza larguras e reordena: quem lidera sobe; o desafio ganha cor quando assume a frente.
+  function mostrarQuadro(elemento, quadro) {
+    const lider = Object.entries(quadro).sort((a, b) => b[1] - a[1])[0][0];
+    for (const raia of elemento.querySelectorAll(".raia")) {
+      const valor = quadro[raia.dataset.nome];
+      raia.querySelector(".barra").style.width = valor + "%";
+      raia.querySelector(".pct").textContent = valor + "%";
+      raia.classList.toggle("alvo", raia.dataset.nome === ALVO && lider === ALVO);
+      raia.style.order = 100 - valor;
+    }
+    return lider;
+  }
+
+  const corridas = [document.getElementById("corrida-demo"), document.getElementById("corrida-jogo")];
+  corridas.forEach(montarCorrida);
+  corridas.forEach((c) => (c.style.display = "flex", c.style.flexDirection = "column"));
+
+  // Loop da demonstração: avança um quadro a cada 1,2 s; o balão do Zé reage quando o alvo lidera.
+  let passo = 0;
+  const balao = document.getElementById("balao");
+  setInterval(() => {
+    const quadro = QUADROS_DA_CORRIDA[passo % QUADROS_DA_CORRIDA.length];
+    corridas.forEach((c) => mostrarQuadro(c, quadro));
+    const lider = Object.entries(quadro).sort((a, b) => b[1] - a[1])[0][0];
+    const texto = lider === ALVO ? "Uai, agora sim! As redes viram a vaca!" : "Hum… tão achando que é " + lider + ". Capricha, peão!";
+    if (balao.textContent !== texto) { balao.textContent = texto; balao.classList.remove("reagindo"); void balao.offsetWidth; balao.classList.add("reagindo"); }
+    passo++;
+  }, 1200);
+
+  // Cronômetro em anel: 20 s; verde → mostarda → terracota nos últimos 5 s.
+  const anel = document.getElementById("anel-tempo");
+  const numero = document.getElementById("numero-tempo");
+  const CIRCUNFERENCIA = 2 * Math.PI * 60;
+  let restante = 20;
+  setInterval(() => {
+    restante = restante <= 0 ? 20 : restante - 1;
+    anel.style.strokeDashoffset = CIRCUNFERENCIA * (1 - restante / 20);
+    anel.style.stroke = restante > 10 ? "#3E7C3A" : restante > 5 ? "#E0A526" : "#B5452A";
+    numero.textContent = restante;
+  }, 1000);
+
+  // Confete de fitas nas cores da direção, só no acerto (aqui, ao clicar no botão).
+  const CORES = ["#B5452A", "#E0A526", "#3E7C3A", "#5A3A22"];
+  document.getElementById("soltar-confete").addEventListener("click", () => {
+    const tela = document.getElementById("tela-veredito");
+    for (let i = 0; i < 60; i++) {
+      const fita = document.createElement("span");
+      fita.className = "confete caindo";
+      fita.style.left = Math.random() * 100 + "%";
+      fita.style.background = CORES[i % CORES.length];
+      fita.style.animationDelay = Math.random() * 0.6 + "s";
+      tela.appendChild(fita);
+      setTimeout(() => fita.remove(), 3200);
+    }
+  });
+</script>
+</body>
+</html>
