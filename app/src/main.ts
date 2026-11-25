@@ -34,6 +34,7 @@ import { instalarAtalhoDeZerarPlacar } from "./presentation/atalho-de-zerar";
 import { criarBotaoDaVoz } from "./presentation/botao-da-voz";
 import { criar } from "./presentation/dom";
 import { mostrarErroDeCarregamento } from "./presentation/erro-de-carregamento";
+import { FundoDeRabiscos } from "./presentation/fundo-de-rabiscos";
 import { InterfaceDoJogo, type InformacoesDoJogo } from "./presentation/interface-do-jogo";
 import { PainelTecnico } from "./presentation/painel-tecnico";
 
@@ -104,6 +105,9 @@ function ligarTela(
     tela.mostrarConversa(estado);
   });
   tela.mostrar(partida.estado);
+  const fundo = new FundoDeRabiscos();
+  document.body.prepend(fundo.raiz);
+  fundo.comecar();
   return tela;
 }
 

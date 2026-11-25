@@ -28,9 +28,9 @@
 
 ## 5. Identidade visual
 
-- [ ] 5.1 Reescrever `app/src/estilo.css` com os tokens da paleta, contornos irregulares, sombras chapadas, manchas e rabiscos de fundo com `pointer-events: none`, pincelada e bloco `prefers-reduced-motion`. Teste que lê o CSS: cores de texto só da paleta, contraste ≥ 4,5:1 em cada par texto/fundo usado, fonte do jogo ≥ 24 px. Verifica: `npm --prefix app test -- estilo`
-- [ ] 5.2 Pincelada entre telas (≤ 1,2 s, imediata com movimento reduzido) e rabiscos de fundo limitados a 6 por vez; teste com relógio falso. Verifica: `npm --prefix app test -- transicao`
-- [ ] 5.3 Teste de build offline continua verde (nenhum endereço externo novo). Verifica: `npm --prefix app run build && npm --prefix app test -- build`
+- [x] 5.1 Reescrever `app/src/estilo.css` com os tokens da paleta, contornos irregulares, sombras chapadas, manchas e rabiscos de fundo com `pointer-events: none`, pincelada e bloco `prefers-reduced-motion`. Teste que lê o CSS: cores de texto só da paleta, contraste ≥ 4,5:1 em cada par texto/fundo usado, fonte do jogo ≥ 24 px. Verifica: `npm --prefix app test -- estilo`
+- [x] 5.2 Pincelada entre telas (≤ 1,2 s, imediata com movimento reduzido) e rabiscos de fundo limitados a 6 por vez; teste com relógio falso. Verifica: `npm --prefix app test -- transicao`
+- [x] 5.3 Teste de build offline continua verde (nenhum endereço externo novo). Verifica: `npm --prefix app run build && npm --prefix app test -- build`
 
 ## 6. Conferência no navegador
 
