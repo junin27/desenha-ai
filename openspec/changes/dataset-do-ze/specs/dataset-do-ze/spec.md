@@ -114,3 +114,28 @@ A exportação SHALL gerar um arquivo com, para cada categoria, as charadas apro
 #### Scenario: Reserva completa
 - **WHEN** todas as 30 categorias têm charadas aprovadas
 - **THEN** o arquivo de reserva tem as 30 categorias e o relatório não lista nenhuma ausente
+
+### Requirement: Revisão só do treino
+Uma revisão offline SHALL ler o `dataset_slm.zip` e gravar outro com só o conjunto de treino revisado (ShareGPT e ChatML); validação, teste e reserva SHALL sair idênticos byte a byte, e um relatório SHALL contar o que mudou e o que saiu. Não há chamadas ao Teacher.
+
+#### Scenario: Teste congelado
+- **WHEN** a revisão gera o novo zip
+- **THEN** `zedorabisco_teste_chatml.jsonl` e `zedorabisco_val_chatml.jsonl` têm o mesmo SHA-256 do zip de entrada
+
+### Requirement: Raciocínio do veredito pela regra
+No treino, o `<pensamento>` de cada VEREDITO SHALL ser trocado por um roteiro fixo com o desafio, o 1º palpite do Ensemble, a posição do desafio na lista do Ensemble (1º, 2º, 3º, fora do top-3 ou ausente) e o rótulo da regra; a narração do Teacher SHALL ficar. Se o rótulo pela posição divergir do rótulo da amostra, ela SHALL ficar como está e ser contada.
+
+#### Scenario: Desafio em terceiro
+- **WHEN** o desafio é chapéu e o Ensemble é "passarinho 40%, melancia 30%, chapéu 10%, ..."
+- **THEN** o pensamento diz que o 1º palpite foi passarinho com 40%, que chapéu está em 3º lugar, dentro do top-3, e que pela regra o veredito é QUASE
+
+#### Scenario: Desafio fora da lista
+- **WHEN** o desafio não aparece entre os 5 palpites do Ensemble
+- **THEN** o pensamento diz que o desafio não aparece entre os palpites e que pela regra o veredito é ERROU
+
+### Requirement: Pensamento da charada sem a palavra
+No treino, as frases do `<pensamento>` de CHARADA em que a palavra secreta vaza (regra da spec de vazamento) SHALL ser removidas; se o pensamento ficar com menos de 12 palavras, a amostra SHALL sair do treino e ser contada.
+
+#### Scenario: Frase que cita a palavra
+- **WHEN** o pensamento é "A palavra é sol. Vou falar do calor e da luz que aquece o peão na roça bem cedinho."
+- **THEN** o pensamento revisado é "Vou falar do calor e da luz que aquece o peão na roça bem cedinho."
