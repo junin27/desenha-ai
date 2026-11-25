@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mistura</title>
+<style>
+  /* Paleta: fundo claro de laboratório; azul (CNN), menta (LSTM), tomate (ação e veredito) */
+  :root { --fundo: #F5F7FC; --tinta: #121831; --suave: #5D6684; --azul: #2F6BFF; --menta: #14C39A;
+    --tomate: #FF4433; --roxo: #6A4BFF; --fonte: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; overflow: hidden; background: radial-gradient(120% 90% at 30% 0%, #fff, var(--fundo) 60%, #E8EDFB);
+    color: var(--tinta); font-family: var(--fonte); }
+
+  /* [do 1] Rede neural viva no fundo */
+  #rede { position: fixed; inset: 0; }
+  .palco { position: relative; height: 100%; display: grid; grid-template-columns: 1fr 1.05fr; gap: 3vw; align-items: center; padding: 3vh 5vw; }
+
+  /* [do 3] Título traçado em contorno e depois preenchido; sublinhado à mão */
+  .titulo { width: 100%; max-width: 720px; overflow: visible; }
+  .titulo text { font: 900 140px var(--fonte); letter-spacing: -6px; fill: transparent; stroke: var(--tinta); stroke-width: 2.5;
+    stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: traco 2.2s cubic-bezier(.6,0,.2,1) forwards, enche .6s 2s forwards; }
+  .titulo .so { fill: transparent; stroke: var(--tomate); animation: traco 2.2s .4s cubic-bezier(.6,0,.2,1) forwards, encheso .6s 2.4s forwards; }
+  .titulo .risco { fill: none; stroke: var(--azul); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 900; stroke-dashoffset: 900;
+    animation: traco 1s 2.6s cubic-bezier(.7,0,.2,1) forwards; }
+  @keyframes traco { to { stroke-dashoffset: 0; } }
+  @keyframes enche { to { fill: var(--tinta); } }
+  @keyframes encheso { to { fill: var(--tomate); } }
+
+  .chamada { font-size: clamp(24px, 1.6vw, 30px); line-height: 1.35; color: var(--suave); max-width: 30ch; opacity: 0; animation: surge .8s 2.8s forwards; }
+  .chamada mark { color: var(--tinta); background: linear-gradient(transparent 58%, rgba(20,195,154,.35) 58%) no-repeat; background-size: 0 100%; animation: marca .8s 3.6s forwards; }
+  @keyframes marca { to { background-size: 100% 100%; } }
+  @keyframes surge { from { transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+  /* [do 1] Números que contam */
+  .numeros { display: flex; gap: 2.6vw; margin-top: 3vh; opacity: 0; animation: surge .8s 3.1s forwards; }
+  .numero { font-size: 24px; color: var(--suave); }
+  .numero strong { display: block; font-size: clamp(40px, 3.2vw, 60px); color: var(--tinta); font-variant-numeric: tabular-nums; }
+
+  /* [do 2] Botão físico que afunda, com [do 1] faixa de luz passando */
+  .jogar { margin-top: 4vh; position: relative; overflow: hidden; border: 0; cursor: pointer; font: 800 36px/1 var(--fonte); color: #fff;
+    padding: 28px 72px; border-radius: 24px; background: linear-gradient(135deg, var(--tomate), #FF7A3D);
+    box-shadow: 0 10px 0 #C92A1C, 0 30px 40px -12px rgba(255,68,51,.55); transition: transform .12s, box-shadow .12s;
+    opacity: 0; animation: surge .6s 3.3s forwards; }
+  .jogar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
+    transform: translateX(-120%); animation: luz 2.8s 4s ease-in-out infinite; }
+  @keyframes luz { 60%, 100% { transform: translateX(120%); } }
+  .jogar:hover { transform: translateY(-4px); box-shadow: 0 14px 0 #C92A1C, 0 36px 44px -12px rgba(255,68,51,.55); }
+  .jogar:active { transform: translateY(8px); box-shadow: 0 2px 0 #C92A1C, 0 10px 20px -12px rgba(255,68,51,.55); }
+  .jogar:focus-visible { outline: 4px solid var(--azul); outline-offset: 6px; }
+
+  /* [do 1] Cartão de vidro que inclina com o mouse */
+  .demo { position: relative; background: rgba(255,255,255,.6); backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.95); border-radius: 32px; padding: 26px 28px;
+    box-shadow: 0 40px 80px -30px rgba(18,24,49,.35); transition: transform .25s; }
+  .charada { font-size: 24px; line-height: 1.3; color: var(--suave); min-height: 64px; }
+  .charada b { color: var(--tomate); }
+  .area { display: grid; grid-template-columns: 290px 1fr; gap: 26px; margin-top: 14px; }
+
+  /* [do 2] Quadro que flutua com sombra embaixo */
+  .quadro-wrap { position: relative; height: 320px; }
+  .quadro { position: relative; width: 290px; height: 290px; background: #fff; border-radius: 22px;
+    box-shadow: 0 0 0 2px #E3E9F5, 0 24px 30px -14px rgba(18,24,49,.35); animation: boia 4s ease-in-out infinite; overflow: hidden; }
+  @keyframes boia { 50% { transform: translateY(-10px) rotate(-1deg); } }
+  .sombra { position: absolute; left: 30px; right: 30px; bottom: 0; height: 18px; border-radius: 50%;
+    background: radial-gradient(rgba(18,24,49,.25), transparent 70%); animation: sombra 4s ease-in-out infinite; }
+  @keyframes sombra { 50% { transform: scaleX(.8); opacity: .6; } }
+  #desenho { position: absolute; inset: 0; }
+  #desenho path { fill: none; stroke: var(--tinta); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+  /* [do 1] varredura das redes */
+  .scan { position: absolute; left: 0; right: 0; height: 60px; top: -60px; background: linear-gradient(180deg, transparent, rgba(47,107,255,.16), transparent); animation: scan 2.2s linear infinite; }
+  @keyframes scan { to { top: 100%; } }
+  /* [do 1] anel do tempo */
+  .relogio { position: absolute; right: 10px; top: 10px; width: 64px; height: 64px; }
+  .relogio text { font: 700 22px var(--fonte); fill: var(--tinta); }
+
+  /* Palpites: barras de vidro com gradiente; o líder ganha cor de ação */
+  .titulo-palpites { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+  .palpite { position: relative; height: 48px; border-radius: 14px; background: #EAF0FA; overflow: hidden; margin-bottom: 12px; }
+  .palpite .barra { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 14px; background: linear-gradient(90deg, var(--azul), var(--menta));
+    transition: width .6s cubic-bezier(.2,1.2,.3,1); }
+  .palpite.lider .barra { background: linear-gradient(90deg, var(--tomate), #FFA03D); }
+  .palpite span { position: relative; display: flex; justify-content: space-between; padding: 0 14px; line-height: 48px; font-size: 24px; font-weight: 600; }
+
+  /* Zé: robô de chapéu [do 1/2] que flutua, pisca e mexe a boca ao falar [do 3] */
+  .ze { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
+  .ze svg { width: 92px; flex: none; animation: flutua 3s ease-in-out infinite; }
+  @keyframes flutua { 50% { transform: translateY(-8px) rotate(-3deg); } }
+  .olho { animation: pisca 4s infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes pisca { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .boca { transform-origin: center; transform-box: fill-box; }
+  .ze.falando .boca { animation: boca .16s infinite alternate; }
+  @keyframes boca { to { transform: scaleY(3); } }
+  .balao { flex: 1; background: #fff; border-radius: 20px 20px 20px 4px; padding: 14px 18px; font-size: 24px; line-height: 1.3;
+    box-shadow: 0 10px 30px -14px rgba(18,24,49,.3); min-height: 64px; }
+
+  /* [do 3] Veredito escrito e circulado à mão, por cima do cartão */
+  .veredito { position: absolute; left: 4%; top: 30%; width: 92%; pointer-events: none; overflow: visible; }
+  .veredito text { font: 900 86px var(--fonte); fill: var(--tomate); opacity: 0; transform: rotate(-7deg) scale(1.6);
+    transform-origin: center; transform-box: fill-box; }
+  .veredito ellipse { fill: rgba(255,255,255,.75); stroke: var(--tomate); stroke-width: 7; stroke-dasharray: 1500; stroke-dashoffset: 1500; }
+  .veredito.mostra text { animation: bate .45s cubic-bezier(.3,1.6,.5,1) forwards; }
+  .veredito.mostra ellipse { animation: traco .8s .15s cubic-bezier(.6,0,.2,1) forwards; }
+  @keyframes bate { to { opacity: 1; transform: rotate(-7deg) scale(1); } }
+  #confete { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+
+  /* [do 3] Pincelada que cobre a tela ao clicar em Jogar */
+  .pincel { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9; }
+  .pincel path { fill: none; stroke: var(--tomate); stroke-width: 520; stroke-linecap: round; stroke-dasharray: 4200; stroke-dashoffset: 4200; }
+  .pincel.vai path { animation: traco .9s cubic-bezier(.7,0,.2,1) forwards; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; animation-delay: 0s !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<canvas id="rede"></canvas>
+<canvas id="confete"></canvas>
+<main class="palco">
+  <section>
+    <svg class="titulo" viewBox="0 0 720 340" role="img" aria-label="Desenha Aí, Sô!">
+      <text x="4" y="130">Desenha</text>
+      <text x="4" y="270">Aí, <tspan class="so">Sô!</tspan></text>
+      <path class="risco" d="M14 310 C 170 292, 400 326, 580 300 S 700 308, 710 302"/>
+    </svg>
+    <p class="chamada">Você desenha e <mark>duas redes neurais adivinham enquanto o traço sai</mark>. O Zé, uma IA que roda aqui, sem internet, dá o veredito.</p>
+    <div class="numeros">
+      <div class="numero"><strong data-alvo="94.7">0</strong>% de acerto</div>
+      <div class="numero"><strong data-alvo="30">0</strong> desenhos</div>
+      <div class="numero"><strong data-alvo="20">0</strong> segundos</div>
+    </div>
+    <button class="jogar" id="jogar">Jogar agora</button>
+  </section>
+
+  <section class="demo" id="demo" aria-label="Demonstração">
+    <p class="charada" id="charada"></p>
+    <div class="area">
+      <div class="quadro-wrap">
+        <div class="quadro">
+          <svg id="desenho" viewBox="0 0 300 300"></svg>
+          <div class="scan"></div>
+          <svg class="relogio" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="27" stroke="#E3E9F5" stroke-width="7" fill="#fff"/>
+            <circle id="anel" cx="32" cy="32" r="27" stroke="#FF4433" stroke-width="7" fill="none" stroke-linecap="round"
+              stroke-dasharray="170" stroke-dashoffset="0" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset .6s"/>
+            <text id="seg" x="32" y="40" text-anchor="middle">20</text>
+          </svg>
+        </div>
+        <div class="sombra"></div>
+      </div>
+      <div>
+        <p class="titulo-palpites">O que as redes acham</p>
+        <div id="lista"></div>
+      </div>
+    </div>
+    <div class="ze" id="ze">
+      <svg viewBox="0 0 100 110" aria-hidden="true">
+        <rect x="12" y="30" width="76" height="62" rx="24" fill="#fff" stroke="#2F6BFF" stroke-width="4"/>
+        <rect x="22" y="42" width="56" height="38" rx="15" fill="#121831"/>
+        <ellipse class="olho" cx="38" cy="56" rx="6" ry="7" fill="#14C39A"/><ellipse class="olho" cx="62" cy="56" rx="6" ry="7" fill="#14C39A"/>
+        <ellipse class="boca" cx="50" cy="71" rx="8" ry="2" fill="#14C39A"/>
+        <path d="M6 32 Q50 -6 94 32 Z" fill="#FFC233"/><rect x="0" y="28" width="100" height="9" rx="4.5" fill="#E0A21A"/>
+        <rect x="34" y="94" width="32" height="12" rx="6" fill="#2F6BFF" opacity=".8"/>
+      </svg>
+      <div class="balao" id="fala"></div>
+    </div>
+    <svg class="veredito" id="veredito" viewBox="0 0 500 160" aria-hidden="true">
+      <ellipse cx="250" cy="80" rx="236" ry="66"/>
+      <text x="250" y="110" text-anchor="middle">ACERTOU!</text>
+    </svg>
+  </section>
+</main>
+<svg class="pincel" id="pincel" viewBox="0 0 1600 900" preserveAspectRatio="none"><path d="M-300 450 C 400 80, 1200 820, 1900 450"/></svg>
+
+<script>
+const reduzir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+/* Números contam até o valor (começa junto com a entrada da linha) */
+document.querySelectorAll("[data-alvo]").forEach(el => {
+  const alvo = +el.dataset.alvo, casas = alvo % 1 ? 1 : 0, inicio = performance.now() + 3100;
+  const passo = t => { const p = Math.min(1, Math.max(0, (t - inicio) / 1400)), v = alvo * (1 - Math.pow(1 - p, 3));
+    el.textContent = v.toFixed(casas).replace(".", ","); if (p < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+});
+
+/* Rede neural do fundo: camadas de nós, pulsos menta viajando pelas ligações */
+const rede = document.getElementById("rede"), ctx = rede.getContext("2d");
+let nos = [], ligacoes = [], pulsos = [];
+function montarRede() {
+  rede.width = innerWidth * devicePixelRatio; rede.height = innerHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  nos = []; [5, 8, 8, 6, 3].forEach((n, c) => { for (let i = 0; i < n; i++)
+    nos.push({ c, x: innerWidth * (0.05 + c * 0.225), y: innerHeight * ((i + 1) / (n + 1)), fase: Math.random() * 6 }); });
+  ligacoes = []; nos.forEach(a => nos.forEach(b => { if (b.c === a.c + 1 && Math.random() < .55) ligacoes.push([a, b]); }));
+}
+function desenharRede(t) {
+  ctx.clearRect(0, 0, innerWidth, innerHeight); ctx.lineWidth = 1; ctx.strokeStyle = "rgba(47,107,255,.10)";
+  ligacoes.forEach(([a, b]) => { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); });
+  if (Math.random() < .35) pulsos.push({ l: ligacoes[Math.random() * ligacoes.length | 0], p: 0 });
+  pulsos = pulsos.filter(p => (p.p += .018) < 1);
+  pulsos.forEach(({ l: [a, b], p }) => { const x = a.x + (b.x - a.x) * p, y = a.y + (b.y - a.y) * p;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 10); g.addColorStop(0, "rgba(20,195,154,.9)"); g.addColorStop(1, "rgba(20,195,154,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 10, 0, 7); ctx.fill(); });
+  ctx.lineWidth = 2; ctx.strokeStyle = "rgba(47,107,255,.35)"; ctx.fillStyle = "#fff";
+  nos.forEach(n => { ctx.beginPath(); ctx.arc(n.x, n.y, 5 + Math.sin(t / 600 + n.fase) * 1.5, 0, 7); ctx.fill(); ctx.stroke(); });
+  if (!reduzir) requestAnimationFrame(desenharRede);
+}
+montarRede(); addEventListener("resize", montarRede); requestAnimationFrame(desenharRede);
+
+/* Cartão inclina com o mouse */
+const demo = document.getElementById("demo");
+addEventListener("mousemove", e => { if (reduzir) return;
+  demo.style.transform = `perspective(1200px) rotateX(${(e.clientY / innerHeight - .5) * -6}deg) rotateY(${(e.clientX / innerWidth - .5) * 8}deg)`; });
+
+/* Fala do Zé: digita letra a letra com a boca mexendo; prefixo opcional em negrito */
+const ze = document.getElementById("ze");
+async function digitar(el, texto, prefixo = "", boca = false) {
+  el.innerHTML = prefixo ? `<b>${prefixo}</b> ` : ""; const n = document.createTextNode(""); el.append(n);
+  if (boca) ze.classList.add("falando");
+  for (const c of texto) { n.data += c; await espera(22); }
+  ze.classList.remove("falando");
+}
+
+/* Palpites em barras */
+const lista = document.getElementById("lista");
+function mostrarPalpites(dados) {
+  if (!lista.children.length) dados.forEach(() => lista.insertAdjacentHTML("beforeend", '<div class="palpite"><div class="barra"></div><span><i></i><b></b></span></div>'));
+  dados.forEach(([nome, p], i) => { const d = lista.children[i]; d.classList.toggle("lider", i === 0);
+    d.querySelector("i").textContent = nome; d.querySelector("i").style.fontStyle = "normal";
+    d.querySelector("b").textContent = p + "%"; d.querySelector(".barra").style.width = p + "%"; });
+}
+
+/* Traço que se desenha (stroke-dashoffset) */
+const desenho = document.getElementById("desenho");
+async function tracar(d) {
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", d); desenho.append(p);
+  const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+  p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 700, easing: "ease-in-out", fill: "forwards" }); await espera(750);
+}
+
+const tracos = ["M45 140 L150 55 L255 140", "M65 128 L65 260 L235 260 L235 128", "M130 260 L130 195 L170 195 L170 260",
+  "M88 160 L114 160 L114 186 L88 186 Z", "M196 96 L196 68 L214 68 L214 112"];
+const etapas = [[["chapéu", 38], ["montanha", 27], ["casa", 14]], [["celeiro", 41], ["casa", 36], ["chapéu", 8]],
+  [["casa", 71], ["celeiro", 19], ["igreja", 4]], [["casa", 88], ["celeiro", 7], ["igreja", 2]], [["casa", 96], ["celeiro", 3], ["igreja", 1]]];
+const charada = document.getElementById("charada"), fala = document.getElementById("fala"), veredito = document.getElementById("veredito"),
+  anel = document.getElementById("anel"), seg = document.getElementById("seg");
+
+async function rodada() {
+  desenho.innerHTML = ""; lista.innerHTML = ""; veredito.classList.remove("mostra"); anel.style.strokeDashoffset = 0; seg.textContent = 20;
+  await digitar(charada, "tem telhado, porta e janela, e é onde a gente volta no fim do dia.", "Charada do Zé:");
+  await digitar(fala, "Bora, sô! Mostra pras máquinas que ocê sabe desenhar!", "", true);
+  for (let i = 0; i < tracos.length; i++) {
+    await tracar(tracos[i]); mostrarPalpites(etapas[i]);
+    anel.style.strokeDashoffset = 170 * (i + 1) / 8; seg.textContent = 20 - (i + 1) * 3; await espera(500);
+  }
+  veredito.classList.add("mostra"); confete();
+  await digitar(fala, "Ô trem bão! Casa com 96% de certeza. Ponto pro ocê!", "", true);
+  await espera(3500); rodada();
+}
+setTimeout(rodada, 1200);
+
+/* Confete que gira em dois eixos (escala no X simula a rotação 3D) */
+const cv = document.getElementById("confete"), cc = cv.getContext("2d");
+function confete() {
+  if (reduzir) return; cv.width = innerWidth; cv.height = innerHeight;
+  const r = demo.getBoundingClientRect(), cores = ["#2F6BFF", "#14C39A", "#FF4433", "#FFC233", "#6A4BFF"];
+  let ps = Array.from({ length: 170 }, () => ({ x: r.left + r.width / 2, y: r.top + r.height * .4, vx: (Math.random() - .5) * 20,
+    vy: -Math.random() * 17 - 5, a: Math.random() * 6, va: Math.random() * .3, f: Math.random() * 6, c: cores[Math.random() * 5 | 0] }));
+  const passo = () => { cc.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => { p.vy += .5; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va; p.f += .25;
+      cc.save(); cc.translate(p.x, p.y); cc.rotate(p.a); cc.scale(Math.cos(p.f), 1); cc.fillStyle = p.c; cc.fillRect(-7, -4, 14, 8); cc.restore(); });
+    ps = ps.filter(p => p.y < innerHeight + 30); if (ps.length) requestAnimationFrame(passo); };
+  passo();
+}
+
+/* Jogar: pincelada tomate cobre a tela (no jogo, levaria à tela do apelido) */
+document.getElementById("jogar").addEventListener("click", () => {
+  const p = document.getElementById("pincel"); p.classList.remove("vai"); void p.offsetWidth; p.classList.add("vai");
+  setTimeout(() => p.classList.remove("vai"), 1800);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galeria das telas</title>
+<style>
+  :root { --papel: #f7ecd4; --tinta: #2b1a0a; --terracota: #b5401f; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--papel); color: var(--tinta); font-family: "Segoe UI", system-ui, sans-serif; padding: 28px; }
+  h1 { font-size: 40px; margin-bottom: 6px; } p.sub { font-size: 20px; color: #6b4f2e; margin-bottom: 24px; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(560px, 1fr)); gap: 28px; }
+  figure { background: #fffdf6; border: 3px solid var(--tinta); border-radius: 18px; box-shadow: 6px 6px 0 var(--terracota); padding: 12px; }
+  figcaption { font-size: 20px; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  figcaption a { color: var(--terracota); font-weight: 600; }
+  .janela { position: relative; width: 100%; aspect-ratio: 1366 / 768; overflow: hidden; border-radius: 10px; border: 2px solid #ead7ad; }
+  .janela iframe { position: absolute; left: 0; top: 0; width: 1366px; height: 768px; border: 0; transform-origin: 0 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<h1>Desenha Aí, Sô! · todas as telas</h1>
+<p class="sub">Cada quadro é o jogo de verdade (rascunho 9) aberto direto numa tela, a 1366×768. Clique em "abrir" para ver em tamanho real e interagir.</p>
+<div class="grade" id="grade"></div>
+<script>
+const telas = [["intro", "1 · Início (introdução com demonstração)"], ["apelido", "2 · Apelido + Pergunte ao Zé"], ["pensando", "3a · Charada: Zé pensando"],
+  ["charada", "3b · Charada pronta"], ["desenho", "4 · Desenho (lápis, borracha, palpites)"], ["acertou", "5a · Veredito: acertou"],
+  ["quase", "5b · Veredito: quase"], ["errou", "5c · Veredito: errou"], ["placar", "6 · Placar (top 5, pesquisa, ordem)"]];
+const grade = document.getElementById("grade");
+telas.forEach(([id, nome]) => {
+  const url = "9_jogavel_tinta_cores.html" + (id === "intro" ? "" : "#tela=" + id);
+  grade.insertAdjacentHTML("beforeend", `<figure><figcaption>${nome}<a href="${url}" target="_blank">abrir ↗</a></figcaption><div class="janela"><iframe src="${url}" loading="lazy" title="${nome}"></iframe></div></figure>`);
+});
+/* Escala cada iframe para caber no quadro */
+const escalar = () => document.querySelectorAll(".janela").forEach(j => j.firstElementChild.style.transform = `scale(${j.clientWidth / 1366})`);
+addEventListener("resize", escalar); escalar();
+</script>
+</body>
+</html>

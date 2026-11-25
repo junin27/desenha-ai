@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratório vivo</title>
+<style>
+  /* Paleta: fundo claro de laboratório, azul elétrico (CNN), menta (LSTM), coral (ensemble/ação) */
+  :root {
+    --fundo: #F4F7FC; --tinta: #0E1630; --suave: #5B6684;
+    --azul: #2F6BFF; --menta: #14C39A; --coral: #FF5A4E; --vidro: rgba(255,255,255,.62);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--fundo); color: var(--tinta);
+    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+  /* Rede neural viva no fundo (canvas) */
+  #rede { position: fixed; inset: 0; z-index: 0; }
+  .palco { position: relative; z-index: 1; height: 100%; display: grid;
+    grid-template-columns: 1.05fr 1fr; gap: 3vw; align-items: center; padding: 4vh 5vw; }
+
+  /* Título: cada letra entra em cascata (stagger) e depois "respira" com um brilho que corre */
+  h1 { font-size: clamp(56px, 7.4vw, 132px); line-height: .92; font-weight: 800; letter-spacing: -.04em; }
+  h1 .l { display: inline-block; opacity: 0; transform: translateY(60%) rotate(8deg);
+    animation: entra .9s cubic-bezier(.2,.9,.2,1.2) forwards; }
+  h1 .so { background: linear-gradient(100deg, var(--azul), var(--menta) 45%, var(--coral) 70%, var(--azul));
+    background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: entra .9s cubic-bezier(.2,.9,.2,1.2) forwards, brilho 6s linear infinite; }
+  @keyframes entra { to { opacity: 1; transform: none; } }
+  @keyframes brilho { to { background-position: -300% 0; } }
+  .chamada { margin-top: 3vh; font-size: clamp(24px, 1.7vw, 32px); color: var(--suave); max-width: 30ch; line-height: 1.3; }
+  .chamada b { color: var(--tinta); }
+  .numeros { display: flex; gap: 2.4vw; margin-top: 4vh; }
+  .numero { font-size: clamp(24px, 1.4vw, 28px); color: var(--suave); }
+  .numero strong { display: block; font-size: clamp(40px, 3.4vw, 64px); color: var(--tinta); font-variant-numeric: tabular-nums; }
+
+  /* Botão Jogar: magnético (segue o mouse) + faixa de luz que passa */
+  .jogar { margin-top: 5vh; position: relative; overflow: hidden; border: 0; cursor: pointer;
+    font: 700 clamp(28px, 2vw, 36px)/1 "Segoe UI", system-ui, sans-serif; color: #fff; padding: 26px 64px; border-radius: 999px;
+    background: linear-gradient(135deg, var(--azul), #6A4BFF); box-shadow: 0 18px 40px -12px rgba(47,107,255,.6);
+    transition: transform .25s cubic-bezier(.2,.9,.2,1); }
+  .jogar::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+    transform: translateX(-120%); animation: luz 2.8s ease-in-out infinite; }
+  @keyframes luz { 60%,100% { transform: translateX(120%); } }
+  .jogar:focus-visible { outline: 4px solid var(--coral); outline-offset: 6px; }
+
+  /* Cartão de vidro com a demonstração */
+  .demo { position: relative; background: var(--vidro); backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,.9); border-radius: 32px; padding: 28px;
+    box-shadow: 0 40px 80px -30px rgba(14,22,48,.35); transform-style: preserve-3d; transition: transform .2s; }
+  .charada { font-size: 24px; color: var(--suave); min-height: 64px; }
+  .charada b { color: var(--tinta); }
+  .area { display: grid; grid-template-columns: 300px 1fr; gap: 24px; margin-top: 12px; align-items: start; }
+  .quadro { position: relative; width: 300px; height: 300px; border-radius: 22px; background: #fff;
+    box-shadow: inset 0 0 0 2px #E3E9F5; overflow: hidden; }
+  .quadro svg { position: absolute; inset: 0; }
+  /* "Varredura" das redes passando sobre o desenho */
+  .scan { position: absolute; left: 0; right: 0; height: 60px; top: -60px;
+    background: linear-gradient(180deg, transparent, rgba(47,107,255,.18), transparent); animation: scan 2.2s linear infinite; }
+  @keyframes scan { to { top: 100%; } }
+  /* Cronômetro em anel */
+  .relogio { position: absolute; right: 10px; top: 10px; width: 64px; height: 64px; }
+  .relogio text { font: 700 22px system-ui; fill: var(--tinta); }
+
+  .palpites { display: grid; gap: 14px; }
+  .rede-nome { font-size: 24px; font-weight: 700; display: flex; justify-content: space-between; }
+  .palpite { position: relative; height: 46px; border-radius: 14px; background: #EAF0FA; overflow: hidden; }
+  .palpite .barra { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 14px;
+    background: linear-gradient(90deg, var(--azul), var(--menta)); transition: width .6s cubic-bezier(.2,.9,.2,1); }
+  .palpite.lider .barra { background: linear-gradient(90deg, var(--coral), #FF9A3C); }
+  .palpite span { position: relative; z-index: 1; display: flex; justify-content: space-between; padding: 0 14px;
+    line-height: 46px; font-size: 24px; font-weight: 600; }
+
+  /* Zé: robozinho holograma que flutua, pisca e fala */
+  .ze { display: flex; gap: 16px; align-items: center; margin-top: 22px; }
+  .ze svg { width: 92px; flex: none; animation: flutua 3s ease-in-out infinite; }
+  @keyframes flutua { 50% { transform: translateY(-8px) rotate(-3deg); } }
+  .olho { animation: pisca 4s infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes pisca { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .balao { flex: 1; background: #fff; border-radius: 20px 20px 20px 4px; padding: 14px 18px; font-size: 24px;
+    box-shadow: 0 10px 30px -14px rgba(14,22,48,.3); min-height: 64px; }
+
+  /* Veredito: carimbo que bate e confete */
+  .veredito { position: absolute; left: 50%; top: 42%; transform: translate(-50%,-50%) scale(3) rotate(-12deg); opacity: 0;
+    font: 900 64px/1 "Segoe UI", system-ui, sans-serif; color: var(--menta); padding: 8px 28px; border: 8px solid currentColor; border-radius: 18px;
+    background: rgba(255,255,255,.85); pointer-events: none; }
+  .veredito.bate { animation: carimbo .5s cubic-bezier(.3,1.6,.5,1) forwards; }
+  @keyframes carimbo { to { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(-12deg); } }
+  #confete { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; }
+    h1 .l { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<canvas id="rede"></canvas>
+<canvas id="confete"></canvas>
+<main class="palco">
+  <section>
+    <h1 id="titulo">Desenha Aí, <span class="l so">Sô!</span></h1>
+    <p class="chamada">Você desenha. <b>Duas redes neurais</b> adivinham <b>enquanto o traço ainda está saindo</b>. E o Zé, uma IA que roda aqui mesmo, sem internet, dá o veredito.</p>
+    <div class="numeros">
+      <div class="numero"><strong data-alvo="94.7">0</strong>% de acerto</div>
+      <div class="numero"><strong data-alvo="30">0</strong> desenhos</div>
+      <div class="numero"><strong data-alvo="20">0</strong> segundos</div>
+    </div>
+    <button class="jogar" id="jogar">Jogar agora</button>
+  </section>
+
+  <section class="demo" id="demo" aria-label="Demonstração">
+    <p class="charada" id="charada"></p>
+    <div class="area">
+      <div class="quadro">
+        <svg viewBox="0 0 300 300" id="desenho" fill="none" stroke="#0E1630" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <div class="scan"></div>
+        <svg class="relogio" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="27" stroke="#E3E9F5" stroke-width="7" fill="#fff"/>
+          <circle id="anel" cx="32" cy="32" r="27" stroke="#FF5A4E" stroke-width="7" fill="none" stroke-linecap="round"
+                  stroke-dasharray="170" stroke-dashoffset="0" transform="rotate(-90 32 32)"/>
+          <text id="segundos" x="32" y="40" text-anchor="middle">20</text>
+        </svg>
+        <div class="veredito" id="veredito">ACERTOU!</div>
+      </div>
+      <div class="palpites">
+        <div class="rede-nome"><span>Palpites das redes</span></div>
+        <div id="lista"></div>
+      </div>
+    </div>
+    <div class="ze">
+      <svg viewBox="0 0 100 110" aria-hidden="true">
+        <line x1="50" y1="6" x2="50" y2="20" stroke="#2F6BFF" stroke-width="4"/><circle cx="50" cy="6" r="6" fill="#FF5A4E"/>
+        <rect x="12" y="20" width="76" height="60" rx="22" fill="#fff" stroke="#2F6BFF" stroke-width="4"/>
+        <rect x="22" y="32" width="56" height="34" rx="14" fill="#0E1630"/>
+        <ellipse class="olho" cx="38" cy="49" rx="6" ry="8" fill="#14C39A"/><ellipse class="olho" cx="62" cy="49" rx="6" ry="8" fill="#14C39A"/>
+        <path d="M24 20 Q50 2 76 20" stroke="#C08A3E" stroke-width="7" fill="none"/>
+        <rect x="32" y="84" width="36" height="20" rx="8" fill="#2F6BFF" opacity=".8"/>
+      </svg>
+      <div class="balao" id="fala"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const reduzir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Título: quebra em letras e aplica atraso crescente (stagger) */
+const titulo = document.getElementById("titulo");
+const so = titulo.querySelector(".so");
+const texto = titulo.firstChild.textContent;
+titulo.firstChild.remove();
+[...texto].reverse().forEach((c, i) => {
+  const s = document.createElement("span");
+  s.className = "l"; s.textContent = c === " " ? " " : c;
+  titulo.prepend(s);
+});
+titulo.querySelectorAll(".l").forEach((l, i) => l.style.animationDelay = (i * 45) + "ms");
+
+/* Números que contam até o valor */
+document.querySelectorAll("[data-alvo]").forEach(el => {
+  const alvo = +el.dataset.alvo, casas = alvo % 1 ? 1 : 0, t0 = performance.now() + 600;
+  const passo = t => { const p = Math.min(1, Math.max(0, (t - t0) / 1400)), v = alvo * (1 - Math.pow(1 - p, 3));
+    el.textContent = v.toFixed(casas).replace(".", ","); if (p < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+});
+
+/* Rede neural do fundo: nós em camadas, pulsos de luz viajam pelas conexões */
+const rede = document.getElementById("rede"), ctx = rede.getContext("2d");
+let nos = [], ligacoes = [], pulsos = [];
+function montarRede() {
+  rede.width = innerWidth * devicePixelRatio; rede.height = innerHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  const camadas = [5, 8, 8, 6, 3]; nos = [];
+  camadas.forEach((n, c) => { for (let i = 0; i < n; i++)
+    nos.push({ c, x: innerWidth * (0.06 + c * 0.22), y: innerHeight * ((i + 1) / (n + 1)), fase: Math.random() * 6 }); });
+  ligacoes = [];
+  nos.forEach(a => nos.forEach(b => { if (b.c === a.c + 1 && Math.random() < .55) ligacoes.push([a, b]); }));
+}
+function desenharRede(t) {
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  ctx.lineWidth = 1;
+  ligacoes.forEach(([a, b]) => { ctx.strokeStyle = "rgba(47,107,255,.10)"; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); });
+  if (Math.random() < .35 && ligacoes.length) pulsos.push({ l: ligacoes[Math.random() * ligacoes.length | 0], p: 0 });
+  pulsos = pulsos.filter(p => (p.p += .018) < 1);
+  pulsos.forEach(({ l: [a, b], p }) => { const x = a.x + (b.x - a.x) * p, y = a.y + (b.y - a.y) * p;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, 10); g.addColorStop(0, "rgba(20,195,154,.9)"); g.addColorStop(1, "rgba(20,195,154,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 10, 0, 7); ctx.fill(); });
+  nos.forEach(n => { const r = 5 + Math.sin(t / 600 + n.fase) * 1.5;
+    ctx.fillStyle = "#fff"; ctx.strokeStyle = "rgba(47,107,255,.35)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 7); ctx.fill(); ctx.stroke(); });
+  if (!reduzir) requestAnimationFrame(desenharRede);
+}
+montarRede(); addEventListener("resize", montarRede); requestAnimationFrame(desenharRede);
+
+/* Cartão de vidro inclina levemente seguindo o mouse; botão Jogar é "magnético" */
+const demo = document.getElementById("demo"), jogar = document.getElementById("jogar");
+addEventListener("mousemove", e => {
+  if (reduzir) return;
+  const rx = (e.clientY / innerHeight - .5) * -6, ry = (e.clientX / innerWidth - .5) * 8;
+  demo.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  const b = jogar.getBoundingClientRect(), dx = e.clientX - (b.left + b.width / 2), dy = e.clientY - (b.top + b.height / 2);
+  const perto = Math.hypot(dx, dy) < 160;
+  jogar.style.transform = perto ? `translate(${dx * .25}px, ${dy * .35}px) scale(1.05)` : "";
+});
+
+/* Demonstração em loop: o desenho de uma casa se faz traço a traço e os palpites mudam */
+const tracos = [
+  "M60 140 L150 60 L240 140", "M75 128 L75 250 L225 250 L225 128",
+  "M130 250 L130 190 L170 190 L170 250", "M95 160 L120 160 L120 185 L95 185 Z", "M190 98 L190 70 L208 70 L208 114"
+];
+const etapas = [ // palpites do ensemble depois de cada traço
+  [["chapéu", 38], ["montanha", 27], ["casa", 14]],
+  [["celeiro", 41], ["casa", 36], ["chapéu", 8]],
+  [["casa", 71], ["celeiro", 19], ["igreja", 4]],
+  [["casa", 88], ["celeiro", 7], ["igreja", 2]],
+  [["casa", 96], ["celeiro", 3], ["igreja", 1]],
+];
+const desenho = document.getElementById("desenho"), lista = document.getElementById("lista");
+const fala = document.getElementById("fala"), charada = document.getElementById("charada");
+const veredito = document.getElementById("veredito"), anel = document.getElementById("anel"), seg = document.getElementById("segundos");
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+/* Digita o texto letra a letra; um prefixo opcional entra em negrito de uma vez */
+async function digitar(el, texto, prefixo = "") { el.innerHTML = prefixo ? `<b>${prefixo}</b> ` : ""; const n = document.createTextNode(""); el.append(n);
+  for (const c of texto) { n.data += c; await espera(22); } }
+
+function mostrarPalpites(dados) {
+  if (!lista.children.length) dados.forEach(() => { const d = document.createElement("div"); d.className = "palpite";
+    d.innerHTML = '<div class="barra"></div><span><em></em><b></b></span>'; d.style.marginBottom = "10px"; lista.append(d); });
+  dados.forEach(([nome, p], i) => { const d = lista.children[i];
+    d.classList.toggle("lider", i === 0); d.querySelector("em").textContent = nome; d.querySelector("em").style.fontStyle = "normal";
+    d.querySelector("b").textContent = p + "%"; d.querySelector(".barra").style.width = p + "%"; });
+}
+
+async function traçar(d) {
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", d); desenho.append(p);
+  const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+  p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 700, easing: "ease-in-out", fill: "forwards" });
+  await espera(750);
+}
+
+async function rodada() {
+  desenho.innerHTML = ""; lista.innerHTML = ""; veredito.classList.remove("bate");
+  await digitar(charada, "tem telhado, porta e janela, e é onde a gente volta no fim do dia.", "Charada do Zé:");
+  await digitar(fala, "Bora, sô! Mostra pras máquinas que ocê sabe desenhar!");
+  for (let i = 0; i < tracos.length; i++) {
+    anel.style.strokeDashoffset = (170 * (i + 1) / 8); seg.textContent = 20 - (i + 1) * 3;
+    await traçar(tracos[i]); mostrarPalpites(etapas[i]); await espera(500);
+  }
+  veredito.classList.add("bate"); soltarConfete();
+  await digitar(fala, "Ô trem bão! Casa com 96% de certeza. Ponto pro ocê!");
+  await espera(3500); rodada();
+}
+
+/* Confete simples em canvas (cores da paleta), dura ~2,5 s */
+const cf = document.getElementById("confete"), cc = cf.getContext("2d");
+function soltarConfete() {
+  if (reduzir) return;
+  cf.width = innerWidth; cf.height = innerHeight;
+  const r = demo.getBoundingClientRect(), cores = ["#2F6BFF", "#14C39A", "#FF5A4E", "#FFB020", "#6A4BFF"];
+  let ps = Array.from({ length: 140 }, () => ({ x: r.left + r.width * .35, y: r.top + r.height * .4,
+    vx: (Math.random() - .5) * 16, vy: -Math.random() * 16 - 4, g: Math.random() * 6, c: cores[Math.random() * 5 | 0], w: 6 + Math.random() * 8 }));
+  const passo = () => { cc.clearRect(0, 0, cf.width, cf.height);
+    ps.forEach(p => { p.vy += .45; p.x += p.vx; p.y += p.vy; p.g += .2; cc.save(); cc.translate(p.x, p.y); cc.rotate(p.g);
+      cc.fillStyle = p.c; cc.fillRect(-p.w / 2, -3, p.w, 6); cc.restore(); });
+    ps = ps.filter(p => p.y < innerHeight + 20); if (ps.length) requestAnimationFrame(passo); };
+  passo();
+}
+rodada();
+</script>
+</body>
+</html>

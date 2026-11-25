@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jogável: Tinta cinética</title>
+<style>
+  :root { --fundo: #F5F7FC; --tinta: #121831; --suave: #5D6684; --azul: #2F6BFF; --menta: #14C39A; --tomate: #FF4433;
+    --ouro: #FFC233; --prata: #B9C2D6; --bronze: #D98C4A; --fonte: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; overflow: hidden; color: var(--tinta); font-family: var(--fonte); font-size: 24px;
+    background: radial-gradient(120% 90% at 30% 0%, #fff, var(--fundo) 60%, #E8EDFB); }
+  button, input { font: inherit; }
+  #rede, #confete { position: fixed; inset: 0; pointer-events: none; }
+  #confete { z-index: 20; }
+
+  /* Telas: só uma visível; entram deslizando */
+  .tela { position: fixed; inset: 0; padding: 3vh 4vw; display: none; }
+  .tela.ativa { display: grid; animation: entraTela .6s cubic-bezier(.2,.9,.2,1); }
+  @keyframes entraTela { from { opacity: 0; transform: translateY(24px) scale(.98); } }
+
+  /* Componentes comuns */
+  .vidro { background: rgba(255,255,255,.62); backdrop-filter: blur(18px) saturate(1.4); border: 1px solid rgba(255,255,255,.95);
+    border-radius: 30px; box-shadow: 0 40px 80px -30px rgba(18,24,49,.35); }
+  .botao { position: relative; overflow: hidden; border: 0; cursor: pointer; font-weight: 800; color: #fff; padding: 22px 52px; border-radius: 22px;
+    background: linear-gradient(135deg, var(--tomate), #FF7A3D); box-shadow: 0 9px 0 #C92A1C, 0 26px 36px -12px rgba(255,68,51,.5);
+    transition: transform .12s, box-shadow .12s; }
+  .botao:hover { transform: translateY(-3px); }
+  .botao:active { transform: translateY(7px); box-shadow: 0 2px 0 #C92A1C; }
+  .botao.azul { background: linear-gradient(135deg, var(--azul), #6A4BFF); box-shadow: 0 9px 0 #1F47C2, 0 26px 36px -12px rgba(47,107,255,.5); }
+  .botao.claro { background: #fff; color: var(--tinta); box-shadow: 0 9px 0 #D5DCEB, 0 20px 30px -14px rgba(18,24,49,.3); }
+  .botao:disabled { filter: grayscale(.8); opacity: .6; cursor: default; }
+  .botao:focus-visible, input:focus-visible { outline: 4px solid var(--azul); outline-offset: 4px; }
+  .brilho::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
+    transform: translateX(-120%); animation: luz 2.8s ease-in-out infinite; }
+  @keyframes luz { 60%, 100% { transform: translateX(120%); } }
+  h2 { font-size: 48px; letter-spacing: -.02em; }
+
+  /* Zé (robô de chapéu) reutilizável */
+  .ze { display: flex; gap: 16px; align-items: center; }
+  .ze svg { width: 96px; flex: none; animation: flutua 3s ease-in-out infinite; }
+  @keyframes flutua { 50% { transform: translateY(-8px) rotate(-3deg); } }
+  .olho { animation: pisca 4s infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes pisca { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  .boca { transform-origin: center; transform-box: fill-box; }
+  .ze.falando .boca { animation: boca .16s infinite alternate; }
+  @keyframes boca { to { transform: scaleY(3); } }
+  .balao { flex: 1; background: #fff; border-radius: 22px 22px 22px 4px; padding: 16px 20px; line-height: 1.3; box-shadow: 0 10px 30px -14px rgba(18,24,49,.3); min-height: 70px; }
+
+  /* ===== Tela 1: introdução ===== */
+  #intro { grid-template-columns: 1fr 1fr; gap: 4vw; align-items: center; }
+  .titulo { width: 100%; max-width: 700px; overflow: visible; }
+  .titulo text { font: 900 140px var(--fonte); letter-spacing: -6px; fill: transparent; stroke: var(--tinta); stroke-width: 2.5;
+    stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: traco 2s cubic-bezier(.6,0,.2,1) forwards, enche .5s 1.8s forwards; }
+  .titulo .so { stroke: var(--tomate); animation: traco 2s .3s cubic-bezier(.6,0,.2,1) forwards, encheso .5s 2.1s forwards; }
+  .titulo .risco { fill: none; stroke: var(--azul); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 900; stroke-dashoffset: 900; animation: traco 1s 2.3s forwards; }
+  @keyframes traco { to { stroke-dashoffset: 0; } }
+  @keyframes enche { to { fill: var(--tinta); } }
+  @keyframes encheso { to { fill: var(--tomate); } }
+  .chamada { font-size: 28px; line-height: 1.35; color: var(--suave); max-width: 30ch; margin: 1vh 0 3vh; }
+  .chamada mark { color: var(--tinta); background: linear-gradient(transparent 58%, rgba(20,195,154,.35) 58%) no-repeat; background-size: 0 100%; animation: marca .8s 2.6s forwards; }
+  @keyframes marca { to { background-size: 100% 100%; } }
+  .numeros { display: flex; gap: 2.6vw; margin-bottom: 4vh; color: var(--suave); }
+  .numeros strong { display: block; font-size: 54px; color: var(--tinta); font-variant-numeric: tabular-nums; }
+  .passos { display: flex; gap: 14px; margin-top: 2vh; }
+  .passo { flex: 1; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,.7); font-size: 24px; color: var(--suave); }
+  .passo b { display: block; color: var(--tomate); font-size: 28px; }
+  .mini { padding: 24px; }
+  .mini .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .mini svg.quadrinho { width: 100%; aspect-ratio: 1; background: #fff; border-radius: 20px; box-shadow: inset 0 0 0 2px #E3E9F5; }
+  .mini svg.quadrinho path { fill: none; stroke: var(--tinta); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ===== Tela 2: apelido + Pergunte ao Zé ===== */
+  #apelido { grid-template-columns: 1fr 1fr; gap: 3vw; align-items: center; }
+  .cartao { padding: 34px; display: grid; gap: 22px; align-content: start; }
+  .campo { width: 100%; padding: 20px 22px; border-radius: 18px; border: 2px solid #D8E0F0; background: #fff; font-size: 32px; }
+  .sugestoes { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip { border: 0; cursor: pointer; padding: 10px 18px; border-radius: 999px; background: #EAF0FA; color: var(--tinta); font-size: 24px; }
+  .chip:hover { background: #DCE6FA; }
+  .conversa { display: grid; gap: 12px; max-height: 32vh; overflow-y: auto; }
+  .msg-visitante { justify-self: end; background: var(--azul); color: #fff; padding: 12px 18px; border-radius: 20px 20px 4px 20px; max-width: 80%; }
+  .linha-form { display: flex; gap: 12px; }
+  .linha-form .campo { font-size: 24px; padding: 16px 18px; }
+
+  /* ===== Tela 3: charada ===== */
+  #charada { place-items: center; }
+  .cartao-charada { width: min(1000px, 90vw); padding: 44px; text-align: center; display: grid; gap: 26px; justify-items: center; }
+  .rodada-tag { color: var(--suave); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .texto-charada { font-size: 40px; line-height: 1.3; font-weight: 700; min-height: 110px; }
+  .pensando { display: inline-flex; gap: 10px; align-items: center; color: var(--suave); }
+  .pensando i { width: 14px; height: 14px; border-radius: 50%; background: var(--azul); animation: ponto 1s infinite; }
+  .pensando i:nth-child(2) { animation-delay: .15s; background: var(--menta); } .pensando i:nth-child(3) { animation-delay: .3s; background: var(--tomate); }
+  @keyframes ponto { 50% { transform: translateY(-12px); } }
+  .resposta-palavra { font-size: 28px; color: var(--suave); }
+  .resposta-palavra b { color: var(--tomate); }
+
+  /* ===== Tela 4: desenho ===== */
+  #desenho { grid-template-columns: auto 1fr; gap: 3vw; align-items: center; }
+  .lado-quadro { display: grid; gap: 16px; justify-items: center; }
+  .barra-topo { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .lembrete { font-size: 24px; color: var(--suave); } .lembrete b { color: var(--tinta); }
+  .quadro { position: relative; width: min(64vh, 620px); aspect-ratio: 1; background: #fff; border-radius: 26px;
+    box-shadow: 0 0 0 3px #E3E9F5, 0 30px 50px -24px rgba(18,24,49,.45); overflow: hidden; touch-action: none; }
+  .quadro canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+  .quadro.borracha canvas { cursor: cell; }
+  .scan { position: absolute; left: 0; right: 0; height: 70px; top: -70px; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(47,107,255,.14), transparent); animation: scan 2.2s linear infinite; }
+  @keyframes scan { to { top: 100%; } }
+  .ferramentas { display: flex; gap: 12px; }
+  .ferramenta { border: 0; cursor: pointer; padding: 14px 22px; border-radius: 16px; background: #fff; font-size: 24px; font-weight: 700;
+    box-shadow: 0 5px 0 #D5DCEB; display: flex; gap: 8px; align-items: center; }
+  .ferramenta.ativa { background: var(--tinta); color: #fff; box-shadow: 0 5px 0 #000; }
+  .lado-info { display: grid; gap: 20px; align-content: center; }
+  .relogio { width: 130px; height: 130px; position: relative; justify-self: start; }
+  .relogio svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .relogio b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 48px; font-variant-numeric: tabular-nums; }
+  .relogio.urgente { animation: treme .4s infinite; } .relogio.urgente b { color: var(--tomate); }
+  @keyframes treme { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+  .palpites { padding: 24px; }
+  .palpites h3 { font-size: 26px; margin-bottom: 14px; }
+  .palpite { position: relative; height: 54px; border-radius: 16px; background: #EAF0FA; overflow: hidden; margin-bottom: 12px; }
+  .palpite .barra { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 16px; background: linear-gradient(90deg, var(--azul), var(--menta)); transition: width .5s cubic-bezier(.2,1.2,.3,1); }
+  .palpite.lider .barra { background: linear-gradient(90deg, var(--tomate), #FFA03D); }
+  .palpite span { position: relative; display: flex; justify-content: space-between; padding: 0 16px; line-height: 54px; font-weight: 700; }
+  .palpite.vazio span { color: var(--suave); font-weight: 500; }
+
+  /* ===== Tela 5: veredito ===== */
+  #veredito { grid-template-columns: auto 1fr; gap: 3vw; align-items: center; }
+  .meu-desenho { position: relative; width: min(52vh, 480px); aspect-ratio: 1; background: #fff; border-radius: 26px; overflow: visible;
+    box-shadow: 0 0 0 3px #E3E9F5, 0 30px 50px -24px rgba(18,24,49,.45); animation: boia 4s ease-in-out infinite; }
+  @keyframes boia { 50% { transform: translateY(-10px) rotate(-1deg); } }
+  .meu-desenho img { width: 100%; height: 100%; border-radius: 26px; }
+  .legenda { margin-top: 18px; text-align: center; color: var(--suave); }
+  .selo { position: absolute; left: -6%; top: 34%; width: 112%; overflow: visible; pointer-events: none; }
+  .selo text { font: 900 92px var(--fonte); opacity: 0; transform: rotate(-8deg) scale(1.7); transform-origin: center; transform-box: fill-box; }
+  .selo ellipse { fill: rgba(255,255,255,.8); stroke-width: 7; stroke-dasharray: 1500; stroke-dashoffset: 1500; }
+  .selo.mostra text { animation: bate .45s cubic-bezier(.3,1.6,.5,1) forwards; }
+  .selo.mostra ellipse { animation: traco .8s .15s cubic-bezier(.6,0,.2,1) forwards; }
+  @keyframes bate { to { opacity: 1; transform: rotate(-8deg) scale(1); } }
+  .resultado { display: grid; gap: 20px; }
+  .pontos { font-size: 64px; font-weight: 900; } .pontos small { font-size: 28px; color: var(--suave); font-weight: 600; }
+  .comparar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .rede { padding: 18px; border-radius: 20px; background: rgba(255,255,255,.75); }
+  .rede h4 { font-size: 24px; color: var(--suave); }
+  .rede p { font-size: 30px; font-weight: 800; }
+  .rede.certa p { color: var(--menta); } .rede.errada p { color: var(--tomate); }
+
+  /* ===== Tela 6: placar ===== */
+  #placar { grid-template-columns: 1fr 1.3fr; gap: 3vw; align-items: center; }
+  .podio { display: flex; align-items: flex-end; justify-content: center; gap: 16px; height: 46vh; }
+  .degrau { width: 150px; border-radius: 20px 20px 0 0; display: grid; align-content: start; justify-items: center; padding-top: 14px; color: #fff; font-weight: 800;
+    transform-origin: bottom; animation: sobe .9s cubic-bezier(.2,1.3,.4,1) both; }
+  .degrau .medalha { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; border: 5px solid rgba(255,255,255,.7); color: var(--tinta); }
+  .degrau .nome { margin-top: 10px; font-size: 24px; text-align: center; padding: 0 6px; word-break: break-word; }
+  .degrau .pts { font-size: 30px; }
+  @keyframes sobe { from { transform: scaleY(0); } }
+  .tabela { padding: 26px; display: grid; gap: 14px; }
+  .controles { display: flex; gap: 12px; }
+  .controles .campo { font-size: 24px; padding: 14px 18px; }
+  .lista-placar { display: grid; gap: 8px; max-height: 42vh; overflow-y: auto; }
+  .linha-placar { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 10px 16px; border-radius: 14px; background: rgba(255,255,255,.75); }
+  .linha-placar.voce { background: #FFF1D6; box-shadow: inset 0 0 0 2px var(--ouro); }
+  .linha-placar b { font-variant-numeric: tabular-nums; }
+  .ordem { border: 0; cursor: pointer; padding: 12px 18px; border-radius: 14px; background: #fff; box-shadow: 0 4px 0 #D5DCEB; font-size: 24px; white-space: nowrap; }
+  .ordem.ativa { background: var(--tinta); color: #fff; box-shadow: 0 4px 0 #000; }
+
+  .aviso { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); font-size: 24px; color: var(--suave); background: rgba(255,255,255,.8); padding: 6px 16px; border-radius: 999px; z-index: 30; }
+  .pincel { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 25; }
+  .pincel path { fill: none; stroke: var(--tomate); stroke-width: 560; stroke-linecap: round; stroke-dasharray: 4200; stroke-dashoffset: 4200; }
+  .pincel.vai path { animation: pincelada 1.1s cubic-bezier(.7,0,.2,1) forwards; }
+  @keyframes pincelada { 0% { stroke-dashoffset: 4200; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -4200; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; animation-delay: 0s !important; transition: none !important; } }
+
+  /* === Tema Tinta cinética: papel, tinta grafite, contornos à mão, um acento tomate === */
+  :root { --tinta: #16161A; --suave: #6E6E78; --azul: #2D5BFF; --menta: #2D5BFF; }
+  html, body { background: #FBFAF7; }
+  #rede { display: none; }
+  #rabiscos { position: fixed; inset: 0; width: 100%; height: 100%; }
+  #rabiscos path { fill: none; stroke: #DEDBD2; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  /* Cartões: sem vidro, contorno de caneta levemente torto */
+  .vidro, .quadro, .meu-desenho, .linha-placar, .rede, .passo, .balao { background: #fff; backdrop-filter: none; box-shadow: none;
+    border: 3px solid var(--tinta); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px; }
+  .vidro { box-shadow: 8px 8px 0 var(--tinta); }
+  .quadro, .meu-desenho { box-shadow: 8px 8px 0 #FF4433; }
+  .campo { border: 3px solid var(--tinta); border-radius: 18px 255px 18px 225px / 225px 18px 255px 18px; }
+  .botao { background: #FF4433; color: #fff; border: 3px solid var(--tinta); box-shadow: 6px 6px 0 var(--tinta);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; }
+  .botao:hover { transform: translate(-2px,-2px) rotate(-1deg); box-shadow: 8px 8px 0 var(--tinta); }
+  .botao:active { transform: translate(4px,4px); box-shadow: 2px 2px 0 var(--tinta); }
+  .botao.azul { background: #2D5BFF; box-shadow: 6px 6px 0 var(--tinta); }
+  .botao.claro { background: #fff; box-shadow: 6px 6px 0 var(--tinta); }
+  .brilho::after { display: none; }
+  .ferramenta, .ordem, .chip { background: #fff; border: 3px solid var(--tinta); box-shadow: 4px 4px 0 var(--tinta); border-radius: 14px 40px 14px 40px / 40px 14px 40px 14px; }
+  .ferramenta.ativa, .ordem.ativa { background: var(--tinta); color: #fff; box-shadow: 4px 4px 0 #FF4433; }
+  .scan { display: none; }
+  /* Palpites como marcador */
+  .palpite { background: transparent; height: 50px; border-bottom: 2px dashed #CFCDC6; border-radius: 0; }
+  .palpite .barra { top: auto; height: 16px; bottom: 6px; border-radius: 10px; background: #CFCDC6; }
+  .palpite.lider .barra { background: #FF4433; }
+  .palpite.lider span { color: #FF4433; }
+  .palpite span { line-height: 34px; z-index: 1; }
+  .palpite .barra { bottom: 4px; height: 10px; }
+  .degrau { border: 3px solid var(--tinta); box-shadow: 6px 0 0 var(--tinta); border-bottom: 0; }
+  .degrau .medalha { border: 3px solid var(--tinta); }
+  .ze svg path, .ze svg ellipse:not(.boca), .ze svg circle { fill: none; stroke: var(--tinta); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ze svg .boca { fill: none; stroke: var(--tinta); stroke-width: 3.5; }
+  .ze svg { animation: balanca 2.6s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes balanca { 50% { transform: rotate(-5deg); } }
+  .msg-visitante { background: #2D5BFF; border: 3px solid var(--tinta); }
+  .linha-placar.voce { background: #FFE9E6; box-shadow: none; }
+  #pincel path { stroke: #FF4433; }
+
+</style>
+</head>
+<body>
+<canvas id="rede"></canvas>
+<svg id="rabiscos" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+<canvas id="confete"></canvas>
+<div class="aviso">Rascunho: redes e Zé simulados</div>
+<svg class="pincel" id="pincel" viewBox="0 0 1600 900" preserveAspectRatio="none"><path d="M-300 450 C 400 80, 1200 820, 1900 450"/></svg>
+
+<!-- Molde do Zé (clonado nas telas) -->
+<template id="molde-ze">
+  <svg viewBox="0 0 100 110" aria-hidden="true">
+    <path d="M14 42 C 20 16, 80 16, 86 42"/><path d="M4 44 C 30 34, 70 34, 96 44"/>
+    <ellipse cx="50" cy="64" rx="30" ry="28"/>
+    <circle class="olho" cx="39" cy="60" r="3"/><circle class="olho" cx="61" cy="60" r="3"/>
+    <path d="M30 52 L44 54 M56 54 L70 52"/>
+    <ellipse class="boca" cx="50" cy="77" rx="9" ry="2.5"/>
+    <path d="M34 92 C 40 104, 60 104, 66 92"/>
+  </svg></template>
+
+<!-- 1. Introdução -->
+<section class="tela ativa" id="intro">
+  <div>
+    <svg class="titulo" viewBox="0 0 720 340" role="img" aria-label="Desenha Aí, Sô!">
+      <text x="4" y="130">Desenha</text><text x="4" y="270">Aí, <tspan class="so">Sô!</tspan></text>
+      <path class="risco" d="M14 310 C 170 292, 400 326, 580 300 S 700 308, 710 302"/>
+    </svg>
+    <p class="chamada">Você desenha e <mark>duas redes neurais adivinham enquanto o traço sai</mark>. O Zé, uma IA que roda aqui, sem internet, dá o veredito.</p>
+    <div class="numeros">
+      <div><strong data-alvo="94.7">0</strong>% de acerto</div>
+      <div><strong data-alvo="30">0</strong> desenhos</div>
+      <div><strong data-alvo="20">0</strong> segundos</div>
+    </div>
+    <button class="botao brilho" data-ir="apelido" style="font-size:36px;padding:28px 72px">Jogar agora</button>
+  </div>
+  <div class="vidro mini inclina">
+    <div class="grade">
+      <svg class="quadrinho" id="demo-desenho" viewBox="0 0 300 300"></svg>
+      <div id="demo-palpites"></div>
+    </div>
+    <div class="passos">
+      <div class="passo"><b>1</b>O Zé dá a charada</div>
+      <div class="passo"><b>2</b>Você desenha em 20 s</div>
+      <div class="passo"><b>3</b>As redes adivinham</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Apelido + Pergunte ao Zé -->
+<section class="tela" id="apelido">
+  <div class="vidro cartao">
+    <h2>Qual é o seu apelido?</h2>
+    <input class="campo" id="campo-apelido" maxlength="16" placeholder="Ex.: Peão Veloz" autocomplete="off">
+    <div class="sugestoes" id="sugestoes"></div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <button class="botao brilho" id="comecar" disabled>Começar partida</button>
+      <button class="botao claro" data-ir="placar">Ver placar</button>
+    </div>
+    <p style="color:var(--suave)">3 rodadas · acertou = 3 pontos · quase (top 3) = 1 ponto</p>
+  </div>
+  <div class="vidro cartao">
+    <h2>Pergunte ao Zé</h2>
+    <div class="conversa" id="conversa"></div>
+    <div class="sugestoes" id="perguntas-prontas"></div>
+    <form class="linha-form" id="form-pergunta">
+      <input class="campo" id="campo-pergunta" placeholder="Como as redes adivinham?" autocomplete="off">
+      <button class="botao azul" style="padding:16px 26px">Enviar</button>
+    </form>
+  </div>
+</section>
+
+<!-- 3. Charada -->
+<section class="tela" id="charada">
+  <div class="vidro cartao-charada">
+    <span class="rodada-tag" id="rodada-tag">Rodada 1 de 3</span>
+    <div class="ze" id="ze-charada" style="width:100%;justify-content:center"></div>
+    <p class="texto-charada" id="texto-charada"></p>
+    <p class="resposta-palavra" id="palavra" hidden>Você vai desenhar: <b></b></p>
+    <button class="botao brilho" id="desenhar" hidden style="font-size:32px">Desenhar!</button>
+  </div>
+</section>
+
+<!-- 4. Desenho -->
+<section class="tela" id="desenho">
+  <div class="lado-quadro">
+    <div class="barra-topo"><span class="lembrete">Desenhe: <b id="alvo-desenho"></b></span><span class="lembrete" id="pontos-topo"></span></div>
+    <div class="quadro" id="quadro"><canvas id="tela-desenho" width="620" height="620"></canvas><div class="scan"></div></div>
+    <div class="ferramentas">
+      <button class="ferramenta ativa" id="f-lapis">✏️ Lápis</button>
+      <button class="ferramenta" id="f-borracha">🧽 Borracha</button>
+      <button class="ferramenta" id="f-limpar">🗑️ Limpar</button>
+      <button class="botao" id="pronto" style="padding:14px 34px">Pronto!</button>
+    </div>
+  </div>
+  <div class="lado-info">
+    <div class="relogio" id="relogio">
+      <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#fff" stroke="#E3E9F5" stroke-width="14"/>
+        <circle id="anel" cx="60" cy="60" r="50" fill="none" stroke="#FF4433" stroke-width="14" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/></svg>
+      <b id="segundos">20</b>
+    </div>
+    <div class="vidro palpites"><h3>O que as redes acham</h3><div id="palpites"></div></div>
+    <div class="ze" id="ze-desenho"></div>
+  </div>
+</section>
+
+<!-- 5. Veredito -->
+<section class="tela" id="veredito">
+  <div>
+    <div class="meu-desenho"><img id="img-desenho" alt="Seu desenho">
+      <svg class="selo" id="selo" viewBox="0 0 500 160"><ellipse cx="250" cy="80" rx="236" ry="66"/><text x="250" y="112" text-anchor="middle"></text></svg>
+    </div>
+    <p class="legenda" id="legenda"></p>
+  </div>
+  <div class="resultado">
+    <div class="pontos" id="pontos"></div>
+    <div class="comparar" id="comparar"></div>
+    <div class="ze" id="ze-veredito"></div>
+    <button class="botao brilho" id="proxima" style="justify-self:start;font-size:30px"></button>
+  </div>
+</section>
+
+<!-- 6. Placar -->
+<section class="tela" id="placar">
+  <div>
+    <h2 style="text-align:center;margin-bottom:2vh">Top 5</h2>
+    <div class="podio" id="podio"></div>
+  </div>
+  <div class="vidro tabela">
+    <h2>Placar</h2>
+    <div class="controles">
+      <input class="campo" id="busca" placeholder="Pesquisar apelido" autocomplete="off">
+      <button class="ordem ativa" data-ordem="pontos">Pontos</button>
+      <button class="ordem" data-ordem="nome">A–Z</button>
+      <button class="ordem" data-ordem="recentes">Recentes</button>
+    </div>
+    <div class="lista-placar" id="lista-placar"></div>
+    <div style="display:flex;gap:14px"><button class="botao brilho" data-ir="apelido">Jogar de novo</button><button class="botao claro" data-ir="intro">Início</button></div>
+  </div>
+</section>
+
+<script>
+const reduzir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const espera = ms => new Promise(r => setTimeout(r, ms));
+const $ = id => document.getElementById(id);
+
+/* ---------- Dados simulados (no jogo real vêm das redes e do Zé) ---------- */
+const CATEGORIAS = ["casa", "sol", "peixe", "gato", "árvore", "carro", "flor", "estrela", "vaca", "chapéu", "celeiro", "bicicleta"];
+const CHARADAS = {
+  casa: "Tem telhado, porta e janela, e é pra onde a gente volta no fim do dia.",
+  sol: "Acorda o galo, esquenta a roça e some atrás do morro de tardezinha.",
+  peixe: "Mora no rio, não tem perna e foge do anzol do compadre.",
+  gato: "Bigodudo, mia no telhado e não quer saber de banho.",
+  árvore: "Dá sombra pro boiadeiro, tem tronco e as folhas balançam no vento.",
+  estrela: "Pisca lá no céu de noite e tem cinco pontas no desenho.",
+};
+const PALAVRAS = Object.keys(CHARADAS);
+const RESPOSTAS_DO_ZE = {
+  "Como as redes adivinham?": "Uai, são duas! A CNN olha o desenho feito foto, e a LSTM lê a ordem dos seus traços, feito quem lê uma frase. Juntas acertam 94,7%.",
+  "Você usa internet?": "Nadinha, sô! Eu moro aqui dentro deste notebook. Sou um modelo pequeno, de 1,7 bilhão de parâmetros, e penso na CPU mesmo.",
+  "Quem te ensinou?": "Um modelo grandão, o Gemini, foi meu professor. Isso chama destilação de conhecimento: o pequeno aprende com o grande.",
+};
+const placar = [
+  { nome: "Peão Veloz", pontos: 9, quando: 1 }, { nome: "Rabisqueira", pontos: 7, quando: 2 }, { nome: "Zezinho", pontos: 7, quando: 3 },
+  { nome: "Tia Cida", pontos: 6, quando: 4 }, { nome: "Boiadeiro", pontos: 4, quando: 5 }, { nome: "Lápis de Ouro", pontos: 3, quando: 6 },
+  { nome: "Maria Traço", pontos: 1, quando: 7 },
+];
+
+/* ---------- Fundo: rede neural viva ---------- */
+const rede = $("rede"), rctx = rede.getContext("2d");
+let nos = [], ligacoes = [], pulsos = [];
+function montarRede() {
+  rede.width = innerWidth * devicePixelRatio; rede.height = innerHeight * devicePixelRatio; rctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  nos = []; [5, 8, 8, 6, 3].forEach((n, c) => { for (let i = 0; i < n; i++) nos.push({ c, x: innerWidth * (.05 + c * .225), y: innerHeight * ((i + 1) / (n + 1)), f: Math.random() * 6 }); });
+  ligacoes = []; nos.forEach(a => nos.forEach(b => { if (b.c === a.c + 1 && Math.random() < .5) ligacoes.push([a, b]); }));
+}
+let intensidade = .35; // sobe enquanto o visitante desenha: a rede "trabalha" mais
+function desenharRede(t) {
+  rctx.clearRect(0, 0, innerWidth, innerHeight); rctx.lineWidth = 1; rctx.strokeStyle = "rgba(47,107,255,.09)";
+  ligacoes.forEach(([a, b]) => { rctx.beginPath(); rctx.moveTo(a.x, a.y); rctx.lineTo(b.x, b.y); rctx.stroke(); });
+  if (Math.random() < intensidade) pulsos.push({ l: ligacoes[Math.random() * ligacoes.length | 0], p: 0 });
+  pulsos = pulsos.filter(p => (p.p += .02) < 1);
+  pulsos.forEach(({ l: [a, b], p }) => { const x = a.x + (b.x - a.x) * p, y = a.y + (b.y - a.y) * p, g = rctx.createRadialGradient(x, y, 0, x, y, 10);
+    g.addColorStop(0, "rgba(20,195,154,.85)"); g.addColorStop(1, "rgba(20,195,154,0)"); rctx.fillStyle = g; rctx.beginPath(); rctx.arc(x, y, 10, 0, 7); rctx.fill(); });
+  rctx.lineWidth = 2; rctx.strokeStyle = "rgba(47,107,255,.3)"; rctx.fillStyle = "#fff";
+  nos.forEach(n => { rctx.beginPath(); rctx.arc(n.x, n.y, 5 + Math.sin(t / 600 + n.f) * 1.5, 0, 7); rctx.fill(); rctx.stroke(); });
+  if (!reduzir) requestAnimationFrame(desenharRede);
+}
+montarRede(); addEventListener("resize", montarRede); requestAnimationFrame(desenharRede);
+
+/* Cartões ".inclina" seguem o mouse */
+addEventListener("mousemove", e => { if (reduzir) return;
+  document.querySelectorAll(".tela.ativa .inclina").forEach(c => c.style.transform =
+    `perspective(1200px) rotateX(${(e.clientY / innerHeight - .5) * -5}deg) rotateY(${(e.clientX / innerWidth - .5) * 7}deg)`); });
+
+/* ---------- Navegação entre telas, com pincelada ---------- */
+let telaAtual = "intro";
+async function irPara(id, comPincel = true) {
+  if (comPincel && !reduzir) { const p = $("pincel"); p.classList.remove("vai"); void p.offsetWidth; p.classList.add("vai"); await espera(550); }
+  document.querySelectorAll(".tela").forEach(t => t.classList.toggle("ativa", t.id === id)); telaAtual = id;
+  if (id === "apelido") abrirApelido(); if (id === "placar") abrirPlacar(); if (id === "intro") demoIntro();
+}
+document.querySelectorAll("[data-ir]").forEach(b => b.addEventListener("click", () => irPara(b.dataset.ir)));
+
+/* ---------- Zé: coloca o robô e fala digitando ---------- */
+function montarZe(id) { const c = $(id); if (!c.firstChild) { c.append($("molde-ze").content.cloneNode(true)); const b = document.createElement("div"); b.className = "balao"; c.append(b); } return c; }
+async function zeFala(id, texto, velocidade = 22) {
+  const c = montarZe(id), balao = c.querySelector(".balao"); c.classList.add("falando"); balao.textContent = "";
+  for (const ch of texto) { balao.textContent += ch; await espera(velocidade); } c.classList.remove("falando");
+}
+
+/* ---------- Palpites (barras) ---------- */
+function mostrarPalpites(alvo, dados) {
+  const lista = $(alvo);
+  if (lista.children.length !== 3) { lista.innerHTML = ""; for (let i = 0; i < 3; i++) lista.insertAdjacentHTML("beforeend", '<div class="palpite vazio"><div class="barra"></div><span><i style="font-style:normal">…</i><b></b></span></div>'); }
+  dados.forEach(([nome, p], i) => { const d = lista.children[i]; d.classList.remove("vazio"); d.classList.toggle("lider", i === 0);
+    d.querySelector("i").textContent = nome; d.querySelector("b").textContent = p + "%"; d.querySelector(".barra").style.width = p + "%"; });
+}
+
+/* ---------- Tela 1: números e demonstração em loop ---------- */
+document.querySelectorAll("[data-alvo]").forEach(el => { const alvo = +el.dataset.alvo, casas = alvo % 1 ? 1 : 0, ini = performance.now() + 1500;
+  const passo = t => { const p = Math.min(1, Math.max(0, (t - ini) / 1400)); el.textContent = (alvo * (1 - Math.pow(1 - p, 3))).toFixed(casas).replace(".", ","); if (p < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo); });
+const DEMO_TRACOS = ["M45 140 L150 55 L255 140", "M65 128 L65 260 L235 260 L235 128", "M130 260 L130 195 L170 195 L170 260", "M88 160 L114 160 L114 186 L88 186 Z"];
+const DEMO_ETAPAS = [[["chapéu", 38], ["montanha", 27], ["casa", 14]], [["celeiro", 41], ["casa", 36], ["chapéu", 8]], [["casa", 71], ["celeiro", 19], ["igreja", 4]], [["casa", 94], ["celeiro", 4], ["igreja", 1]]];
+let demoGeracao = 0;
+async function demoIntro() {
+  const minha = ++demoGeracao, svg = $("demo-desenho");
+  while (telaAtual === "intro" && minha === demoGeracao) {
+    svg.innerHTML = ""; $("demo-palpites").innerHTML = "";
+    for (let i = 0; i < DEMO_TRACOS.length && telaAtual === "intro"; i++) {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", DEMO_TRACOS[i]); svg.append(p);
+      const L = p.getTotalLength(); p.style.strokeDasharray = L;
+      p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 700, fill: "forwards", easing: "ease-in-out" });
+      await espera(800); mostrarPalpites("demo-palpites", DEMO_ETAPAS[i]); await espera(500);
+    }
+    await espera(2500);
+  }
+}
+demoIntro();
+
+/* ---------- Tela 2: apelido e Pergunte ao Zé ---------- */
+const campoApelido = $("campo-apelido");
+function abrirApelido() {
+  campoApelido.value = ""; $("comecar").disabled = true; setTimeout(() => campoApelido.focus(), 100);
+  const sug = ["Peão Veloz", "Rabisco de Ouro", "Lápis Ligeiro", "Traço Fino"].map(s => `<button class="chip">${s}</button>`).join("");
+  $("sugestoes").innerHTML = sug; $("sugestoes").querySelectorAll(".chip").forEach(c => c.onclick = () => { campoApelido.value = c.textContent; campoApelido.dispatchEvent(new Event("input")); });
+  const conv = $("conversa"); if (!conv.children.length) { const z = document.createElement("div"); z.className = "ze"; z.id = "ze-conversa"; conv.append(z); zeFala("ze-conversa", "Ô de casa! Pergunta o que quiser sobre como eu e as redes funcionamos."); }
+  $("perguntas-prontas").innerHTML = Object.keys(RESPOSTAS_DO_ZE).map(p => `<button class="chip">${p}</button>`).join("");
+  $("perguntas-prontas").querySelectorAll(".chip").forEach(c => c.onclick = () => perguntar(c.textContent));
+}
+campoApelido.addEventListener("input", () => $("comecar").disabled = campoApelido.value.trim().length < 2);
+campoApelido.addEventListener("keydown", e => { if (e.key === "Enter" && !$("comecar").disabled) $("comecar").click(); });
+let nPergunta = 0;
+async function perguntar(texto) {
+  const conv = $("conversa"), m = document.createElement("div"); m.className = "msg-visitante"; m.textContent = texto; conv.append(m);
+  const z = document.createElement("div"); z.className = "ze"; z.id = "ze-r" + (++nPergunta); conv.append(z);
+  montarZe(z.id).querySelector(".balao").innerHTML = '<span class="pensando"><i></i><i></i><i></i> Pensando…</span>'; conv.scrollTop = conv.scrollHeight;
+  await espera(1200);
+  await zeFala(z.id, RESPOSTAS_DO_ZE[texto] || "Boa pergunta, sô! No jogo de verdade quem responde sou eu, o modelo treinado. Aqui no rascunho eu só finjo."); conv.scrollTop = conv.scrollHeight;
+}
+$("form-pergunta").addEventListener("submit", e => { e.preventDefault(); const v = $("campo-pergunta").value.trim(); if (v) { perguntar(v); $("campo-pergunta").value = ""; } });
+
+/* ---------- Partida ---------- */
+const RODADAS = 3, SEGUNDOS = 20;
+let partida;
+$("comecar").addEventListener("click", () => { partida = { nome: campoApelido.value.trim(), rodada: 0, pontos: 0, palavras: [...PALAVRAS].sort(() => Math.random() - .5).slice(0, RODADAS) }; proximaRodada(); });
+
+async function proximaRodada() {
+  partida.rodada++; const alvo = partida.palavras[partida.rodada - 1]; partida.alvo = alvo;
+  await irPara("charada");
+  $("rodada-tag").textContent = `Rodada ${partida.rodada} de ${RODADAS}`;
+  const txt = $("texto-charada"); $("palavra").hidden = true; $("desenhar").hidden = true;
+  montarZe("ze-charada").querySelector(".balao").innerHTML = '<span class="pensando"><i></i><i></i><i></i> Pensando…</span>';
+  txt.textContent = "";
+  await espera(1600); // no jogo real, o Zé gerando (só "Pensando…" na tela)
+  await zeFala("ze-charada", "Escuta essa, sô:");
+  for (const ch of CHARADAS[alvo]) { txt.textContent += ch; await espera(18); }
+  $("palavra").hidden = false; $("palavra").querySelector("b").textContent = alvo; $("desenhar").hidden = false; $("desenhar").focus();
+}
+$("desenhar").addEventListener("click", comecarDesenho);
+
+/* ---------- Tela 4: desenho com lápis, borracha e limpar ---------- */
+const cv = $("tela-desenho"), cx = cv.getContext("2d");
+let ferramenta = "lapis", desenhando = false, ultimo = null, tracos = 0, tinta = 0, cronometro, restante;
+function escolher(f) { ferramenta = f; $("f-lapis").classList.toggle("ativa", f === "lapis"); $("f-borracha").classList.toggle("ativa", f === "borracha"); $("quadro").classList.toggle("borracha", f === "borracha"); }
+$("f-lapis").onclick = () => escolher("lapis"); $("f-borracha").onclick = () => escolher("borracha");
+$("f-limpar").onclick = () => { cx.clearRect(0, 0, cv.width, cv.height); tracos = 0; tinta = 0; $("palpites").innerHTML = ""; };
+function ponto(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; }
+cv.addEventListener("pointerdown", e => { desenhando = true; ultimo = ponto(e); cv.setPointerCapture(e.pointerId); intensidade = .9; });
+cv.addEventListener("pointermove", e => {
+  if (!desenhando) return; const p = ponto(e);
+  cx.lineCap = "round"; cx.lineJoin = "round";
+  if (ferramenta === "borracha") { cx.globalCompositeOperation = "destination-out"; cx.lineWidth = 46; } else { cx.globalCompositeOperation = "source-over"; cx.strokeStyle = "#121831"; cx.lineWidth = 9; tinta += Math.hypot(p[0] - ultimo[0], p[1] - ultimo[1]); }
+  cx.beginPath(); cx.moveTo(...ultimo); cx.lineTo(...p); cx.stroke(); ultimo = p;
+});
+addEventListener("pointerup", () => { if (!desenhando) return; desenhando = false; intensidade = .35; if (ferramenta === "lapis") { tracos++; palpitar(); } });
+
+/* Palpites simulados: quanto mais tinta, mais o alvo sobe (no jogo real: CNN + LSTM a cada traço) */
+function palpitar() {
+  if (tinta < 30) return;
+  const outros = CATEGORIAS.filter(c => c !== partida.alvo).sort(() => Math.random() - .5);
+  const chance = Math.min(.97, .1 + tracos * .17 + Math.random() * .15);
+  let candidatos = [[partida.alvo, chance], [outros[0], (1 - chance) * .6], [outros[1], (1 - chance) * .25]];
+  if (tracos < 2) candidatos = [[outros[0], .42], [partida.alvo, .3], [outros[1], .12]];
+  candidatos.sort((a, b) => b[1] - a[1]);
+  mostrarPalpites("palpites", candidatos.map(([n, p]) => [n, Math.round(p * 100)]));
+  partida.palpites = candidatos.map(([n, p]) => [n, Math.round(p * 100)]);
+}
+
+function comecarDesenho() {
+  irPara("desenho"); cx.clearRect(0, 0, cv.width, cv.height); tracos = 0; tinta = 0; partida.palpites = null; escolher("lapis");
+  $("palpites").innerHTML = ""; $("alvo-desenho").textContent = partida.alvo; $("pontos-topo").textContent = `${partida.nome} · ${partida.pontos} pts`;
+  restante = SEGUNDOS; atualizarRelogio(); zeFala("ze-desenho", "Bora, sô! Capricha no traço!");
+  clearInterval(cronometro); cronometro = setInterval(() => { restante--; atualizarRelogio(); if (restante <= 0) terminarDesenho(); }, 1000);
+}
+function atualizarRelogio() { $("segundos").textContent = restante; $("anel").style.strokeDashoffset = 314 * (1 - restante / SEGUNDOS); $("relogio").classList.toggle("urgente", restante <= 5 && restante > 0); }
+$("pronto").onclick = () => terminarDesenho();
+
+/* ---------- Tela 5: veredito ---------- */
+async function terminarDesenho() {
+  clearInterval(cronometro); $("relogio").classList.remove("urgente");
+  const imagem = cv.toDataURL(), palpites = partida.palpites || [["nada", 0], ["—", 0], ["—", 0]];
+  const pos = palpites.findIndex(([n]) => n === partida.alvo);
+  const tipo = pos === 0 ? "ACERTOU" : pos > 0 ? "QUASE" : "ERROU", ganho = { ACERTOU: 3, QUASE: 1, ERROU: 0 }[tipo];
+  partida.pontos += ganho;
+  await irPara("veredito");
+  $("img-desenho").src = imagem; $("legenda").textContent = `Seu desenho de "${partida.alvo}"`;
+  const cor = { ACERTOU: "#14C39A", QUASE: "#FFB020", ERROU: "#FF4433" }[tipo];
+  const selo = $("selo"); selo.classList.remove("mostra"); selo.querySelector("text").textContent = tipo + (tipo === "ERROU" ? "" : "!");
+  selo.querySelector("text").style.fill = cor; selo.querySelector("ellipse").style.stroke = cor; void selo.offsetWidth; selo.classList.add("mostra");
+  $("pontos").innerHTML = `+${ganho} <small>pontos · total ${partida.pontos}</small>`;
+  // O que cada rede achou (simulado a partir do ensemble)
+  const lider = palpites[0][0], segundo = palpites[1][0];
+  const redes = [["CNN (imagem)", tipo === "ERROU" ? segundo : lider], ["LSTM (traços)", lider], ["Ensemble", lider]];
+  $("comparar").innerHTML = redes.map(([n, chute]) => `<div class="rede ${chute === partida.alvo ? "certa" : "errada"}"><h4>${n}</h4><p>${chute}</p></div>`).join("");
+  if (tipo === "ACERTOU") confete();
+  $("proxima").textContent = partida.rodada < RODADAS ? "Próxima rodada →" : "Ver placar →";
+  const falas = { ACERTOU: `Ô trem bão! As redes cravaram ${partida.alvo} de primeira. Ponto pro ocê!`,
+    QUASE: `Quase, sô! ${partida.alvo} ficou entre os três palpites. Leva um pontinho.`,
+    ERROU: `Eita! As redes acharam que era ${lider}. Na próxima ocê pega!` };
+  await zeFala("ze-veredito", falas[tipo]);
+}
+$("proxima").onclick = () => {
+  if (partida.rodada < RODADAS) return proximaRodada();
+  placar.push({ nome: partida.nome, pontos: partida.pontos, quando: 0, voce: true }); placar.forEach(p => p.quando++); irPara("placar");
+};
+
+/* ---------- Tela 6: placar com pódio, ordenar e pesquisar ---------- */
+let ordem = "pontos";
+function abrirPlacar() { $("busca").value = ""; desenharPodio(); listar(); }
+function desenharPodio() {
+  const top = [...placar].sort((a, b) => b.pontos - a.pontos).slice(0, 5);
+  const ordemVisual = [3, 1, 0, 2, 4], alturas = [100, 82, 66, 50, 38], cores = ["#FFC233", "#9AA6C0", "#D98C4A", "#6A4BFF", "#2F6BFF"];
+  $("podio").innerHTML = ordemVisual.filter(i => top[i]).map((i, k) => `<div class="degrau" style="height:${alturas[i]}%;background:linear-gradient(180deg, ${cores[i]}, ${cores[i]}cc);animation-delay:${k * 120}ms">
+    <div class="medalha" style="background:#fff">${i + 1}</div><div class="nome">${top[i].nome}</div><div class="pts">${top[i].pontos}</div></div>`).join("");
+}
+function listar() {
+  const termo = $("busca").value.trim().toLowerCase();
+  const ranking = [...placar].sort((a, b) => b.pontos - a.pontos);
+  let linhas = ranking.map((p, i) => ({ ...p, posicao: i + 1 })).filter(p => p.nome.toLowerCase().includes(termo));
+  if (ordem === "nome") linhas.sort((a, b) => a.nome.localeCompare(b.nome)); if (ordem === "recentes") linhas.sort((a, b) => a.quando - b.quando);
+  $("lista-placar").innerHTML = linhas.length ? linhas.map(p => `<div class="linha-placar ${p.voce ? "voce" : ""}"><b>${p.posicao}º</b><span>${p.nome}${p.voce ? " (você)" : ""}</span><b>${p.pontos} pts</b></div>`).join("")
+    : `<p style="color:var(--suave)">Ninguém com "${termo}" no placar.</p>`;
+}
+$("busca").addEventListener("input", listar);
+document.querySelectorAll(".ordem").forEach(b => b.onclick = () => { ordem = b.dataset.ordem; document.querySelectorAll(".ordem").forEach(o => o.classList.toggle("ativa", o === b)); listar(); });
+
+/* ---------- Confete ---------- */
+const cfv = $("confete"), cfc = cfv.getContext("2d");
+function confete() {
+  if (reduzir) return; cfv.width = innerWidth; cfv.height = innerHeight; const cores = ["#2F6BFF", "#14C39A", "#FF4433", "#FFC233", "#6A4BFF"];
+  let ps = Array.from({ length: 180 }, () => ({ x: innerWidth * .3, y: innerHeight * .45, vx: (Math.random() - .3) * 22, vy: -Math.random() * 18 - 5, a: Math.random() * 6, va: Math.random() * .3, f: Math.random() * 6, c: cores[Math.random() * 5 | 0] }));
+  const passo = () => { cfc.clearRect(0, 0, cfv.width, cfv.height);
+    ps.forEach(p => { p.vy += .5; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va; p.f += .25; cfc.save(); cfc.translate(p.x, p.y); cfc.rotate(p.a); cfc.scale(Math.cos(p.f), 1); cfc.fillStyle = p.c; cfc.fillRect(-7, -4, 14, 8); cfc.restore(); });
+    ps = ps.filter(p => p.y < innerHeight + 30); if (ps.length) requestAnimationFrame(passo); };
+  passo();
+}
+
+/* Tema Tinta: rabiscos que se desenham e somem no fundo */
+(() => { const NS = "http://www.w3.org/2000/svg", fundo = document.getElementById("rabiscos");
+  const formas = ["M0 40 C 20 0, 60 0, 80 40 S 140 80, 160 40", "M10 60 L40 10 L70 60 Z", "M40 0 A40 40 0 1 0 40.1 0",
+    "M0 30 C 30 -10, 50 70, 80 30 C 100 0, 120 60, 150 30", "M10 70 L10 20 L50 0 L90 20 L90 70 Z", "M0 50 Q40 0 80 50 Q120 100 160 50", "M20 0 L30 30 L60 32 L36 50 L46 80 L20 62 L-6 80 L4 50 L-20 32 L10 30 Z"];
+  setInterval(async () => { const g = document.createElementNS(NS, "g");
+    g.setAttribute("transform", `translate(${Math.random() * 1500} ${Math.random() * 820}) rotate(${Math.random() * 40 - 20}) scale(${.8 + Math.random()})`); fundo.append(g);
+    const p = document.createElementNS(NS, "path"); p.setAttribute("d", formas[Math.random() * formas.length | 0]); g.append(p);
+    const L = p.getTotalLength(); p.style.strokeDasharray = L;
+    await p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1400, fill: "forwards", easing: "cubic-bezier(.6,0,.2,1)" }).finished;
+    await new Promise(r => setTimeout(r, 2500)); await g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 800, fill: "forwards" }).finished; g.remove(); }, 900); })();
+
+</script>
+</body>
+</html>

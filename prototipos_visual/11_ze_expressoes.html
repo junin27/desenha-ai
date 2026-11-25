@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expressões do Zé</title>
+<style>
+  /* Paleta do jogo: papel creme, tinta marrom, terracota, mostarda, verde */
+  :root { --papel: #f7ecd4; --tinta: #2b1a0a; --suave: #6b4f2e; --terracota: #b5401f; --mostarda: #c98a00; --verde: #2f7d32;
+    --pele: #f3c79b; --palha: #e8b64c; --palha-escura: #b8862a; --fonte: "Segoe UI", system-ui, sans-serif; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--papel); color: var(--tinta); font-family: var(--fonte); padding: 28px; }
+  h1 { font-size: 44px; } .sub { font-size: 22px; color: var(--suave); margin: 6px 0 24px; max-width: 70ch; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 24px; }
+  .cartao { background: #fffdf6; border: 3px solid var(--tinta); border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+    box-shadow: 6px 6px 0 var(--terracota); padding: 16px 16px 20px; text-align: center; cursor: pointer; transition: transform .15s; }
+  .cartao:hover { transform: rotate(-1deg) translateY(-3px); }
+  .cartao h2 { font-size: 26px; margin-top: 6px; } .cartao p { font-size: 20px; color: var(--suave); }
+  .ze { width: 220px; height: 240px; overflow: visible; }
+
+  /* ---------- Traço do personagem ---------- */
+  .ze .linha { fill: none; stroke: var(--tinta); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+  .ze .preenche { stroke: var(--tinta); stroke-width: 3.5; stroke-linejoin: round; }
+  .ze .pele { fill: var(--pele); } .ze .palha { fill: var(--palha); } .ze .faixa { fill: var(--terracota); }
+  .ze .xadrez { fill: url(#xadrez); } .ze .olho { fill: var(--tinta); } .ze .bochecha { fill: var(--terracota); opacity: .35; }
+  .ze .sarda { fill: #b7743f; } .ze .lapis { fill: var(--mostarda); }
+  .ze * { transform-box: fill-box; transform-origin: center; }
+
+  /* Partes que cada humor mexe (todas com a mesma transição suave) */
+  .ze .corpo, .ze .cabeca, .ze .chapeu, .ze .braco-e, .ze .braco-d, .ze .sobrancelhas path, .ze .capim { transition: transform .35s cubic-bezier(.3,1.4,.5,1); }
+  .ze .braco-e { transform-origin: 90% 10%; } .ze .braco-d { transform-origin: 10% 10%; } .ze .capim { transform-origin: 0% 50%; }
+  .ze .boca > *, .ze .olhos > *, .ze .extras > * { display: none; }
+
+  /* Neutro (respira e pisca) */
+  .ze .corpo { animation: respira 3s ease-in-out infinite; }
+  @keyframes respira { 50% { transform: translateY(-3px); } }
+  .ze .olhos .aberto { display: inline; animation: pisca 4s infinite; }
+  @keyframes pisca { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+  .ze .boca .sorriso { display: inline; }
+  .ze .capim { animation: capim 2.4s ease-in-out infinite; }
+  @keyframes capim { 50% { transform: rotate(-12deg); } }
+
+  /* Falando: boca abre e fecha, cabeça balança */
+  .falando .boca .sorriso { display: none; } .falando .boca .fala { display: inline; animation: fala .18s infinite alternate; }
+  @keyframes fala { to { transform: scaleY(.25); } }
+  .falando .cabeca { animation: balanca 1.2s ease-in-out infinite; }
+  @keyframes balanca { 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+  .falando .braco-d { transform: rotate(-35deg); }
+
+  /* Pensando: olha para cima, mão no queixo, balões */
+  .pensando .olhos .aberto { display: none; } .pensando .olhos .cima { display: inline; }
+  .pensando .boca .sorriso { display: none; } .pensando .boca .hum { display: inline; }
+  .pensando .braco-d { transform: rotate(-120deg) translate(-6px, 0); }
+  .pensando .extras .bolhas { display: inline; } .pensando .bolhas circle { animation: bolha 1.5s ease-in-out infinite; }
+  .pensando .bolhas circle:nth-child(2) { animation-delay: .2s; } .pensando .bolhas circle:nth-child(3) { animation-delay: .4s; }
+  @keyframes bolha { 50% { transform: translateY(-6px) scale(1.15); } }
+  .pensando .sobrancelhas .e { transform: translateY(-4px) rotate(-8deg); }
+
+  /* Torcendo: punhos para cima, pulinhos */
+  .torcendo .corpo { animation: pulinho .5s ease-in-out infinite; }
+  @keyframes pulinho { 50% { transform: translateY(-10px); } }
+  .torcendo .braco-e { transform: rotate(140deg); } .torcendo .braco-d { transform: rotate(-140deg); }
+  .torcendo .boca .sorriso { display: none; } .torcendo .boca .aberta { display: inline; }
+  .torcendo .sobrancelhas path { transform: translateY(-4px); }
+
+  /* Comemorando: pula alto e joga o chapéu, estrelas */
+  .comemorando .corpo { animation: pulo .9s cubic-bezier(.3,1.5,.5,1) infinite; }
+  @keyframes pulo { 40% { transform: translateY(-26px) rotate(-4deg); } 70% { transform: translateY(0) scaleY(.94); } }
+  .comemorando .chapeu { animation: jogachapeu .9s cubic-bezier(.3,1.5,.5,1) infinite; }
+  @keyframes jogachapeu { 40% { transform: translateY(-44px) rotate(-25deg); } 70% { transform: none; } }
+  .comemorando .braco-e { transform: rotate(150deg); } .comemorando .braco-d { transform: rotate(-150deg); }
+  .comemorando .olhos .aberto { display: none; } .comemorando .olhos .feliz { display: inline; }
+  .comemorando .boca .sorriso { display: none; } .comemorando .boca .aberta { display: inline; }
+  .comemorando .extras .estrelas { display: inline; } .comemorando .estrelas path { animation: brilha .9s ease-in-out infinite; }
+  .comemorando .estrelas path:nth-child(2) { animation-delay: .3s; } .comemorando .estrelas path:nth-child(3) { animation-delay: .6s; }
+  @keyframes brilha { 50% { transform: scale(1.4) rotate(30deg); } }
+
+  /* Bravo: sobrancelhas em V, treme, fumacinha, vermelho no rosto */
+  .bravo .cabeca { animation: treme .12s infinite; }
+  @keyframes treme { 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+  .bravo .sobrancelhas .e { transform: rotate(25deg) translateY(4px); } .bravo .sobrancelhas .d { transform: rotate(-25deg) translateY(4px); }
+  .bravo .boca .sorriso { display: none; } .bravo .boca .brava { display: inline; }
+  .bravo .bochecha { opacity: .8; }
+  .bravo .braco-e { transform: rotate(-20deg); } .bravo .braco-d { transform: rotate(20deg); }
+  .bravo .extras .fumaca { display: inline; } .bravo .fumaca path { animation: fumaca 1s ease-out infinite; }
+  .bravo .fumaca path:nth-child(2) { animation-delay: .5s; }
+  @keyframes fumaca { from { opacity: 1; transform: translateY(0) scale(.6); } to { opacity: 0; transform: translateY(-20px) scale(1.2); } }
+
+  /* Entediado: olhos meio fechados, cabeça caída, bocejo, "zzz" */
+  .entediado .corpo { animation: respira 5s ease-in-out infinite; }
+  .entediado .cabeca { transform: rotate(10deg) translateY(4px); }
+  .entediado .olhos .aberto { display: none; } .entediado .olhos .meio { display: inline; }
+  .entediado .boca .sorriso { display: none; } .entediado .boca .tedio { display: inline; animation: boceja 4s ease-in-out infinite; }
+  @keyframes boceja { 40%, 60% { transform: scale(1.5, 2.4); } }
+  .entediado .braco-d { transform: rotate(-150deg) translate(-4px, 6px); }
+  .entediado .capim { animation: none; transform: rotate(30deg); }
+  .entediado .extras .zzz { display: inline; } .entediado .zzz text { animation: zzz 3s ease-in-out infinite; font: 700 18px var(--fonte); fill: var(--suave); }
+  .entediado .zzz text:nth-child(2) { animation-delay: 1s; } .entediado .zzz text:nth-child(3) { animation-delay: 2s; }
+  @keyframes zzz { from { opacity: 0; transform: translate(0, 0); } 30% { opacity: 1; } to { opacity: 0; transform: translate(14px, -26px); } }
+
+  /* Triste (errou): coça a cabeça, gota de suor, boca torta */
+  .triste .olhos .aberto { display: none; } .triste .olhos .triste { display: inline; }
+  .triste .boca .sorriso { display: none; } .triste .boca .torta { display: inline; }
+  .triste .sobrancelhas .e { transform: rotate(-20deg); } .triste .sobrancelhas .d { transform: rotate(20deg); }
+  .triste .braco-d { animation: coca .4s ease-in-out infinite alternate; }
+  @keyframes coca { from { transform: rotate(-150deg); } to { transform: rotate(-165deg); } }
+  .triste .extras .gota { display: inline; animation: gota 1.6s ease-in infinite; }
+  @keyframes gota { from { transform: translateY(0); opacity: 1; } to { transform: translateY(14px); opacity: 0; } }
+
+  /* Assustado (tempo acabando): olhos arregalados, cabelo arrepiado, treme */
+  .assustado .corpo { animation: treme .1s infinite; }
+  .assustado .olhos .aberto { display: none; } .assustado .olhos .arregalado { display: inline; }
+  .assustado .boca .sorriso { display: none; } .assustado .boca .oh { display: inline; }
+  .assustado .chapeu { transform: translateY(-12px); }
+  .assustado .sobrancelhas path { transform: translateY(-7px); }
+  .assustado .braco-e { transform: rotate(60deg); } .assustado .braco-d { transform: rotate(-60deg); }
+
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+</style>
+</head>
+<body>
+<h1>Zé do Rabisco · expressões</h1>
+<p class="sub">Personagem original, no traço da Tinta cinética e com a paleta do jogo. Passe o mouse num cartão para ver o Zé falando. Cada humor entra num momento do jogo.</p>
+
+<template id="molde">
+<svg class="ze" viewBox="0 0 200 230" aria-hidden="true">
+  <defs>
+    <pattern id="xadrez" width="16" height="16" patternUnits="userSpaceOnUse">
+      <rect width="16" height="16" fill="#c98a00"/><rect width="8" height="16" fill="#b5401f" opacity=".55"/><rect width="16" height="8" fill="#b5401f" opacity=".45"/>
+    </pattern>
+  </defs>
+  <g class="corpo">
+    <!-- Braços (atrás do tronco) -->
+    <g class="braco-e"><path class="preenche xadrez" d="M66 150 C 50 158, 40 172, 38 186 L 50 190 C 54 178, 62 168, 74 162 Z"/><circle class="preenche pele" cx="43" cy="192" r="9"/></g>
+    <g class="braco-d"><path class="preenche xadrez" d="M134 150 C 150 158, 160 172, 162 186 L 150 190 C 146 178, 138 168, 126 162 Z"/><circle class="preenche pele" cx="157" cy="192" r="9"/></g>
+    <!-- Tronco com camisa xadrez, suspensório e calça -->
+    <path class="preenche xadrez" d="M68 146 C 72 140, 128 140, 132 146 L 138 200 L 62 200 Z"/>
+    <path class="linha" d="M84 146 L 80 200 M116 146 L 120 200"/>
+    <path class="preenche" style="fill:#3d6c9e" d="M62 198 L 138 198 L 136 222 L 104 222 L 100 208 L 96 222 L 64 222 Z"/>
+    <g class="cabeca">
+      <!-- Orelhas e rosto -->
+      <ellipse class="preenche pele" cx="58" cy="100" rx="9" ry="12"/><ellipse class="preenche pele" cx="142" cy="100" rx="9" ry="12"/>
+      <ellipse class="preenche pele" cx="100" cy="102" rx="44" ry="42"/>
+      <!-- Cabelo espetado saindo do chapéu -->
+      <path class="preenche" style="fill:#7a4a22" d="M62 76 L 70 92 L 76 78 L 84 92 L 92 78 L 100 90 L 108 78 L 116 92 L 124 78 L 130 92 L 138 76 Z"/>
+      <circle class="bochecha" cx="72" cy="118" r="9"/><circle class="bochecha" cx="128" cy="118" r="9"/>
+      <circle class="sarda" cx="80" cy="110" r="1.8"/><circle class="sarda" cx="86" cy="114" r="1.8"/><circle class="sarda" cx="114" cy="114" r="1.8"/><circle class="sarda" cx="120" cy="110" r="1.8"/>
+      <path class="linha" d="M98 104 C 94 112, 102 114, 104 110"/>
+      <g class="sobrancelhas"><path class="linha e" d="M74 86 C 80 82, 88 82, 92 85"/><path class="linha d" d="M108 85 C 112 82, 120 82, 126 86"/></g>
+      <g class="olhos">
+        <g class="aberto"><ellipse class="olho" cx="84" cy="97" rx="4.5" ry="6"/><ellipse class="olho" cx="116" cy="97" rx="4.5" ry="6"/></g>
+        <g class="cima"><ellipse class="olho" cx="86" cy="92" rx="4.5" ry="5"/><ellipse class="olho" cx="118" cy="92" rx="4.5" ry="5"/></g>
+        <g class="feliz"><path class="linha" d="M78 98 Q 84 90 90 98 M110 98 Q 116 90 122 98"/></g>
+        <g class="meio"><path class="linha" d="M78 97 L 90 97 M110 97 L 122 97"/><ellipse class="olho" cx="84" cy="99" rx="4" ry="2.5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="2.5"/></g>
+        <g class="triste"><ellipse class="olho" cx="84" cy="99" rx="4" ry="5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="5"/></g>
+        <g class="arregalado"><circle cx="84" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="84" cy="96" r="3"/><circle cx="116" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="116" cy="96" r="3"/></g>
+      </g>
+      <g class="boca">
+        <path class="linha sorriso" d="M84 124 Q 100 136 116 124"/>
+        <path class="preenche fala" style="fill:#7a2a14" d="M88 122 Q 100 140 112 122 Z"/>
+        <path class="linha hum" d="M90 128 Q 100 124 110 128"/>
+        <path class="preenche aberta" style="fill:#7a2a14" d="M82 120 Q 100 148 118 120 Z"/>
+        <path class="linha brava" d="M86 130 Q 100 120 114 130"/>
+        <ellipse class="preenche tedio" style="fill:#7a2a14" cx="100" cy="127" rx="5" ry="3"/>
+        <path class="linha torta" d="M86 130 C 94 124, 104 132, 114 126"/>
+        <ellipse class="preenche oh" style="fill:#7a2a14" cx="100" cy="128" rx="7" ry="9"/>
+      </g>
+      <!-- Capim no canto da boca e lápis atrás da orelha -->
+      <path class="linha capim" style="stroke:#2f7d32;stroke-width:3" d="M116 126 L 140 118 M128 122 L 136 112"/>
+      <path class="preenche lapis" d="M146 70 L 154 74 L 140 104 L 132 100 Z"/><path class="preenche" style="fill:#f3c79b" d="M132 100 L 140 104 L 132 110 Z"/>
+    </g>
+    <!-- Chapéu de palha com remendo e faixa -->
+    <g class="chapeu">
+      <ellipse class="preenche palha" cx="100" cy="74" rx="68" ry="12"/>
+      <path class="preenche palha" d="M66 72 C 66 40, 134 40, 134 72 Z"/>
+      <path class="preenche faixa" d="M67 64 C 90 70, 110 70, 133 64 L 134 72 C 110 78, 90 78, 66 72 Z"/>
+      <path class="preenche" style="fill:#2f7d32" d="M108 52 L 121 54 L 120 64 L 107 62 Z"/>
+      <path class="linha" style="stroke-width:2" d="M80 50 L 84 60 M96 44 L 96 58 M42 76 L 38 84 M158 76 L 162 84 M50 80 L 48 86"/>
+    </g>
+  </g>
+  <!-- Efeitos de cada humor -->
+  <g class="extras">
+    <g class="bolhas"><circle class="preenche" style="fill:#fff" cx="160" cy="54" r="5"/><circle class="preenche" style="fill:#fff" cx="172" cy="38" r="8"/><circle class="preenche" style="fill:#fff" cx="184" cy="16" r="12"/></g>
+    <g class="estrelas"><path class="preenche" style="fill:#c98a00" d="M28 40 l4 9 10 1 -8 6 3 10 -9 -5 -9 5 3 -10 -8 -6 10 -1 z"/><path class="preenche" style="fill:#b5401f" d="M172 30 l3 7 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 z"/><path class="preenche" style="fill:#2f7d32" d="M178 120 l3 6 7 1 -5 4 2 7 -7 -4 -6 4 2 -7 -5 -4 7 -1 z"/></g>
+    <g class="fumaca"><path class="preenche" style="fill:#d9cbb3" d="M56 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/><path class="preenche" style="fill:#d9cbb3" d="M150 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/></g>
+    <g class="zzz"><text x="146" y="60">z</text><text x="154" y="48">z</text><text x="162" y="36">Z</text></g>
+    <path class="gota preenche" style="fill:#8ec5ef" d="M150 82 C 146 90, 146 96, 150 96 C 154 96, 154 90, 150 82 Z"/>
+  </g>
+</svg>
+</template>
+
+<div class="grade" id="grade"></div>
+<script>
+/* Cada humor: nome, quando aparece no jogo */
+const humores = [
+  ["neutro", "Neutro", "Parado na tela inicial: respira, pisca, mastiga o capim."],
+  ["falando", "Falando", "Sempre que narra ou responde no Pergunte ao Zé."],
+  ["pensando", "Pensando", "Enquanto o SLM gera a charada ou a resposta."],
+  ["torcendo", "Torcendo", "Durante o desenho, quando os palpites sobem."],
+  ["assustado", "Assustado", "Últimos 5 segundos do cronômetro."],
+  ["comemorando", "Comemorando", "Veredito ACERTOU: pula e joga o chapéu."],
+  ["triste", "Coçando a cabeça", "Veredito QUASE ou ERROU."],
+  ["bravo", "Bravo", "Quando o visitante aperta Pronto sem desenhar nada."],
+  ["entediado", "Entediado", "Ninguém mexe na tela por 30 s: chama o próximo visitante."],
+];
+const grade = document.getElementById("grade"), molde = document.getElementById("molde");
+humores.forEach(([classe, nome, quando]) => {
+  const c = document.createElement("div"); c.className = "cartao"; c.tabIndex = 0;
+  c.append(molde.content.cloneNode(true));
+  const svg = c.querySelector("svg"); svg.classList.add(classe);
+  c.insertAdjacentHTML("beforeend", `<h2>${nome}</h2><p>${quando}</p>`);
+  /* Passar o mouse faz o Zé falar (troca temporária de humor) */
+  c.addEventListener("mouseenter", () => { svg.classList.remove(classe); svg.classList.add("falando"); });
+  c.addEventListener("mouseleave", () => { svg.classList.remove("falando"); svg.classList.add(classe); });
+  grade.append(c);
+});
+</script>
+</body>
+</html>

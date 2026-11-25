@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estúdio 3D</title>
+<style>
+  /* Paleta pastel de estúdio: piso lilás-claro, blocos em azul, menta e pêssego */
+  :root { --fundo1: #FDFBFF; --fundo2: #E9E6FF; --tinta: #1B1640; --suave: #6C6790;
+    --roxo: #6A4BFF; --menta: #2BD4A4; --pessego: #FF8A65; --ouro: #FFC233; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; overflow: hidden; color: var(--tinta);
+    font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(120% 90% at 50% 10%, var(--fundo1), var(--fundo2)); }
+
+  /* Cena 3D só com CSS (roda offline, sem Three.js): perspectiva + "câmera" que deriva com o mouse */
+  .cena { position: fixed; inset: 0; perspective: 1400px; perspective-origin: 50% 35%; }
+  .mundo { position: absolute; left: 50%; top: 56%; width: 0; height: 0; transform-style: preserve-3d;
+    transform: rotateX(58deg) rotateZ(-28deg); transition: transform 1.2s cubic-bezier(.2,.9,.2,1); }
+  /* Piso com grade que corre devagar (sensação de profundidade) */
+  .piso { position: absolute; width: 2400px; height: 2400px; left: -1200px; top: -1200px;
+    background-image: linear-gradient(rgba(106,75,255,.13) 2px, transparent 2px), linear-gradient(90deg, rgba(106,75,255,.13) 2px, transparent 2px);
+    background-size: 80px 80px; animation: grade 8s linear infinite;
+    mask-image: radial-gradient(circle, #000 25%, transparent 60%); -webkit-mask-image: radial-gradient(circle, #000 25%, transparent 60%); }
+  @keyframes grade { to { background-position: 80px 80px; } }
+
+  /* Quadro do desenho em pé, flutuando sobre o piso, com sombra no chão */
+  .quadro { position: absolute; width: 340px; height: 340px; left: -420px; top: -170px;
+    transform: rotateX(-90deg) translateZ(170px) translateY(-200px); transform-style: preserve-3d; animation: boia 4s ease-in-out infinite; }
+  @keyframes boia { 50% { transform: rotateX(-90deg) translateZ(170px) translateY(-222px); } }
+  .tela { position: absolute; inset: 0; background: #fff; border-radius: 26px;
+    box-shadow: 0 0 0 10px #fff, 0 0 0 12px rgba(106,75,255,.25), 0 50px 80px -20px rgba(27,22,64,.35); }
+  .sombra { position: absolute; width: 340px; height: 120px; left: -420px; top: -60px; border-radius: 50%;
+    background: radial-gradient(rgba(27,22,64,.25), transparent 70%); animation: sombra 4s ease-in-out infinite; }
+  @keyframes sombra { 50% { transform: scale(.85); opacity: .7; } }
+
+  /* Colunas 3D dos palpites (cubo de 4 faces com altura animada) */
+  .coluna { position: absolute; width: 90px; height: 90px; transform-style: preserve-3d; }
+  .coluna .face { position: absolute; left: 0; bottom: 0; width: 90px; transform-origin: bottom; transition: height .8s cubic-bezier(.2,1.3,.4,1); }
+  .coluna .topo { position: absolute; width: 90px; height: 90px; transition: transform .8s cubic-bezier(.2,1.3,.4,1); }
+  .rotulo { position: absolute; white-space: nowrap; font: 700 26px/1.1 "Segoe UI", system-ui, sans-serif; transform: rotateX(-90deg) rotateY(28deg);
+    transform-origin: bottom left; transition: transform .8s cubic-bezier(.2,1.3,.4,1); color: var(--tinta); }
+  .rotulo small { display: block; font-size: 24px; color: var(--suave); font-weight: 600; }
+
+  /* Camada HTML sobre a cena (título, botão, Zé) */
+  .hud { position: fixed; inset: 0; pointer-events: none; display: grid; grid-template-rows: auto 1fr auto; padding: 4vh 4vw; }
+  .hud > * { pointer-events: auto; }
+  .topo-hud { display: flex; justify-content: space-between; align-items: flex-start; }
+  h1 { font-size: clamp(56px, 6.4vw, 116px); line-height: .9; font-weight: 900; letter-spacing: -.045em;
+    text-shadow: 0 2px 0 #fff, 0 6px 0 #D9D3FF, 0 14px 30px rgba(106,75,255,.25); }
+  h1 span { display: inline-block; animation: pula 2.4s cubic-bezier(.3,1.6,.5,1) infinite; animation-delay: calc(var(--i) * 90ms); }
+  @keyframes pula { 0%, 30%, 100% { transform: none; } 12% { transform: translateY(-14px) rotate(-3deg); } }
+  .sub { margin-top: 2vh; font-size: clamp(24px, 1.6vw, 30px); color: var(--suave); max-width: 32ch; line-height: 1.3; }
+  .tempo { width: 120px; height: 120px; position: relative; }
+  .tempo svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .tempo b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 44px; font-variant-numeric: tabular-nums; }
+
+  .base { display: flex; justify-content: space-between; align-items: flex-end; gap: 3vw; }
+  .ze { display: flex; align-items: flex-end; gap: 14px; max-width: 46vw; }
+  .ze svg { width: 110px; flex: none; filter: drop-shadow(0 18px 20px rgba(27,22,64,.25)); animation: boiaze 3s ease-in-out infinite; }
+  @keyframes boiaze { 50% { transform: translateY(-10px); } }
+  .balao { background: #fff; border-radius: 26px 26px 26px 6px; padding: 18px 22px; font-size: 26px; line-height: 1.3;
+    box-shadow: 0 20px 40px -18px rgba(27,22,64,.35); min-height: 72px; }
+  .jogar { border: 0; cursor: pointer; font: 800 34px/1 "Segoe UI", system-ui, sans-serif; color: #fff; padding: 28px 70px; border-radius: 26px;
+    background: var(--roxo); box-shadow: 0 10px 0 #4A2FD6, 0 30px 40px -10px rgba(106,75,255,.6); transition: transform .12s, box-shadow .12s; }
+  .jogar:hover { transform: translateY(-4px); box-shadow: 0 14px 0 #4A2FD6, 0 36px 44px -10px rgba(106,75,255,.6); }
+  .jogar:active { transform: translateY(8px); box-shadow: 0 2px 0 #4A2FD6, 0 10px 20px -10px rgba(106,75,255,.6); }
+  .jogar:focus-visible { outline: 4px solid var(--pessego); outline-offset: 6px; }
+
+  /* Veredito: placa 3D que gira e entra */
+  .veredito { position: fixed; left: 50%; top: 40%; font: 900 88px/1 "Segoe UI", system-ui, sans-serif; color: #fff; padding: 20px 50px; border-radius: 30px;
+    background: linear-gradient(135deg, var(--menta), #19B388); box-shadow: 0 14px 0 #128A69, 0 40px 60px -10px rgba(43,212,164,.6);
+    transform: translate(-50%,-50%) perspective(800px) rotateY(90deg) scale(.6); opacity: 0; pointer-events: none; }
+  .veredito.entra { animation: placa .9s cubic-bezier(.2,1.5,.4,1) forwards; }
+  @keyframes placa { to { opacity: 1; transform: translate(-50%,-50%) perspective(800px) rotateY(-8deg) scale(1); } }
+  #confete { position: fixed; inset: 0; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="cena"><div class="mundo" id="mundo">
+  <div class="piso"></div>
+  <div class="sombra"></div>
+  <div class="quadro"><div class="tela"><svg viewBox="0 0 300 300" id="desenho" fill="none" stroke="#1B1640" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:20px;width:300px;height:300px"></svg></div></div>
+  <div id="colunas" style="transform-style:preserve-3d;position:absolute"></div>
+</div></div>
+<canvas id="confete"></canvas>
+
+<div class="hud">
+  <div class="topo-hud">
+    <div>
+      <h1 id="titulo">Desenha Aí, Sô!</h1>
+      <p class="sub">Desenhe em 20 segundos. Uma <b>CNN</b> e uma <b>LSTM</b> disputam quem adivinha primeiro, e o Zé, uma IA offline, julga.</p>
+    </div>
+    <div class="tempo" aria-label="Tempo restante">
+      <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#fff" stroke="#E9E6FF" stroke-width="14"/>
+        <circle id="anel" cx="60" cy="60" r="50" fill="none" stroke="#FF8A65" stroke-width="14" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="0" style="transition:stroke-dashoffset .6s"/></svg>
+      <b id="seg">20</b>
+    </div>
+  </div>
+  <div></div>
+  <div class="base">
+    <div class="ze">
+      <svg viewBox="0 0 120 130" aria-hidden="true">
+        <ellipse cx="60" cy="124" rx="34" ry="5" fill="rgba(27,22,64,.15)"/>
+        <rect x="20" y="40" width="80" height="70" rx="28" fill="#6A4BFF"/>
+        <rect x="30" y="52" width="60" height="40" rx="18" fill="#fff"/>
+        <circle cx="48" cy="72" r="7" fill="#1B1640"><animate attributeName="r" values="7;7;1;7" keyTimes="0;.9;.95;1" dur="4s" repeatCount="indefinite"/></circle>
+        <circle cx="72" cy="72" r="7" fill="#1B1640"><animate attributeName="r" values="7;7;1;7" keyTimes="0;.9;.95;1" dur="4s" repeatCount="indefinite"/></circle>
+        <path d="M10 44 Q60 4 110 44 Z" fill="#FFC233"/><rect x="0" y="40" width="120" height="10" rx="5" fill="#E0A21A"/>
+      </svg>
+      <div class="balao" id="fala"></div>
+    </div>
+    <button class="jogar" id="jogar">Jogar</button>
+  </div>
+</div>
+<div class="veredito" id="veredito">ACERTOU!</div>
+
+<script>
+const reduzir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const espera = ms => new Promise(r => setTimeout(r, ms));
+
+/* Título com letras que pulam em onda */
+const t = document.getElementById("titulo");
+t.innerHTML = [...t.textContent].map((c, i) => `<span style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join("");
+
+/* "Câmera": o mundo gira suavemente seguindo o mouse */
+const mundo = document.getElementById("mundo");
+addEventListener("mousemove", e => { if (reduzir) return;
+  const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+  mundo.style.transform = `rotateX(${58 - y * 8}deg) rotateZ(${-28 + x * 14}deg)`; });
+
+/* Três colunas 3D para os palpites: cada uma tem frente, lado e topo */
+const cores = [["#6A4BFF", "#5236E0", "#8C73FF"], ["#2BD4A4", "#1FB089", "#5FE6BF"], ["#FF8A65", "#E66D47", "#FFAA8C"]];
+const ALTURA_MAXIMA = 230;
+const colunas = cores.map((c, i) => {
+  const el = document.createElement("div"); el.className = "coluna";
+  el.style.left = (40 + i * 150) + "px"; el.style.top = "-40px";
+  el.innerHTML = `
+    <div class="face" style="background:${c[0]};height:0;transform:rotateX(-90deg)"></div>
+    <div class="face" style="background:${c[1]};height:0;transform:rotateY(90deg) rotateX(-90deg) translateZ(0)"></div>
+    <div class="topo" style="background:${c[2]};border-radius:6px"></div>
+    <div class="rotulo"></div>`;
+  document.getElementById("colunas").append(el); return el; });
+function alturas(dados) {
+  dados.forEach(([nome, p], i) => { const h = ALTURA_MAXIMA * p / 100, el = colunas[i];
+    el.querySelectorAll(".face").forEach(f => f.style.height = h + "px");
+    el.querySelector(".face:nth-child(2)").style.left = "90px";
+    el.querySelector(".topo").style.transform = `translateZ(${h}px)`;
+    const r = el.querySelector(".rotulo"); r.innerHTML = `${nome}<small>${p}%</small>`;
+    r.style.transform = `translateZ(${h + 30}px) rotateZ(28deg) rotateX(-90deg)`; });
+}
+
+/* Demonstração: casa desenhada traço a traço, colunas crescendo */
+const tracos = ["M40 140 L150 50 L260 140", "M60 126 L60 270 L240 270 L240 126", "M128 270 L128 200 L172 200 L172 270",
+  "M82 160 L110 160 L110 188 L82 188 Z", "M200 92 L200 62 L220 62 L220 108"];
+const etapas = [[["chapéu", 38], ["montanha", 27], ["casa", 14]], [["celeiro", 41], ["casa", 36], ["chapéu", 8]],
+  [["casa", 71], ["celeiro", 19], ["igreja", 4]], [["casa", 88], ["celeiro", 7], ["igreja", 2]], [["casa", 96], ["celeiro", 3], ["igreja", 1]]];
+const desenho = document.getElementById("desenho"), fala = document.getElementById("fala"),
+  anel = document.getElementById("anel"), seg = document.getElementById("seg"), veredito = document.getElementById("veredito");
+async function digitar(txt) { fala.textContent = ""; for (const c of txt) { fala.textContent += c; await espera(22); } }
+async function tracar(d) { const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", d); desenho.append(p);
+  const L = p.getTotalLength(); p.style.strokeDasharray = L;
+  p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 700, easing: "ease-in-out", fill: "forwards" }); await espera(750); }
+async function rodada() {
+  desenho.innerHTML = ""; alturas([["?", 0], ["?", 0], ["?", 0]]); veredito.classList.remove("entra"); anel.style.strokeDashoffset = 0; seg.textContent = 20;
+  await digitar("Charada: tem telhado, porta e janela, e é pra onde a gente volta no fim do dia.");
+  for (let i = 0; i < tracos.length; i++) { await tracar(tracos[i]); alturas(etapas[i]);
+    anel.style.strokeDashoffset = 314 * (i + 1) / 8; seg.textContent = 20 - (i + 1) * 3; await espera(500); }
+  veredito.classList.add("entra"); confete();
+  await digitar("Ô trem bão! Casa com 96% de certeza. Ponto pro ocê!"); await espera(3500); rodada();
+}
+
+/* Confete 3D falso: retângulos que giram em dois eixos (escala no X simula a rotação) */
+const cv = document.getElementById("confete"), cx = cv.getContext("2d");
+function confete() { if (reduzir) return; cv.width = innerWidth; cv.height = innerHeight;
+  const paleta = ["#6A4BFF", "#2BD4A4", "#FF8A65", "#FFC233"];
+  let ps = Array.from({ length: 180 }, () => ({ x: innerWidth / 2, y: innerHeight * .4, vx: (Math.random() - .5) * 22, vy: -Math.random() * 18 - 6,
+    a: Math.random() * 6, va: Math.random() * .3, f: Math.random() * 6, c: paleta[Math.random() * 4 | 0] }));
+  const passo = () => { cx.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => { p.vy += .5; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va; p.f += .25;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.a); cx.scale(Math.cos(p.f), 1); cx.fillStyle = p.c; cx.fillRect(-7, -4, 14, 8); cx.restore(); });
+    ps = ps.filter(p => p.y < innerHeight + 30); if (ps.length) requestAnimationFrame(passo); };
+  passo(); }
+rodada();
+</script>
+</body>
+</html>
