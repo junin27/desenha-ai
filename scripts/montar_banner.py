@@ -11,20 +11,23 @@ Uso (a partir de `projeto_final/`):
 
 import argparse
 import re
+import struct
 import zipfile
 from pathlib import Path
 from xml.sax.saxutils import escape
 
 SAIDA_PADRAO = Path("docs/banner/Banner Desenha Ai.pptx")
 FIGURAS = Path("docs/banner/figuras")
-CAPTURA_DO_JOGO = Path("docs/capturas/desenho-com-a-mao/1920x1080-4c-desenho-mao.png")
+CAPTURA_DO_JOGO = FIGURAS / "captura-do-jogo.png"
 EMU_POR_CM = 360000
 AZUL_UNIRV = "004AAD"
-# A captura do jogo ocupa a faixa entre o texto da Introdução e o título da Metodologia. Para ela ficar grande,
-# a Metodologia (título cinza e texto) desce um pouco; há folga antes do diagrama do rodapé.
+# A Figura 1 (captura do jogo) tem a largura da coluna, como as outras duas figuras. Para ela caber, a
+# Metodologia (título cinza e texto) desce e o diagrama do rodapé fica mais baixo e mais achatado.
 Y_DA_CAPTURA_CM = 55.8
-ALTURA_DA_CAPTURA_CM = 13.6
-DESCIDA_DA_METODOLOGIA_CM = 2.5
+ALTURA_DA_LEGENDA_CM = 2.0
+DESCIDA_DA_METODOLOGIA_CM = 10.8
+Y_DO_DIAGRAMA_CM = 107.3
+ALTURA_DO_DIAGRAMA_CM = 9.6
 FORMAS_DA_METODOLOGIA = ("Group 29", "TextBox 46", "TextBox 47")
 
 TITULO = "Desenha Aí, Sô!: duas redes neurais e um SLM caipira que adivinham e julgam o seu rabisco"
@@ -48,16 +51,14 @@ TEXTOS = {
     ],
     "TextBox 46": [  # Metodologia
         (
-            "**Redes neurais.** Google Quick, Draw! (30 categorias; 210 mil desenhos de treino, 30 mil de validação e 30 mil "
-            "de teste). Uma CNN residual (680 mil parâmetros) vê a imagem 28×28; uma LSTM bidirecional (666 mil) lê a "
-            "sequência de traços; o ensemble é a média das duas (w = 0,5). Metade dos exemplos usa desenhos incompletos, "
-            "para adivinhar cedo."
+            "**Redes neurais.** Google Quick, Draw! (30 categorias, 9 mil desenhos por categoria). Uma CNN residual "
+            "(680 mil parâmetros) vê a imagem 28×28; uma LSTM bidirecional (666 mil) lê a sequência de traços; o "
+            "ensemble é a média das duas (w = 0,5). Metade dos exemplos usa desenhos incompletos, para adivinhar cedo."
         ),
         (
-            "**Zé do Rabisco.** Qwen3-1,7B ajustado com QLoRA (r = 16; 1,01% dos parâmetros) em 455 amostras destiladas de um "
-            "professor (Gemini) com raciocínio em etapas e aprovadas por curadoria verificável por código. Roda como GGUF "
-            "Q8_0 no llama.cpp. A pontuação vem de uma regra fixa; o Zé só narra. No modo Mão, o MediaPipe (modelo pronto) "
-            "acha 21 pontos da mão na webcam."
+            "**Zé do Rabisco.** Qwen3-1,7B ajustado com QLoRA (r = 16; 1,01% dos parâmetros) em 455 amostras destiladas "
+            "do Gemini e aprovadas por curadoria verificável por código. Roda como GGUF Q8_0 no llama.cpp. No modo "
+            "Mão, o MediaPipe (modelo pronto) acha 21 pontos da mão."
         ),
     ],
     "TextBox 48": [  # Resultados e conclusões
@@ -81,7 +82,7 @@ TEXTOS = {
         "ZHANG, F. et al. MediaPipe Hands: on-device real-time hand tracking. 2020. Disponível em: arxiv.org/abs/2006.10214.",
     ],
 }
-LEGENDA_DA_CAPTURA = "**Figura 1.** Tela do jogo no modo Mão: a casa desenhada com o dedo, os palpites ao vivo das redes e o Zé torcendo."
+LEGENDA_DA_CAPTURA = "**Figura 1.** Tela do jogo no modo Mão."
 
 
 def bloco_da_forma(xml: str, nome: str) -> tuple[int, int]:
@@ -163,28 +164,52 @@ def descer_forma(xml: str, nome: str, centimetros: float) -> str:
     )
 
 
-def figura_do_jogo(xml: str) -> str:
-    """Captura do jogo (e a legenda) no espaço livre abaixo do texto da Introdução."""
+def tamanho_do_png(dados: bytes) -> tuple[int, int]:
+    """Largura e altura lidas do cabeçalho do PNG (sem precisar do Pillow)."""
+    largura, altura = struct.unpack(">II", dados[16:24])
+    return int(largura), int(altura)
+
+
+def reposicionar_forma(xml: str, nome: str, y_cm: float, altura_cm: float) -> str:
+    """Muda o `y` e a altura de uma forma; a imagem de fundo estica junto."""
+    inicio = xml.index(f'name="{nome}"')
+    achou = re.compile(
+        r'<a:off x="(\d+)" y="\d+"/><a:ext cx="(\d+)" cy="\d+"/>'
+    ).search(xml, inicio)
+    if achou is None:
+        raise SystemExit(f"forma {nome} sem posição no template")
+    novo = (
+        f'<a:off x="{achou.group(1)}" y="{round(y_cm * EMU_POR_CM)}"/>'
+        f'<a:ext cx="{achou.group(2)}" cy="{round(altura_cm * EMU_POR_CM)}"/>'
+    )
+    return xml[: achou.start()] + novo + xml[achou.end() :]
+
+
+def figura_do_jogo(xml: str, imagem_png: bytes) -> str:
+    """Figura 1: a captura do jogo na largura da coluna, com a legenda de uma linha embaixo."""
     x, _, largura, _ = posicao_da_forma(xml, "TextBox 45")
     y = round(Y_DA_CAPTURA_CM * EMU_POR_CM)
-    altura_da_figura = round(ALTURA_DA_CAPTURA_CM * EMU_POR_CM)
-    largura_da_figura = round(altura_da_figura * 1920 / 1080)
+    largura_png, altura_png = tamanho_do_png(imagem_png)
+    altura = round(largura * altura_png / largura_png)
     imagem = (
         '<p:pic><p:nvPicPr><p:cNvPr id="100" name="Captura do jogo" descr="Tela de desenho do jogo no modo Mão"/>'
         '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>'
         '<p:blipFill><a:blip r:embed="rId5"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>'
-        f'<p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{largura_da_figura}" cy="{altura_da_figura}"/></a:xfrm>'
-        f'<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln w="38100"><a:solidFill><a:srgbClr val="{AZUL_UNIRV}"/></a:solidFill></a:ln></p:spPr></p:pic>'
+        f'<p:spPr><a:xfrm><a:off x="{x}" y="{y}"/><a:ext cx="{largura}" cy="{altura}"/></a:xfrm>'
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln w="38100"><a:solidFill>'
+        f'<a:srgbClr val="{AZUL_UNIRV}"/></a:solidFill></a:ln></p:spPr></p:pic>'
     )
     inicio, fim = bloco_da_forma(xml, "TextBox 45")
     propriedades, corrida = modelos_do_paragrafo(xml[inicio:fim])
-    esquerda = x + largura_da_figura + round(1.3 * EMU_POR_CM)
+    centralizado = propriedades.replace('algn="just"', 'algn="ctr"')
+    y_da_legenda = y + altura + round(0.25 * EMU_POR_CM)
     legenda = (
         '<p:sp><p:nvSpPr><p:cNvPr name="Legenda da captura" id="101"/><p:cNvSpPr txBox="true"/><p:nvPr/></p:nvSpPr>'
-        f'<p:spPr><a:xfrm rot="0"><a:off x="{esquerda}" y="{y}"/><a:ext cx="{x + largura - esquerda}" cy="{altura_da_figura}"/></a:xfrm>'
+        f'<p:spPr><a:xfrm rot="0"><a:off x="{x}" y="{y_da_legenda}"/>'
+        f'<a:ext cx="{largura}" cy="{round(ALTURA_DA_LEGENDA_CM * EMU_POR_CM)}"/></a:xfrm>'
         '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>'
-        '<p:txBody><a:bodyPr anchor="ctr" rtlCol="false" tIns="0" lIns="0" bIns="0" rIns="0"><a:spAutoFit/></a:bodyPr><a:lstStyle/>'
-        f"<a:p>{propriedades.replace('algn="just"', 'algn="l"')}{corridas(LEGENDA_DA_CAPTURA, corrida)}</a:p></p:txBody></p:sp>"
+        '<p:txBody><a:bodyPr anchor="t" rtlCol="false" tIns="0" lIns="0" bIns="0" rIns="0"><a:spAutoFit/></a:bodyPr>'
+        f"<a:lstStyle/><a:p>{centralizado}{corridas(LEGENDA_DA_CAPTURA, corrida)}</a:p></p:txBody></p:sp>"
     )
     return imagem + legenda
 
@@ -200,7 +225,11 @@ def montar(template: Path, saida: Path, email: str) -> None:
         xml = trocar_paragrafos(xml, nome, textos)
     for forma in FORMAS_DA_METODOLOGIA:
         xml = descer_forma(xml, forma, DESCIDA_DA_METODOLOGIA_CM)
-    xml = xml.replace("</p:spTree>", figura_do_jogo(xml) + "</p:spTree>")
+    xml = reposicionar_forma(
+        xml, "Freeform 38", Y_DO_DIAGRAMA_CM, ALTURA_DO_DIAGRAMA_CM
+    )
+    captura = CAPTURA_DO_JOGO.read_bytes()
+    xml = xml.replace("</p:spTree>", figura_do_jogo(xml, captura) + "</p:spTree>")
     relacoes = arquivos["ppt/slides/_rels/slide1.xml.rels"].decode("utf8")
     relacoes = relacoes.replace(
         "</Relationships>",
@@ -215,7 +244,7 @@ def montar(template: Path, saida: Path, email: str) -> None:
     arquivos["ppt/media/image2.png"] = (
         FIGURAS / "resultados.png"
     ).read_bytes()  # forma "Freeform 39"
-    arquivos["ppt/media/image4.png"] = CAPTURA_DO_JOGO.read_bytes()
+    arquivos["ppt/media/image4.png"] = captura
     saida.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(saida, "w", zipfile.ZIP_DEFLATED) as destino:
         for nome, conteudo in arquivos.items():

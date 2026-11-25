@@ -2,7 +2,8 @@
 
 Lê os números dos JSONs de métricas (nada digitado à mão) e desenha com `PIL`, com o dobro da resolução
 e redução no fim, para as linhas ficarem suaves. Gera, em `docs/banner/figuras/`:
-- `arquitetura.png`  (41,6 x 12,1 cm): do desenho do visitante à narração do Zé;
+- `arquitetura.png`  (41,6 x 9,6 cm): do desenho do visitante à narração do Zé;
+- `captura-do-jogo.png`: a captura do modo Mão sem a faixa de botões de baixo (a Figura 1, na largura da coluna);
 - `resultados.png`   (40,7 x 30,0 cm): quem adivinha mais cedo (redes) e Qwen3 base x Zé destilado (SLM).
 As proporções são as das duas formas de imagem do template `Banner Workshop IA.pptx`.
 
@@ -17,6 +18,9 @@ from PIL import Image, ImageDraw, ImageFont
 PASTA_DE_SAIDA = Path("docs/banner/figuras")
 METRICAS_DAS_REDES = Path("notebooks/resultados/modelos_redes/metricas_redes.json")
 METRICAS_DO_SLM = Path("notebooks/resultados/rodada5/metricas_slm.json")
+CAPTURA_DO_JOGO = Path("docs/capturas/desenho-com-a-mao/1920x1080-4c-desenho-mao.png")
+# Recorte da captura: tira a margem de cima e a faixa de botões de baixo, sem cortar o Zé nem o quadro.
+RECORTE_DA_CAPTURA = (0, 70, 1920, 980)
 
 PIXELS_POR_CM = 100
 SUPERAMOSTRAGEM = 2  # desenha com o dobro da resolução e reduz no fim
@@ -160,8 +164,8 @@ def caixa_com_titulo(
 
 
 def arquitetura() -> Quadro:
-    q = Quadro(41.6, 12.1)
-    largura, altura, topo, folga = 900, 760, 60, 150
+    q = Quadro(41.6, 9.6)
+    largura, altura, topo, folga = 900, 640, 40, 150
     textos = [
         (
             "1. Desenho",
@@ -190,7 +194,7 @@ def arquitetura() -> Quadro:
             )
     q.texto(
         q.largura / 2,
-        topo + altura + 190,
+        topo + altura + 150,
         "Tudo offline: redes no navegador (ONNX) e SLM em CPU, sem internet e sem GPU",
         "negrito",
         74,
@@ -352,7 +356,16 @@ def resultados() -> Quadro:
     return q
 
 
+def captura_do_jogo() -> None:
+    destino = PASTA_DE_SAIDA / "captura-do-jogo.png"
+    recortada = Image.open(CAPTURA_DO_JOGO).convert("RGB").crop(RECORTE_DA_CAPTURA)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    recortada.save(destino, optimize=True)
+    print(f"{destino}: {recortada.width}x{recortada.height}px")
+
+
 def main() -> None:
+    captura_do_jogo()
     arquitetura().salvar(PASTA_DE_SAIDA / "arquitetura.png")
     resultados().salvar(PASTA_DE_SAIDA / "resultados.png")
 
