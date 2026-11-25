@@ -33,7 +33,8 @@ export class ReservaDeArquivo implements ReservaDoZe {
 
   narracao(veredito: Veredito, desafio: string, primeiroPalpite: string): string {
     const modelo = this.sorteador.embaralhar(NARRACOES_MODELO[veredito])[0] ?? "{desafio}";
-    return modelo.replaceAll("{desafio}", desafio).replaceAll("{palpite}", primeiroPalpite);
+    const texto = modelo.replaceAll("{desafio}", desafio).replaceAll("{palpite}", primeiroPalpite);
+    return comMaiusculaNoInicioDasFrases(texto);
   }
 
   resposta(): string {
@@ -63,4 +64,12 @@ export function lerCharadasDeReserva(conteudo: unknown): Resultado<CharadasDeRes
 function tipoDe(valor: unknown): string {
   if (Array.isArray(valor)) return "lista";
   return valor === null ? "null" : typeof valor;
+}
+
+/** As frases-modelo podem começar pelo desafio ("banana apareceu…"): sobe a primeira letra de cada frase. */
+function comMaiusculaNoInicioDasFrases(texto: string): string {
+  return texto.replace(
+    /(^|[.!?]\s+)(\p{Ll})/gu,
+    (_, antes: string, letra: string) => antes + letra.toUpperCase(),
+  );
 }

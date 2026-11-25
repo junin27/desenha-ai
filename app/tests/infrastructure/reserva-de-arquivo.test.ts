@@ -50,7 +50,7 @@ describe("narrações-modelo coerentes com o veredito", () => {
   it.each(VEREDITOS)("toda narração de %s cita o desafio e não sobra marcador", (veredito) => {
     for (let posicao = 0; posicao < 6; posicao++) {
       const texto = reserva(posicao).narracao(veredito, "vaca", "cavalo");
-      expect(texto).toContain("vaca");
+      expect(texto.toLowerCase()).toContain("vaca");
       expect(texto).not.toMatch(/[{}]/);
     }
   });
@@ -67,6 +67,23 @@ describe("narrações-modelo coerentes com o veredito", () => {
     const textos = (veredito: Veredito) => NARRACOES_MODELO[veredito].join(" ").toLowerCase();
     expect(textos("ACERTOU")).not.toMatch(/errou|quase|faltou/);
     expect(textos("ERROU")).not.toMatch(/acertou|cravou|cravaram/);
+  });
+
+  it("narrações-modelo sem artigo antes do desafio ou do palpite ('o banana', 'o cobra' erravam o gênero)", () => {
+    const todas = Object.values(NARRACOES_MODELO).flat();
+    const comArtigo = todas.filter((frase) =>
+      /\b(o|a|os|as|do|da|no|na|ao|pelo|pela)\s+\{(desafio|palpite)\}/iu.test(frase),
+    );
+    expect(comArtigo).toEqual([]);
+  });
+
+  it("narração de reserva começa cada frase com maiúscula, mesmo quando a frase começa pelo desafio", () => {
+    for (const veredito of ["ACERTOU", "QUASE", "ERROU"] as const) {
+      for (let posicao = 0; posicao < 6; posicao++) {
+        const texto = reserva(posicao).narracao(veredito, "banana", "lua");
+        expect(texto).not.toMatch(/(^|[.!?]\s+)\p{Ll}/u);
+      }
+    }
   });
 
   it("o sorteador escolhe qual narração-modelo é usada", () => {
