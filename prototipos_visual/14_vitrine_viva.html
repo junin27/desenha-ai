@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine viva</title>
+<!-- Protótipo 14: tela inicial em "modo vitrine". Tudo local: fontes do node_modules do app, Zé do jogo,
+     MediaPipe do node_modules (só funciona servido por http, não por file://). -->
+<style>
+@font-face { font-family: "Gochi Hand"; src: url("../app/node_modules/@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Patrick Hand"; src: url("../app/node_modules/@fontsource/patrick-hand/files/patrick-hand-latin-400-normal.woff2") format("woff2"); }
+:root {
+  --papel: #f7ecd4; --papel-escuro: #ead7ad; --quadro: #fffdf6; --tinta: #2b1a0a; --tinta-suave: #6b4f2e;
+  --terracota: #b5401f; --mostarda: #c98a00; --mostarda-texto: #8a5c00; --verde: #2f7d32; --azul: #3d6c9e;
+  --creme: #fff6df; --torto: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  --titulo: "Gochi Hand", system-ui, sans-serif; --texto: "Patrick Hand", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--papel); color: var(--tinta); font-family: var(--texto); }
+body { background:
+  radial-gradient(circle at 12% 18%, #f9e3c9 0 18%, transparent 40%),
+  radial-gradient(circle at 88% 82%, #eef6e6 0 16%, transparent 38%), var(--papel); }
+
+/* Camada do rastro de tinta (mão ou mouse) por cima de tudo, sem pegar cliques */
+#rastro { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
+
+/* Respingos de fundo que "pingam" na entrada */
+.respingo { position: absolute; border-radius: 50%; opacity: .16; transform: scale(0); animation: pinga .9s cubic-bezier(.2,1.6,.4,1) forwards; }
+@keyframes pinga { to { transform: scale(1); } }
+
+.palco { position: relative; height: 100vh; display: grid; grid-template-columns: 1.25fr 1fr;
+  grid-template-rows: auto 1fr auto; gap: clamp(8px, 1.6vh, 20px) clamp(16px, 2.4vw, 40px);
+  padding: clamp(14px, 2.4vh, 32px) clamp(20px, 3vw, 56px); }
+
+/* Título escrito a tinta, letra por letra (traço desenha, depois preenche) */
+.titulo { grid-column: 1 / -1; display: flex; align-items: center; gap: 24px; }
+.titulo svg { height: clamp(78px, 13vh, 140px); width: auto; overflow: visible; }
+.titulo text { font-family: var(--titulo); font-size: 120px; fill: transparent; stroke: var(--tinta); stroke-width: 2.5;
+  stroke-dasharray: 600; stroke-dashoffset: 600; animation: escreve 1.1s ease forwards, enche .5s ease forwards; }
+.titulo text.so { fill: transparent; stroke: var(--terracota); }
+@keyframes escreve { to { stroke-dashoffset: 0; } }
+@keyframes enche { to { fill: var(--cor, var(--tinta)); } }
+.selo-ia { font-family: var(--titulo); font-size: clamp(22px, 2vw, 30px); text-transform: uppercase; background: var(--mostarda);
+  color: var(--tinta); padding: 6px 18px; border-radius: var(--torto); border: 3px solid var(--tinta); transform: rotate(-4deg) scale(0);
+  animation: carimbo .5s 2.4s cubic-bezier(.2,1.8,.4,1) forwards; box-shadow: 4px 4px 0 var(--tinta); }
+@keyframes carimbo { to { transform: rotate(-4deg) scale(1); } }
+
+/* Quadro onde o Zé desenha sozinho */
+.cena { position: relative; display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; }
+.cena h2, .redes h2 { font-family: var(--titulo); text-transform: uppercase; font-size: clamp(24px, 2vw, 34px); }
+.cena h2 b { color: var(--terracota); font-weight: 400; }
+.quadro { position: relative; background: var(--quadro); border: 4px solid var(--tinta); border-radius: var(--torto);
+  box-shadow: 8px 8px 0 var(--tinta); overflow: hidden; min-height: 0; }
+.quadro canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.acertou { position: absolute; left: 50%; top: 50%; font-family: var(--titulo); font-size: clamp(48px, 6vw, 96px); color: var(--verde);
+  border: 6px solid var(--verde); padding: 0 28px; border-radius: var(--torto); background: #fffdf6e6; text-transform: uppercase;
+  transform: translate(-50%, -50%) rotate(-10deg) scale(0); pointer-events: none; }
+.acertou.vai { animation: bate .55s cubic-bezier(.2,1.9,.4,1) forwards; }
+@keyframes bate { 0% { transform: translate(-50%,-50%) rotate(-10deg) scale(2.4); opacity: 0; } 100% { transform: translate(-50%,-50%) rotate(-10deg) scale(1); opacity: 1; } }
+
+/* Lateral: palpites ao vivo e o Zé */
+.lateral { display: grid; grid-template-rows: auto 1fr; gap: 12px; min-height: 0; }
+.redes { background: var(--creme); border: 3px solid var(--tinta); border-radius: var(--torto); padding: 12px 20px; box-shadow: 6px 6px 0 var(--tinta); }
+.redes ol { list-style: none; padding: 0; display: grid; gap: 6px; margin-top: 6px; }
+.redes li { position: relative; font-size: clamp(24px, 2vw, 32px); display: flex; justify-content: space-between; padding: 0 10px; z-index: 0; }
+.redes li .barra { position: absolute; left: 0; top: 10%; height: 80%; background: var(--mostarda); opacity: .45; z-index: -1;
+  border-radius: 6px 30px 8px 24px; transition: width .35s ease; }
+.redes li:first-child .barra { background: var(--terracota); opacity: .5; }
+.redes li:first-child { font-weight: 700; }
+.ze-canto { position: relative; display: flex; align-items: end; gap: 10px; min-height: 0; }
+.ze-canto svg { height: 100%; max-height: 300px; width: auto; flex: none; }
+.balao { position: relative; align-self: start; margin-top: 10px; background: #fff; border: 3px solid var(--tinta); border-radius: var(--torto);
+  padding: 10px 18px; font-size: clamp(24px, 1.9vw, 30px); max-width: 15em; min-height: 2.4em; }
+.balao::after { content: ""; position: absolute; left: -18px; bottom: 14px; border: 10px solid transparent; border-right: 14px solid var(--tinta); }
+
+/* Rodapé: botão magnético + convite da mão + números do dia */
+.rodape { grid-column: 1 / -1; display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px); }
+.jogar { font-family: var(--titulo); text-transform: uppercase; font-size: clamp(36px, 3.6vw, 60px); color: var(--creme);
+  background: var(--terracota); border: 4px solid var(--tinta); border-radius: var(--torto); padding: 4px 48px; cursor: pointer;
+  box-shadow: 7px 7px 0 var(--tinta); transition: transform .18s ease-out, box-shadow .18s; animation: respira 2.2s ease-in-out infinite; }
+.jogar:hover { box-shadow: 3px 3px 0 var(--tinta); }
+.jogar:focus-visible { outline: 4px dashed var(--azul); outline-offset: 6px; }
+@keyframes respira { 50% { filter: brightness(1.12); } }
+.mao { display: flex; align-items: center; gap: 12px; font-size: clamp(24px, 2vw, 32px); }
+.mao .icone { font-size: 1.4em; display: inline-block; animation: acena 1.6s ease-in-out infinite; transform-origin: 70% 90%; }
+@keyframes acena { 0%,100% { transform: rotate(0); } 25% { transform: rotate(18deg); } 75% { transform: rotate(-12deg); } }
+.mao button { font: inherit; font-size: max(24px, .8em); border: 3px solid var(--tinta); background: var(--creme); border-radius: var(--torto); padding: 2px 14px; cursor: pointer; text-transform: uppercase; }
+.mao video { width: 120px; height: 68px; object-fit: cover; transform: scaleX(-1); border: 3px solid var(--tinta); border-radius: 10px; display: none; }
+.mao.ligada video { display: block; }
+.placar-do-dia { margin-left: auto; font-size: clamp(24px, 1.8vw, 30px); text-align: right; color: var(--tinta-suave); }
+.placar-do-dia strong { color: var(--tinta); font-family: var(--titulo); font-size: 1.2em; }
+
+/* Zé: humores (cópia do ze.css do jogo, injetada pelo gerador) */
+/* Zé do Rabisco: traço, cores e um bloco por humor (spec personagem-do-ze). Animações só com transform e
+   opacity; com movimento reduzido elas param e fica só a expressão. */
+.ze {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.ze-svg {
+  width: 128px;
+  height: auto;
+  flex: none;
+  overflow: visible;
+}
+.ze-svg {
+  --pele: #f3c79b;
+  --palha: #e8b64c;
+  --tinta: #2b1a0a;
+  --suave: #6b4f2e;
+  --terracota: #b5401f;
+  --mostarda: #c98a00;
+  --fonte: "Segoe UI", system-ui, sans-serif;
+}
+/* ---------- Traço do personagem ---------- */
+.ze-svg .linha {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ze-svg .preenche {
+  stroke: var(--tinta);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+}
+.ze-svg .pele {
+  fill: var(--pele);
+}
+.ze-svg .palha {
+  fill: var(--palha);
+}
+.ze-svg .faixa {
+  fill: var(--terracota);
+}
+.ze-svg .olho {
+  fill: var(--tinta);
+}
+.ze-svg .bochecha {
+  fill: var(--terracota);
+  opacity: 0.35;
+}
+.ze-svg .sarda {
+  fill: #b7743f;
+}
+.ze-svg .lapis {
+  fill: var(--mostarda);
+}
+.ze-svg * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Partes que cada humor mexe (todas com a mesma transição suave) */
+.ze-svg .corpo,
+.ze-svg .cabeca,
+.ze-svg .chapeu,
+.ze-svg .braco-e,
+.ze-svg .braco-d,
+.ze-svg .sobrancelhas path,
+.ze-svg .capim {
+  transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.ze-svg .braco-e {
+  transform-origin: 90% 10%;
+}
+.ze-svg .braco-d {
+  transform-origin: 10% 10%;
+}
+.ze-svg .capim {
+  transform-origin: 0% 50%;
+}
+.ze-svg .boca > *,
+.ze-svg .olhos > *,
+.ze-svg .extras > * {
+  display: none;
+}
+
+/* Neutro (respira e pisca) */
+.ze-svg .corpo {
+  animation: respira 3s ease-in-out infinite;
+}
+@keyframes respira {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.ze-svg .olhos .aberto {
+  display: inline;
+  animation: pisca 4s infinite;
+}
+@keyframes pisca {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+.ze-svg .boca .sorriso {
+  display: inline;
+}
+.ze-svg .capim {
+  animation: capim 2.4s ease-in-out infinite;
+}
+@keyframes capim {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+/* Falando: boca abre e fecha, cabeça balança */
+.ze-svg.humor-falando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-falando .boca .fala {
+  display: inline;
+  animation: fala 0.18s infinite alternate;
+}
+@keyframes fala {
+  to {
+    transform: scaleY(0.25);
+  }
+}
+.ze-svg.humor-falando .cabeca {
+  animation: balanca 1.2s ease-in-out infinite;
+}
+@keyframes balanca {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+.ze-svg.humor-falando .braco-d {
+  transform: rotate(-35deg);
+}
+
+/* Pensando: olha para cima, mão no queixo, balões */
+.ze-svg.humor-pensando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-pensando .olhos .cima {
+  display: inline;
+}
+.ze-svg.humor-pensando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-pensando .boca .hum {
+  display: inline;
+}
+.ze-svg.humor-pensando .braco-d {
+  transform: rotate(-120deg) translate(-6px, 0);
+}
+.ze-svg.humor-pensando .extras .bolhas {
+  display: inline;
+}
+.ze-svg.humor-pensando .bolhas circle {
+  animation: bolha 1.5s ease-in-out infinite;
+}
+.ze-svg.humor-pensando .bolhas circle:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ze-svg.humor-pensando .bolhas circle:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes bolha {
+  50% {
+    transform: translateY(-6px) scale(1.15);
+  }
+}
+.ze-svg.humor-pensando .sobrancelhas .e {
+  transform: translateY(-4px) rotate(-8deg);
+}
+
+/* Torcendo: punhos para cima, pulinhos */
+.ze-svg.humor-torcendo .corpo {
+  animation: pulinho 0.5s ease-in-out infinite;
+}
+@keyframes pulinho {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.ze-svg.humor-torcendo .braco-e {
+  transform: rotate(140deg);
+}
+.ze-svg.humor-torcendo .braco-d {
+  transform: rotate(-140deg);
+}
+.ze-svg.humor-torcendo .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-torcendo .boca .aberta {
+  display: inline;
+}
+.ze-svg.humor-torcendo .sobrancelhas path {
+  transform: translateY(-4px);
+}
+
+/* Comemorando: pula alto e joga o chapéu, estrelas */
+.ze-svg.humor-comemorando .corpo {
+  animation: pulo 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+@keyframes pulo {
+  40% {
+    transform: translateY(-26px) rotate(-4deg);
+  }
+  70% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+.ze-svg.humor-comemorando .chapeu {
+  animation: jogachapeu 0.9s cubic-bezier(0.3, 1.5, 0.5, 1) infinite;
+}
+@keyframes jogachapeu {
+  40% {
+    transform: translateY(-44px) rotate(-25deg);
+  }
+  70% {
+    transform: none;
+  }
+}
+.ze-svg.humor-comemorando .braco-e {
+  transform: rotate(150deg);
+}
+.ze-svg.humor-comemorando .braco-d {
+  transform: rotate(-150deg);
+}
+.ze-svg.humor-comemorando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-comemorando .olhos .feliz {
+  display: inline;
+}
+.ze-svg.humor-comemorando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-comemorando .boca .aberta {
+  display: inline;
+}
+.ze-svg.humor-comemorando .extras .estrelas {
+  display: inline;
+}
+.ze-svg.humor-comemorando .estrelas path {
+  animation: brilha 0.9s ease-in-out infinite;
+}
+.ze-svg.humor-comemorando .estrelas path:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.ze-svg.humor-comemorando .estrelas path:nth-child(3) {
+  animation-delay: 0.6s;
+}
+@keyframes brilha {
+  50% {
+    transform: scale(1.4) rotate(30deg);
+  }
+}
+
+/* Bravo: sobrancelhas em V, treme, fumacinha, vermelho no rosto */
+.ze-svg.humor-bravo .cabeca {
+  animation: treme 0.12s infinite;
+}
+@keyframes treme {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+.ze-svg.humor-bravo .sobrancelhas .e {
+  transform: rotate(25deg) translateY(4px);
+}
+.ze-svg.humor-bravo .sobrancelhas .d {
+  transform: rotate(-25deg) translateY(4px);
+}
+.ze-svg.humor-bravo .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-bravo .boca .brava {
+  display: inline;
+}
+.ze-svg.humor-bravo .bochecha {
+  opacity: 0.8;
+}
+.ze-svg.humor-bravo .braco-e {
+  transform: rotate(-20deg);
+}
+.ze-svg.humor-bravo .braco-d {
+  transform: rotate(20deg);
+}
+.ze-svg.humor-bravo .extras .fumaca {
+  display: inline;
+}
+.ze-svg.humor-bravo .fumaca path {
+  animation: fumaca 1s ease-out infinite;
+}
+.ze-svg.humor-bravo .fumaca path:nth-child(2) {
+  animation-delay: 0.5s;
+}
+@keyframes fumaca {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(1.2);
+  }
+}
+
+/* Entediado: olhos meio fechados, cabeça caída, bocejo, "zzz" */
+.ze-svg.humor-entediado .corpo {
+  animation: respira 5s ease-in-out infinite;
+}
+.ze-svg.humor-entediado .cabeca {
+  transform: rotate(10deg) translateY(4px);
+}
+.ze-svg.humor-entediado .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-entediado .olhos .meio {
+  display: inline;
+}
+.ze-svg.humor-entediado .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-entediado .boca .tedio {
+  display: inline;
+  animation: boceja 4s ease-in-out infinite;
+}
+@keyframes boceja {
+  40%,
+  60% {
+    transform: scale(1.5, 2.4);
+  }
+}
+.ze-svg.humor-entediado .braco-d {
+  transform: rotate(-150deg) translate(-4px, 6px);
+}
+.ze-svg.humor-entediado .capim {
+  animation: none;
+  transform: rotate(30deg);
+}
+.ze-svg.humor-entediado .extras .zzz {
+  display: inline;
+}
+.ze-svg.humor-entediado .zzz text {
+  animation: zzz 3s ease-in-out infinite;
+  font: 700 18px var(--fonte);
+  fill: var(--suave);
+}
+.ze-svg.humor-entediado .zzz text:nth-child(2) {
+  animation-delay: 1s;
+}
+.ze-svg.humor-entediado .zzz text:nth-child(3) {
+  animation-delay: 2s;
+}
+@keyframes zzz {
+  from {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(14px, -26px);
+  }
+}
+
+/* Triste (errou): coça a cabeça, gota de suor, boca torta */
+.ze-svg.humor-cocando .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-cocando .olhos .triste {
+  display: inline;
+}
+.ze-svg.humor-cocando .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-cocando .boca .torta {
+  display: inline;
+}
+.ze-svg.humor-cocando .sobrancelhas .e {
+  transform: rotate(-20deg);
+}
+.ze-svg.humor-cocando .sobrancelhas .d {
+  transform: rotate(20deg);
+}
+.ze-svg.humor-cocando .braco-d {
+  animation: coca 0.4s ease-in-out infinite alternate;
+}
+@keyframes coca {
+  from {
+    transform: rotate(-150deg);
+  }
+  to {
+    transform: rotate(-165deg);
+  }
+}
+.ze-svg.humor-cocando .extras .gota {
+  display: inline;
+  animation: gota 1.6s ease-in infinite;
+}
+@keyframes gota {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+/* Assustado (tempo acabando): olhos arregalados, cabelo arrepiado, treme */
+.ze-svg.humor-assustado .corpo {
+  animation: treme 0.1s infinite;
+}
+.ze-svg.humor-assustado .olhos .aberto {
+  display: none;
+}
+.ze-svg.humor-assustado .olhos .arregalado {
+  display: inline;
+}
+.ze-svg.humor-assustado .boca .sorriso {
+  display: none;
+}
+.ze-svg.humor-assustado .boca .oh {
+  display: inline;
+}
+.ze-svg.humor-assustado .chapeu {
+  transform: translateY(-12px);
+}
+.ze-svg.humor-assustado .sobrancelhas path {
+  transform: translateY(-7px);
+}
+.ze-svg.humor-assustado .braco-e {
+  transform: rotate(60deg);
+}
+.ze-svg.humor-assustado .braco-d {
+  transform: rotate(-60deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ze-svg *,
+  .ze-svg {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Mídia gerada por IA (Wan 2.2 via Hugging Face), tudo local em 14_midia/ ---------- */
+/* Fundo: a roça desenhada respira atrás da vitrine; o véu de papel garante leitura do conteúdo */
+.fundo-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+/* z-index 0 (e não negativo): negativo ficaria por baixo do fundo do body, que não é posicionado */
+.veu-papel { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 55%, #f7ecd4d9 0 45%, #f7ecd4a6 75%, #f7ecd480 100%); }
+.palco { z-index: 1; }
+/* Fogos de tinta dentro do quadro: multiply some com o papel e deixa só a tinta */
+.quadro .fogos { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply;
+  opacity: 0; transition: opacity .3s; pointer-events: none; }
+.quadro .fogos.vai { opacity: 1; }
+/* Transição do JOGAR: vídeos em tela cheia por cima de tudo */
+.transicao { position: fixed; inset: 0; z-index: 50; display: none; background: var(--papel); }
+.transicao.ativa { display: block; }
+.transicao video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.transicao .proxima { position: absolute; inset: 0; display: grid; place-content: center; gap: 16px; text-align: center;
+  opacity: 0; transition: opacity .4s; font-family: var(--titulo); font-size: clamp(40px, 5vw, 80px); text-transform: uppercase; }
+.transicao .proxima small { font-family: var(--texto); font-size: clamp(24px, 2vw, 32px); text-transform: none; color: var(--tinta-suave); }
+.transicao .proxima.vai { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fundo-video { display: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<video class="fundo-video" id="fundo-video" src="14_midia/fundo-roca-toon.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
+<div class="veu-papel"></div>
+<div class="transicao" id="transicao" aria-hidden="true">
+  <video id="trans-tinta" src="14_midia/trans-tinta.mp4" muted playsinline preload="auto"></video>
+  <video id="trans-folha" src="14_midia/trans-folha.mp4" muted playsinline preload="auto" hidden></video>
+  <div class="proxima" id="proxima">Qual é o seu apelido?<small>(protótipo: aqui entra a tela de apelido do jogo)</small></div>
+</div>
+<canvas id="rastro"></canvas>
+<main class="palco">
+  <header class="titulo">
+    <svg viewBox="0 0 960 150" aria-label="Desenha aí, sô!" role="img"><g id="letras"></g></svg>
+    <span class="selo-ia">Feito com IA</span>
+  </header>
+
+  <section class="cena">
+    <h2>O Zé tá desenhando um <b id="alvo">…</b></h2>
+    <div class="quadro"><canvas id="quadro"></canvas><video class="fogos" id="fogos" src="14_midia/acerto.mp4" muted playsinline preload="auto"></video><div class="acertou" id="acertou">Acertou!</div></div>
+  </section>
+
+  <aside class="lateral">
+    <div class="redes"><h2>O que as redes acham</h2><ol id="palpites"></ol></div>
+    <div class="ze-canto">
+      <svg class="ze-svg humor-falando" id="ze" viewBox="0 0 200 230" aria-hidden="true">
+<defs>
+<pattern id="xadrez-vitrine" width="16" height="16" patternUnits="userSpaceOnUse">
+<rect width="16" height="16" fill="#c98a00"/><rect width="8" height="16" fill="#b5401f" opacity=".55"/><rect width="16" height="8" fill="#b5401f" opacity=".45"/>
+</pattern>
+</defs>
+<g class="corpo">
+<!-- Braços (atrás do tronco) -->
+<g class="braco-e"><path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M66 150 C 50 158, 40 172, 38 186 L 50 190 C 54 178, 62 168, 74 162 Z"/><circle class="preenche pele" cx="43" cy="192" r="9"/></g>
+<g class="braco-d"><path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M134 150 C 150 158, 160 172, 162 186 L 150 190 C 146 178, 138 168, 126 162 Z"/><circle class="preenche pele" cx="157" cy="192" r="9"/></g>
+<!-- Tronco com camisa xadrez, suspensório e calça -->
+<path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M68 146 C 72 140, 128 140, 132 146 L 138 200 L 62 200 Z"/>
+<path class="linha" d="M84 146 L 80 200 M116 146 L 120 200"/>
+<path class="preenche" style="fill:#3d6c9e" d="M62 198 L 138 198 L 136 222 L 104 222 L 100 208 L 96 222 L 64 222 Z"/>
+<g class="cabeca">
+<!-- Orelhas e rosto -->
+<ellipse class="preenche pele" cx="58" cy="100" rx="9" ry="12"/><ellipse class="preenche pele" cx="142" cy="100" rx="9" ry="12"/>
+<ellipse class="preenche pele" cx="100" cy="102" rx="44" ry="42"/>
+<!-- Cabelo espetado saindo do chapéu -->
+<path class="preenche" style="fill:#7a4a22" d="M62 76 L 70 92 L 76 78 L 84 92 L 92 78 L 100 90 L 108 78 L 116 92 L 124 78 L 130 92 L 138 76 Z"/>
+<circle class="bochecha" cx="72" cy="118" r="9"/><circle class="bochecha" cx="128" cy="118" r="9"/>
+<circle class="sarda" cx="80" cy="110" r="1.8"/><circle class="sarda" cx="86" cy="114" r="1.8"/><circle class="sarda" cx="114" cy="114" r="1.8"/><circle class="sarda" cx="120" cy="110" r="1.8"/>
+<path class="linha" d="M98 104 C 94 112, 102 114, 104 110"/>
+<g class="sobrancelhas"><path class="linha e" d="M74 86 C 80 82, 88 82, 92 85"/><path class="linha d" d="M108 85 C 112 82, 120 82, 126 86"/></g>
+<g class="olhos">
+<g class="aberto"><ellipse class="olho" cx="84" cy="97" rx="4.5" ry="6"/><ellipse class="olho" cx="116" cy="97" rx="4.5" ry="6"/></g>
+<g class="cima"><ellipse class="olho" cx="86" cy="92" rx="4.5" ry="5"/><ellipse class="olho" cx="118" cy="92" rx="4.5" ry="5"/></g>
+<g class="feliz"><path class="linha" d="M78 98 Q 84 90 90 98 M110 98 Q 116 90 122 98"/></g>
+<g class="meio"><path class="linha" d="M78 97 L 90 97 M110 97 L 122 97"/><ellipse class="olho" cx="84" cy="99" rx="4" ry="2.5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="2.5"/></g>
+<g class="triste"><ellipse class="olho" cx="84" cy="99" rx="4" ry="5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="5"/></g>
+<g class="arregalado"><circle cx="84" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="84" cy="96" r="3"/><circle cx="116" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="116" cy="96" r="3"/></g>
+</g>
+<g class="boca">
+<path class="linha sorriso" d="M84 124 Q 100 136 116 124"/>
+<path class="preenche fala" style="fill:#7a2a14" d="M88 122 Q 100 140 112 122 Z"/>
+<path class="linha hum" d="M90 128 Q 100 124 110 128"/>
+<path class="preenche aberta" style="fill:#7a2a14" d="M82 120 Q 100 148 118 120 Z"/>
+<path class="linha brava" d="M86 130 Q 100 120 114 130"/>
+<ellipse class="preenche tedio" style="fill:#7a2a14" cx="100" cy="127" rx="5" ry="3"/>
+<path class="linha torta" d="M86 130 C 94 124, 104 132, 114 126"/>
+<ellipse class="preenche oh" style="fill:#7a2a14" cx="100" cy="128" rx="7" ry="9"/>
+</g>
+<!-- Capim no canto da boca e lápis atrás da orelha -->
+<path class="linha capim" style="stroke:#2f7d32;stroke-width:3" d="M116 126 L 140 118 M128 122 L 136 112"/>
+<path class="preenche lapis" d="M146 70 L 154 74 L 140 104 L 132 100 Z"/><path class="preenche" style="fill:#f3c79b" d="M132 100 L 140 104 L 132 110 Z"/>
+</g>
+<!-- Chapéu de palha com remendo e faixa -->
+<g class="chapeu">
+<ellipse class="preenche palha" cx="100" cy="74" rx="68" ry="12"/>
+<path class="preenche palha" d="M66 72 C 66 40, 134 40, 134 72 Z"/>
+<path class="preenche faixa" d="M67 64 C 90 70, 110 70, 133 64 L 134 72 C 110 78, 90 78, 66 72 Z"/>
+<path class="preenche" style="fill:#2f7d32" d="M108 52 L 121 54 L 120 64 L 107 62 Z"/>
+<path class="linha" style="stroke-width:2" d="M80 50 L 84 60 M96 44 L 96 58 M42 76 L 38 84 M158 76 L 162 84 M50 80 L 48 86"/>
+</g>
+</g>
+<!-- Efeitos de cada humor -->
+<g class="extras">
+<g class="bolhas"><circle class="preenche" style="fill:#fff" cx="160" cy="54" r="5"/><circle class="preenche" style="fill:#fff" cx="172" cy="38" r="8"/><circle class="preenche" style="fill:#fff" cx="184" cy="16" r="12"/></g>
+<g class="estrelas"><path class="preenche" style="fill:#c98a00" d="M28 40 l4 9 10 1 -8 6 3 10 -9 -5 -9 5 3 -10 -8 -6 10 -1 z"/><path class="preenche" style="fill:#b5401f" d="M172 30 l3 7 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 z"/><path class="preenche" style="fill:#2f7d32" d="M178 120 l3 6 7 1 -5 4 2 7 -7 -4 -6 4 2 -7 -5 -4 7 -1 z"/></g>
+<g class="fumaca"><path class="preenche" style="fill:#d9cbb3" d="M56 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/><path class="preenche" style="fill:#d9cbb3" d="M150 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/></g>
+<g class="zzz"><text x="146" y="60">z</text><text x="154" y="48">z</text><text x="162" y="36">Z</text></g>
+<path class="gota preenche" style="fill:#8ec5ef" d="M150 82 C 146 90, 146 96, 150 96 C 154 96, 154 90, 150 82 Z"/>
+</g>
+</svg>
+      <p class="balao" id="balao"></p>
+    </div>
+  </aside>
+
+  <footer class="rodape">
+    <button class="jogar" id="jogar">Jogar!</button>
+    <div class="mao" id="mao"><span class="icone">✋</span> ou levante a mão <button id="ligar-mao">Ligar câmera</button><video id="video" playsinline muted></video></div>
+    <p class="placar-do-dia">Já jogaram hoje: <strong id="jogaram">0</strong><br>Recorde: <strong>Juninho · 2.840</strong></p>
+  </footer>
+</main>
+
+<script type="module">
+/* ---------- Título letra por letra: cada letra desenha o contorno e depois enche de tinta ---------- */
+const FRASE = [["DESENHA", "#2b1a0a"], ["AÍ,", "#2b1a0a"], ["SÔ!", "#b5401f"]];
+const letras = document.getElementById("letras");
+let x = 0, atraso = 0;
+for (const [palavra, cor] of FRASE) {
+  for (const letra of palavra) {
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.textContent = letra; t.setAttribute("x", x); t.setAttribute("y", 115);
+    t.style.setProperty("--cor", cor);
+    t.style.animationDelay = `${atraso}s, ${atraso + .7}s`;
+    if (cor !== "#2b1a0a") t.classList.add("so");
+    letras.append(t); x += t.getComputedTextLength() + 2; atraso += .08; // largura real de cada letra
+  }
+  x += 34;
+}
+
+/* ---------- Respingos de tinta que pingam no fundo na entrada ---------- */
+const CORES = ["#b5401f", "#c98a00", "#2f7d32", "#3d6c9e"];
+for (let i = 0; i < 9; i++) {
+  const r = document.createElement("i"); r.className = "respingo";
+  const tam = 60 + Math.random() * 180;
+  Object.assign(r.style, { width: `${tam}px`, height: `${tam}px`, left: `${Math.random() * 95}%`, top: `${Math.random() * 90}%`,
+    background: CORES[i % 4], animationDelay: `${.2 + i * .12}s` });
+  document.body.prepend(r);
+}
+
+/* ---------- Desenhos do "dataset" (traços normalizados 0..1) que o Zé faz sozinho ---------- */
+const circulo = (cx, cy, r, n = 28) => Array.from({ length: n + 1 }, (_, i) => [cx + r * Math.cos(i / n * 6.283), cy + r * Math.sin(i / n * 6.283)]);
+const DESENHOS = [
+  { nome: "casa", tracos: [[[.18,.45],[.5,.16],[.82,.45]], [[.24,.42],[.24,.86],[.76,.86],[.76,.42]], [[.44,.86],[.44,.64],[.56,.64],[.56,.86]], [[.3,.5],[.38,.5],[.38,.58],[.3,.58],[.3,.5]]] },
+  { nome: "sol", tracos: [circulo(.5,.5,.17), ...Array.from({ length: 10 }, (_, i) => { const a = i / 10 * 6.283; return [[.5 + .24*Math.cos(a), .5 + .24*Math.sin(a)], [.5 + .36*Math.cos(a), .5 + .36*Math.sin(a)]]; })] },
+  { nome: "peixe", tracos: [[[.2,.5],[.35,.32],[.6,.3],[.72,.5],[.6,.7],[.35,.68],[.2,.5]], [[.72,.5],[.86,.34],[.86,.66],[.72,.5]], [[.32,.46],[.33,.47]], [[.48,.38],[.52,.5],[.48,.62]]] },
+  { nome: "árvore", tracos: [[[.44,.88],[.46,.56],[.54,.56],[.56,.88]], [[.46,.56],[.3,.52],[.26,.38],[.36,.26],[.5,.2],[.64,.26],[.74,.38],[.7,.52],[.54,.56]], [[.38,.36],[.42,.4]], [[.6,.32],[.62,.38]]] },
+  { nome: "estrela", tracos: [[[.5,.14],[.6,.4],[.88,.4],[.66,.56],[.75,.84],[.5,.67],[.25,.84],[.34,.56],[.12,.4],[.4,.4],[.5,.14]]] },
+];
+const CATEGORIAS = ["casa", "sol", "peixe", "árvore", "estrela", "gato", "carro", "bola", "flor", "chapéu"];
+const CORES_DO_TRACO = ["#2b1a0a", "#b5401f", "#3d6c9e", "#2f7d32"];
+
+const quadro = document.getElementById("quadro"), cq = quadro.getContext("2d");
+const ajustar = (cv) => { const r = cv.getBoundingClientRect(); cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio; };
+ajustar(quadro);
+
+/* Lápis desenhado no canvas: corpo amarelo, madeira e grafite na cor do traço */
+function lapis(c, x, y, cor, s) {
+  c.save(); c.translate(x, y); c.rotate(-0.7); c.scale(s, s);
+  c.fillStyle = cor; c.beginPath(); c.moveTo(0,0); c.lineTo(8,-5); c.lineTo(8,5); c.fill();
+  c.fillStyle = "#f3c79b"; c.beginPath(); c.moveTo(8,-5); c.lineTo(22,-9); c.lineTo(22,9); c.lineTo(8,5); c.fill();
+  c.fillStyle = "#e8b200"; c.fillRect(22,-9,90,18); c.fillStyle = "#c98a00"; c.fillRect(22,3,90,6);
+  c.fillStyle = "#9aa3ab"; c.fillRect(112,-9,10,18); c.fillStyle = "#e58a9a"; c.fillRect(122,-9,14,18);
+  c.strokeStyle = "#2b1a0a"; c.lineWidth = 2; c.strokeRect(22,-9,114,18); c.restore();
+}
+
+/* Partículas: pó de grafite na cor do traço, que cai e quica */
+const particulas = [];
+function soltarPo(x, y, cor, n = 3) {
+  for (let i = 0; i < n; i++) particulas.push({ x, y, vx: (Math.random() - .5) * 3, vy: -Math.random() * 3, cor, vida: 1, t: 2 + Math.random() * 3 });
+}
+
+/* ---------- Estado da vitrine: desenha, palpita, carimba, troca ---------- */
+let atual = 0, progresso = 0, tracos = [], cor = CORES_DO_TRACO[0], pausa = 0, jogaram = 37, palpites = [];
+const balao = document.getElementById("balao"), ze = document.getElementById("ze"), alvo = document.getElementById("alvo");
+const FALAS = ["Ô de casa! Chega mais, sô!", "Duvido as redes acertarem esse…", "Óia que capricho!", "Sua vez! Aperta o JOGAR!"];
+let falaAtual = 0; // cada fala nova cancela a anterior, senão as letras se misturam
+function falar(texto, humor = "falando") {
+  const minha = ++falaAtual;
+  ze.setAttribute("class", `ze-svg humor-${humor}`); balao.textContent = "";
+  [...texto].forEach((l, i) => setTimeout(() => { if (minha === falaAtual) balao.textContent += l; }, i * 35));
+}
+function novoDesenho() {
+  atual = (atual + 1) % DESENHOS.length; progresso = 0; tracos = []; pausa = 0;
+  cor = CORES_DO_TRACO[atual % CORES_DO_TRACO.length];
+  alvo.textContent = DESENHOS[atual].nome;
+  document.getElementById("acertou").classList.remove("vai");
+  falar(FALAS[atual % FALAS.length], atual % 2 ? "pensando" : "falando");
+}
+/* Palpites simulados: a chance do alvo cresce com o desenho (no jogo real, a CNN e a LSTM de verdade) */
+function palpitar(f) {
+  const nome = DESENHOS[atual].nome;
+  palpites = CATEGORIAS.map((c) => ({ c, p: c === nome ? .08 + f * .85 : Math.random() * (1 - f) * .4 }));
+  const soma = palpites.reduce((a, b) => a + b.p, 0);
+  palpites = palpites.map((x) => ({ ...x, p: x.p / soma })).sort((a, b) => b.p - a.p).slice(0, 3);
+  document.getElementById("palpites").innerHTML = palpites.map(({ c, p }) =>
+    `<li><span class="barra" style="width:${Math.round(p * 100)}%"></span><span>${c}</span><span>${Math.round(p * 100)}%</span></li>`).join("");
+}
+function acertar() {
+  document.getElementById("acertou").classList.add("vai");
+  falar("ACERTARAM! Agora quero ver você!", "comemorando");
+  document.getElementById("jogaram").textContent = ++jogaram;
+  const r = quadro.width;
+  for (let i = 0; i < 70; i++) soltarPo(r * Math.random(), quadro.height * .3, CORES[i % 4], 1);
+  tocarDoComeco(fogos).then(() => fogos.classList.add("vai"));
+}
+const fogos = document.getElementById("fogos");
+fogos.addEventListener("ended", () => fogos.classList.remove("vai"));
+
+/* Recomeçar um vídeo: recarregar a fonte em vez de buscar currentTime=0, porque servidor sem Range (http.server) não deixa buscar */
+function tocarDoComeco(video) {
+  video.pause(); video.src = video.getAttribute("src"); video.load();
+  return video.play().catch(() => {});
+}
+const fundoVideo = document.getElementById("fundo-video");
+fundoVideo.loop = false;
+fundoVideo.addEventListener("ended", () => tocarDoComeco(fundoVideo));
+
+let ultimo = performance.now(), proximoPalpite = 0;
+function passo(agora) {
+  const dt = Math.min(.05, (agora - ultimo) / 1000); ultimo = agora;
+  const W = quadro.width, H = quadro.height, lado = Math.min(W, H) * .92, ox = (W - lado) / 2, oy = (H - lado) / 2;
+  const d = DESENHOS[atual], total = d.tracos.reduce((a, t) => a + t.length - 1, 0);
+  let ponta = null;
+  if (pausa === 0) {
+    progresso = Math.min(total, progresso + dt * 9);
+    if (progresso >= total) { pausa = agora; acertar(); }
+  } else if (agora - pausa > 3200) novoDesenho();
+
+  cq.clearRect(0, 0, W, H);
+  cq.lineCap = cq.lineJoin = "round"; cq.lineWidth = 12 * devicePixelRatio; cq.strokeStyle = cor;
+  let resta = progresso;
+  for (const t of d.tracos) {
+    if (resta <= 0) break;
+    cq.beginPath(); cq.moveTo(ox + t[0][0] * lado, oy + t[0][1] * lado);
+    for (let i = 1; i < t.length && resta > 0; i++) {
+      const f = Math.min(1, resta), [ax, ay] = t[i - 1], [bx, by] = t[i];
+      const px = ox + (ax + (bx - ax) * f) * lado, py = oy + (ay + (by - ay) * f) * lado;
+      cq.lineTo(px, py); ponta = [px, py]; resta -= 1;
+    }
+    cq.stroke();
+  }
+  if (ponta && pausa === 0) { soltarPo(ponta[0], ponta[1], cor, 2); lapis(cq, ponta[0], ponta[1], cor, devicePixelRatio * 1.1); }
+  if (agora > proximoPalpite && pausa === 0) { palpitar(progresso / total); proximoPalpite = agora + 260; }
+
+  for (const p of particulas) {
+    p.vy += 18 * dt * devicePixelRatio; p.x += p.vx; p.y += p.vy;
+    if (p.y > H - 6) { p.y = H - 6; p.vy *= -.35; p.vx *= .6; }
+    p.vida -= dt / p.t;
+    cq.globalAlpha = Math.max(0, p.vida); cq.fillStyle = p.cor; cq.fillRect(p.x, p.y, 4 * devicePixelRatio, 4 * devicePixelRatio);
+  }
+  cq.globalAlpha = 1;
+  for (let i = particulas.length - 1; i >= 0; i--) if (particulas[i].vida <= 0) particulas.splice(i, 1);
+  requestAnimationFrame(passo);
+}
+setTimeout(() => { novoDesenho(); requestAnimationFrame(passo); }, 1600);
+
+/* ---------- Rastro de tinta: segue o mouse, ou a ponta do indicador quando a câmera está ligada ---------- */
+const rastro = document.getElementById("rastro"), cr = rastro.getContext("2d");
+const pontosDoRastro = [], faiscas = [];
+let corDoRastro = 0;
+function ajustarRastro() { rastro.width = innerWidth * devicePixelRatio; rastro.height = innerHeight * devicePixelRatio; }
+ajustarRastro(); addEventListener("resize", () => { ajustarRastro(); ajustar(quadro); });
+function tocar(x, y) {
+  const ultimoPonto = pontosDoRastro.at(-1);
+  if (ultimoPonto && Math.hypot(x - ultimoPonto.x, y - ultimoPonto.y) > 260) pontosDoRastro.length = 0;
+  pontosDoRastro.push({ x, y, t: performance.now() });
+  if (Math.random() < .5) faiscas.push({ x, y, vx: (Math.random() - .5) * 6, vy: (Math.random() - .5) * 6, vida: 1, cor: CORES[corDoRastro % 4] });
+}
+addEventListener("pointermove", (e) => tocar(e.clientX * devicePixelRatio, e.clientY * devicePixelRatio));
+addEventListener("pointerdown", () => { corDoRastro++; });
+(function pintarRastro(agora) {
+  cr.clearRect(0, 0, rastro.width, rastro.height);
+  while (pontosDoRastro.length && agora - pontosDoRastro[0].t > 650) pontosDoRastro.shift();
+  cr.lineCap = cr.lineJoin = "round";
+  for (let i = 1; i < pontosDoRastro.length; i++) {
+    const a = pontosDoRastro[i - 1], b = pontosDoRastro[i], vida = 1 - (agora - b.t) / 650;
+    cr.strokeStyle = CORES[corDoRastro % 4]; cr.globalAlpha = vida * .8; cr.lineWidth = (4 + 14 * vida) * devicePixelRatio;
+    cr.beginPath(); cr.moveTo(a.x, a.y); cr.lineTo(b.x, b.y); cr.stroke();
+  }
+  for (let i = faiscas.length - 1; i >= 0; i--) {
+    const f = faiscas[i]; f.x += f.vx; f.y += f.vy; f.vy += .25; f.vida -= .03;
+    if (f.vida <= 0) { faiscas.splice(i, 1); continue; }
+    cr.globalAlpha = f.vida; cr.fillStyle = f.cor; cr.beginPath(); cr.arc(f.x, f.y, 3 * devicePixelRatio, 0, 6.283); cr.fill();
+  }
+  cr.globalAlpha = 1;
+  requestAnimationFrame(pintarRastro);
+})(0);
+
+/* ---------- Botão magnético: puxa na direção do cursor quando ele chega perto ---------- */
+const jogar = document.getElementById("jogar");
+addEventListener("pointermove", (e) => {
+  const r = jogar.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+  const perto = Math.hypot(dx, dy) < 220;
+  jogar.style.transform = perto ? `translate(${dx * .25}px, ${dy * .3}px) rotate(${dx * .02}deg)` : "";
+});
+/* JOGAR: a tinta respinga e cobre a tela, a folha vira e revela a próxima tela; depois volta à vitrine */
+const TEMPO_NA_PROXIMA_TELA_MS = 3500;
+const transicao = document.getElementById("transicao"), tinta = document.getElementById("trans-tinta");
+const folha = document.getElementById("trans-folha"), proxima = document.getElementById("proxima");
+jogar.addEventListener("click", () => {
+  falar("Bora!", "comemorando");
+  folha.hidden = true; proxima.classList.remove("vai"); tinta.hidden = false;
+  transicao.classList.add("ativa"); tocarDoComeco(tinta);
+});
+tinta.addEventListener("ended", () => { tinta.hidden = true; folha.hidden = false; tocarDoComeco(folha); });
+folha.addEventListener("ended", () => {
+  proxima.classList.add("vai");
+  setTimeout(() => transicao.classList.remove("ativa"), TEMPO_NA_PROXIMA_TELA_MS);
+});
+
+/* ---------- Mão pela câmera (MediaPipe local): o indicador vira o rastro de tinta ---------- */
+document.getElementById("ligar-mao").addEventListener("click", async () => {
+  try {
+    const { FilesetResolver, HandLandmarker } = await import("../app/node_modules/@mediapipe/tasks-vision/vision_bundle.mjs");
+    const video = document.getElementById("video");
+    video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 } });
+    await video.play();
+    const arquivos = await FilesetResolver.forVisionTasks("../app/node_modules/@mediapipe/tasks-vision/wasm");
+    const detector = await HandLandmarker.createFromOptions(arquivos, { baseOptions: { modelAssetPath: "../notebooks/resultados/modelo_mao/hand_landmarker.task", delegate: "CPU" }, runningMode: "VIDEO", numHands: 1 });
+    document.getElementById("mao").classList.add("ligada");
+    falar("Tô te vendo! Mexe o dedo aí!", "comemorando");
+    (function ver() {
+      const r = detector.detectForVideo(video, performance.now());
+      const dedo = r.landmarks?.[0]?.[8];
+      if (dedo) tocar((1 - dedo.x) * rastro.width, dedo.y * rastro.height);
+      setTimeout(ver, 50);
+    })();
+  } catch (erro) { falar(`Câmera não deu: ${erro.message}`, "cocando"); }
+});
+</script>
+</body>
+</html>
