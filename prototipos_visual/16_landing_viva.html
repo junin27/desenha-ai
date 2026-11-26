@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing viva</title>
+<!-- Protótipo 16: landing page em "plano contínuo". A rodinha/setas avançam a história (a página não rola);
+     parado, ela roda sozinha. Cada transição é um mergulho: a câmera entra num objeto que vira a próxima cena.
+     Números: levantados dos arquivos do projeto (metricas_redes.json, metricas_slm.json, relatorio_dataset.json, banner.md). -->
+<link rel="stylesheet" href="../app/src/presentation/ze/ze.css">
+<link rel="stylesheet" href="16_landing/landing.css">
+</head>
+<body>
+<div id="mundo">
+
+  <!-- 00 · Abertura -->
+  <section class="cena" id="s-abertura" data-nome="Início">
+    <svg class="tinta-abertura" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g id="mancha-abertura" transform="translate(800 450)">
+        <path id="gota" d="M0 -60 C12 -40 20 -28 20 -16 C20 -2 11 8 0 8 C-11 8 -20 -2 -20 -16 C-20 -28 -12 -40 0 -60 Z"/>
+      </g>
+      <path id="forma-mancha" style="visibility:hidden" d="M0 -300 C90 -290 110 -190 200 -210 C310 -230 350 -130 300 -50 C260 20 380 50 360 140 C340 240 230 230 180 290 C120 360 40 340 -10 300 C-80 250 -170 330 -240 260 C-310 190 -250 110 -300 50 C-360 -20 -330 -120 -240 -140 C-160 -160 -140 -250 -70 -280 C-50 -290 -25 -300 0 -300 Z"/>
+    </svg>
+    <h1 class="titulo" id="t-titulo">Desenha aí, <span class="destaque" id="foco-so">sô!</span><small>um jogo de desenho que conversa com a IA</small></h1>
+  </section>
+
+  <!-- 01 · O jogo (a roça) -->
+  <section class="cena" id="s-roca" data-nome="O jogo">
+    <video class="fundo-video" src="14_midia/fundo-roca-toon.mp4" autoplay muted playsinline loop aria-hidden="true"></video>
+    <i class="foco" id="f-janela" style="left:22.5%;top:52%"></i>
+    <div class="ze-lugar" id="ze-roca"></div>
+    <article class="cartao">
+      <p class="sobre">01 · o jogo</p>
+      <h2>Ô de casa, <span class="destaque">sô!</span></h2>
+      <p>O <b>Zé do Rabisco</b> te dá uma charada. Você desenha a resposta em <b>20 segundos</b>. Duas <b>redes neurais</b> tentam adivinhar ao vivo — e o Zé dá o veredito.</p>
+    </article>
+  </section>
+
+  <!-- 02 · O desenho -->
+  <section class="cena" id="s-caderno" data-nome="O desenho">
+    <div class="folha">
+      <svg id="desenho-sol" viewBox="-110 -110 220 220" aria-hidden="true">
+        <path class="traco" id="sol-circulo" d="M0 -48 C27 -48 48 -27 48 0 C48 27 27 48 0 48 C-27 48 -48 27 -48 0 C-48 -27 -27 -48 0 -48"/>
+        <g id="raios"></g>
+        <g id="lapis"><g transform="rotate(-35)">
+          <rect x="-7" y="-78" width="14" height="60" rx="2" fill="#e8b64c" stroke="#2b1a0a" stroke-width="3"/>
+          <rect x="-7" y="-92" width="14" height="14" rx="3" fill="#e79aa6" stroke="#2b1a0a" stroke-width="3"/>
+          <path d="M-7 -18 L0 0 L7 -18 Z" fill="#f3d6a8" stroke="#2b1a0a" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M-2.5 -6 L0 0 L2.5 -6 Z" fill="#b5401f"/>
+        </g></g>
+      </svg>
+      <i class="foco" id="f-sol" style="left:50%;top:50%"></i>
+      <div class="mao-dica"><span>✋</span> 21 pontos da mão</div>
+    </div>
+    <article class="cartao">
+      <p class="sobre">02 · o desenho</p>
+      <h2>Desenha com <span class="destaque">o que tiver</span></h2>
+      <p>Mouse, dedo ou a <b>mão no ar</b>: o <b>MediaPipe</b> acha 21 pontos da sua mão na câmera e a ponta do indicador vira lápis. A imagem da câmera <b>não sai do computador</b>.</p>
+    </article>
+  </section>
+
+  <!-- 03 · CNN -->
+  <section class="cena quadriculado" id="s-cnn" data-nome="A CNN">
+    <div class="grade-caixa"><canvas id="grade" width="28" height="28"></canvas><div id="janela-conv"></div>
+      <i class="foco" id="f-grade" style="left:50%;top:50%"></i><span class="rotulo">28 × 28 pixels</span></div>
+    <div class="pilha" id="pilha"></div>
+    <ol class="barras" id="barras-cnn"></ol>
+    <article class="cartao">
+      <p class="sobre">03 · a CNN vê a imagem</p>
+      <h2>Filtros que <span class="destaque">enxergam</span></h2>
+      <p>O traço vira uma imagem de <b>28×28</b>. Filtros 3×3 deslizam procurando curvas e cantos, camada após camada (<b>5 blocos residuais</b>, 680 mil parâmetros). Acerta <b>92,4%</b> — e a resposta certa está no top-3 em <b>98,8%</b>.</p>
+    </article>
+  </section>
+
+  <!-- 04 · LSTM -->
+  <section class="cena" id="s-lstm" data-nome="A LSTM">
+    <svg class="contas" id="contas" viewBox="-110 -110 220 220" aria-hidden="true">
+      <path class="traco-fraco" id="sol-trilho" d="M0 -48 C27 -48 48 -27 48 0 C48 27 27 48 0 48 C-27 48 -48 27 -48 0 C-48 -27 -27 -48 0 -48"/>
+    </svg>
+    <div class="corrente" id="corrente"></div>
+    <div class="saida-lstm" id="saida-lstm">?<i class="foco" id="f-saida" style="left:50%;top:50%"></i></div>
+    <article class="cartao">
+      <p class="sobre">04 · a LSTM lê o movimento</p>
+      <h2>A ordem dos <span class="destaque">traços</span></h2>
+      <p>O mesmo rabisco, agora como sequência de pontos (Δx, Δy, levantou o lápis). A <b>LSTM</b> lembra o caminho — por isso chuta <b>antes de você terminar</b>. Juntas, as duas redes acertam <b>94,7%</b>; com metade do desenho, já <b>78,6%</b>.</p>
+    </article>
+  </section>
+
+  <!-- 05 · SLM -->
+  <section class="cena" id="s-ze" data-nome="O Zé (SLM)">
+    <div class="ze-lugar grande" id="ze-slm"><i class="foco" id="f-cabeca" style="left:50%;top:22%"></i></div>
+    <div class="balao" id="balao-tokens"></div>
+    <article class="cartao">
+      <p class="sobre">05 · o Zé é um SLM</p>
+      <h2>Um modelo de <span class="destaque">linguagem pequeno</span></h2>
+      <p>O Zé é o <b>Qwen3 de 1,7 bilhão</b> de parâmetros: cria a charada, julga e narra como locutor de rodeio. Roda <b>aqui, sem internet</b>, a uns <b>12 tokens por segundo</b>.</p>
+    </article>
+  </section>
+
+  <!-- 06 · Destilação -->
+  <section class="cena" id="s-destilacao" data-nome="Destilação">
+    <div class="professor"><svg viewBox="0 0 300 170" aria-hidden="true"><path class="nuvem" d="M60 150 C20 150 10 110 40 95 C30 60 70 40 95 55 C105 20 160 10 180 45 C200 25 250 35 250 75 C290 80 295 140 250 150 Z"/>
+      <circle cx="125" cy="98" r="7"/><circle cx="175" cy="98" r="7"/><path class="boca" d="M135 120 Q150 132 165 120"/></svg>
+      <span>professor · Gemini</span></div>
+    <div class="funil"></div>
+    <div class="jarro"><div class="nivel" id="nivel"></div><span>aluno · Qwen3 1,7B</span><i class="foco" id="f-jarro" style="left:50%;top:55%"></i></div>
+    <div class="gotas" id="gotas"></div>
+    <div class="contador"><b id="cont-aprovados">0</b> exemplos aprovados<br><small><span id="cont-reprovados">0</span> reprovados pelo filtro</small></div>
+    <article class="cartao">
+      <p class="sobre">06 · destilação</p>
+      <h2>O grande ensina <span class="destaque">o pequeno</span></h2>
+      <p>Um modelo grande (o <b>professor</b>) escreveu charadas e vereditos com o raciocínio junto. Um filtro reprovou os ruins e sobraram <b>455 exemplos</b>. O Qwen3 (o <b>aluno</b>) aprendeu imitando o professor.</p>
+    </article>
+  </section>
+
+  <!-- 07 · QLoRA -->
+  <section class="cena quadriculado" id="s-qlora" data-nome="QLoRA">
+    <div class="pesos" id="pesos"><i class="foco" id="f-peso" style="left:50%;top:50%"></i></div>
+    <div class="adaptador a" id="ad-a">A</div><div class="adaptador b" id="ad-b">B</div>
+    <div class="legenda-pesos"><span class="cinza">■</span> 1,72 bi congelados em 4 bits<br><span class="cor">■</span> 17 mi treináveis (1%)</div>
+    <div class="antes-depois"><span>formato certo</span><b id="formato">78%</b></div>
+    <article class="cartao">
+      <p class="sobre">07 · fine-tuning com QLoRA</p>
+      <h2>Ajuste fino <span class="destaque">leve</span></h2>
+      <p>O Qwen3 fica <b>congelado em 4 bits</b>; só treinamos adaptadores pequenos (<b>LoRA</b>, rank 16): 1% do modelo. Foram <b>6,4 minutos</b> numa GPU T4 do Colab. Respostas no formato certo: de <b>78% para 100%</b>.</p>
+    </article>
+  </section>
+
+  <!-- 08 · GGUF -->
+  <section class="cena" id="s-gguf" data-nome="Quantização">
+    <div class="bits" id="bits"></div>
+    <div class="arquivo" id="arquivo"><span class="icone">📄</span><b>zedorabisco-1.7b-Q8_0.gguf</b><span class="tamanho" id="tamanho">3,44 GB</span>
+      <div class="cabe"><i id="barra-tamanho"></i><em>2,8 GB livres no notebook</em></div></div>
+    <div class="cpu">CPU · llama.cpp · ~12 tokens/s</div>
+    <article class="cartao">
+      <p class="sobre">08 · quantização GGUF</p>
+      <h2>Cabe no <span class="destaque">notebook</span></h2>
+      <p>Cada peso vai de <b>16 para 8 bits</b> (Q8_0): de 3,44 GB para <b>1,83 GB</b>. Assim o Zé cabe num notebook comum, <b>sem placa de vídeo</b>, rodando no llama.cpp só na CPU.</p>
+    </article>
+  </section>
+
+  <!-- 09 · Engenharia -->
+  <section class="cena quadriculado" id="s-engenharia" data-nome="Engenharia">
+    <div class="hexagonos" id="hexagonos"></div>
+    <div class="selos" id="selos">
+      <span><b id="cont-py">0</b> testes em Python</span><span><b id="cont-ts">0</b> testes em TypeScript</span>
+      <span>OpenSpec: spec antes do código</span><span>Contratos Python ↔ navegador</span><span>100% offline</span>
+    </div>
+    <article class="cartao">
+      <p class="sobre">09 · engenharia</p>
+      <h2>Feito com <span class="destaque">capricho</span></h2>
+      <p>Arquitetura <b>hexagonal</b>: as regras do jogo no centro, redes, Zé e câmera nas bordas. Cada comportamento nasceu de uma <b>spec</b> e de um <b>teste</b> antes do código. Tudo roda <b>offline</b>.</p>
+    </article>
+  </section>
+
+  <!-- 10 · Convite -->
+  <section class="cena" id="s-convite" data-nome="Sua vez">
+    <video class="fundo-video" src="14_midia/fundo-roca-toon.mp4" autoplay muted playsinline loop aria-hidden="true"></video>
+    <div class="por-do-sol"></div>
+    <i class="foco" id="f-janela-2" style="left:22.5%;top:52%"></i>
+    <div class="ze-lugar" id="ze-convite"></div>
+    <h2 class="titulo convite" id="t-convite">Sua vez, <span class="destaque">sô!</span></h2>
+    <button class="jogar" id="jogar">Jogar!</button>
+  </section>
+
+  <!-- 11 · Apelido (fora da linha do tempo: só por clique no JOGAR) -->
+  <section class="cena apelido" id="s-apelido">
+    <div class="placa">
+      <h2>Qual é o seu apelido?</h2>
+      <input id="apelido" maxlength="16" placeholder="Ex.: Peão Veloz" autocomplete="off">
+      <div class="sugestoes"><button>Peão Veloz</button><button>Rabisco de Ouro</button><button>Lápis Ligeiro</button><button>Traço Fino</button></div>
+      <div class="modo">Desenhar com: <button class="ativo">Mouse</button><button>Mão</button></div>
+      <div class="acoes"><button class="jogar" id="comecar">Começar partida</button><button id="ver-placar">Ver placar</button></div>
+      <p class="dica">3 rodadas · acertou rápido vale mais · quase (top 3) vale 30</p>
+      <p class="aviso" id="aviso"></p>
+    </div>
+    <button class="voltar" id="voltar">‹ voltar à história</button>
+  </section>
+
+  <svg class="camada-tinta" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path id="mancha-cobre" d=""/></svg>
+  <canvas id="particulas"></canvas>
+  <canvas id="rastro"></canvas>
+</div>
+
+<button class="ui" id="pular">Jogar agora ›</button>
+
+<template id="tpl-ze">
+      <svg class="ze-svg humor-falando" id="ze" viewBox="0 0 200 230" aria-hidden="true">
+<defs>
+<pattern id="xadrez-vitrine" width="16" height="16" patternUnits="userSpaceOnUse">
+<rect width="16" height="16" fill="#c98a00"/><rect width="8" height="16" fill="#b5401f" opacity=".55"/><rect width="16" height="8" fill="#b5401f" opacity=".45"/>
+</pattern>
+</defs>
+<g class="corpo">
+<!-- Braços (atrás do tronco) -->
+<g class="braco-e"><path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M66 150 C 50 158, 40 172, 38 186 L 50 190 C 54 178, 62 168, 74 162 Z"/><circle class="preenche pele" cx="43" cy="192" r="9"/></g>
+<g class="braco-d"><path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M134 150 C 150 158, 160 172, 162 186 L 150 190 C 146 178, 138 168, 126 162 Z"/><circle class="preenche pele" cx="157" cy="192" r="9"/></g>
+<!-- Tronco com camisa xadrez, suspensório e calça -->
+<path class="preenche xadrez" fill="url(#xadrez-vitrine)" d="M68 146 C 72 140, 128 140, 132 146 L 138 200 L 62 200 Z"/>
+<path class="linha" d="M84 146 L 80 200 M116 146 L 120 200"/>
+<path class="preenche" style="fill:#3d6c9e" d="M62 198 L 138 198 L 136 222 L 104 222 L 100 208 L 96 222 L 64 222 Z"/>
+<g class="cabeca">
+<!-- Orelhas e rosto -->
+<ellipse class="preenche pele" cx="58" cy="100" rx="9" ry="12"/><ellipse class="preenche pele" cx="142" cy="100" rx="9" ry="12"/>
+<ellipse class="preenche pele" cx="100" cy="102" rx="44" ry="42"/>
+<!-- Cabelo espetado saindo do chapéu -->
+<path class="preenche" style="fill:#7a4a22" d="M62 76 L 70 92 L 76 78 L 84 92 L 92 78 L 100 90 L 108 78 L 116 92 L 124 78 L 130 92 L 138 76 Z"/>
+<circle class="bochecha" cx="72" cy="118" r="9"/><circle class="bochecha" cx="128" cy="118" r="9"/>
+<circle class="sarda" cx="80" cy="110" r="1.8"/><circle class="sarda" cx="86" cy="114" r="1.8"/><circle class="sarda" cx="114" cy="114" r="1.8"/><circle class="sarda" cx="120" cy="110" r="1.8"/>
+<path class="linha" d="M98 104 C 94 112, 102 114, 104 110"/>
+<g class="sobrancelhas"><path class="linha e" d="M74 86 C 80 82, 88 82, 92 85"/><path class="linha d" d="M108 85 C 112 82, 120 82, 126 86"/></g>
+<g class="olhos">
+<g class="aberto"><ellipse class="olho" cx="84" cy="97" rx="4.5" ry="6"/><ellipse class="olho" cx="116" cy="97" rx="4.5" ry="6"/></g>
+<g class="cima"><ellipse class="olho" cx="86" cy="92" rx="4.5" ry="5"/><ellipse class="olho" cx="118" cy="92" rx="4.5" ry="5"/></g>
+<g class="feliz"><path class="linha" d="M78 98 Q 84 90 90 98 M110 98 Q 116 90 122 98"/></g>
+<g class="meio"><path class="linha" d="M78 97 L 90 97 M110 97 L 122 97"/><ellipse class="olho" cx="84" cy="99" rx="4" ry="2.5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="2.5"/></g>
+<g class="triste"><ellipse class="olho" cx="84" cy="99" rx="4" ry="5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="5"/></g>
+<g class="arregalado"><circle cx="84" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="84" cy="96" r="3"/><circle cx="116" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="116" cy="96" r="3"/></g>
+</g>
+<g class="boca">
+<path class="linha sorriso" d="M84 124 Q 100 136 116 124"/>
+<path class="preenche fala" style="fill:#7a2a14" d="M88 122 Q 100 140 112 122 Z"/>
+<path class="linha hum" d="M90 128 Q 100 124 110 128"/>
+<path class="preenche aberta" style="fill:#7a2a14" d="M82 120 Q 100 148 118 120 Z"/>
+<path class="linha brava" d="M86 130 Q 100 120 114 130"/>
+<ellipse class="preenche tedio" style="fill:#7a2a14" cx="100" cy="127" rx="5" ry="3"/>
+<path class="linha torta" d="M86 130 C 94 124, 104 132, 114 126"/>
+<ellipse class="preenche oh" style="fill:#7a2a14" cx="100" cy="128" rx="7" ry="9"/>
+</g>
+<!-- Capim no canto da boca e lápis atrás da orelha -->
+<path class="linha capim" style="stroke:#2f7d32;stroke-width:3" d="M116 126 L 140 118 M128 122 L 136 112"/>
+<path class="preenche lapis" d="M146 70 L 154 74 L 140 104 L 132 100 Z"/><path class="preenche" style="fill:#f3c79b" d="M132 100 L 140 104 L 132 110 Z"/>
+</g>
+<!-- Chapéu de palha com remendo e faixa -->
+<g class="chapeu">
+<ellipse class="preenche palha" cx="100" cy="74" rx="68" ry="12"/>
+<path class="preenche palha" d="M66 72 C 66 40, 134 40, 134 72 Z"/>
+<path class="preenche faixa" d="M67 64 C 90 70, 110 70, 133 64 L 134 72 C 110 78, 90 78, 66 72 Z"/>
+<path class="preenche" style="fill:#2f7d32" d="M108 52 L 121 54 L 120 64 L 107 62 Z"/>
+<path class="linha" style="stroke-width:2" d="M80 50 L 84 60 M96 44 L 96 58 M42 76 L 38 84 M158 76 L 162 84 M50 80 L 48 86"/>
+</g>
+</g>
+<!-- Efeitos de cada humor -->
+<g class="extras">
+<g class="bolhas"><circle class="preenche" style="fill:#fff" cx="160" cy="54" r="5"/><circle class="preenche" style="fill:#fff" cx="172" cy="38" r="8"/><circle class="preenche" style="fill:#fff" cx="184" cy="16" r="12"/></g>
+<g class="estrelas"><path class="preenche" style="fill:#c98a00" d="M28 40 l4 9 10 1 -8 6 3 10 -9 -5 -9 5 3 -10 -8 -6 10 -1 z"/><path class="preenche" style="fill:#b5401f" d="M172 30 l3 7 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 z"/><path class="preenche" style="fill:#2f7d32" d="M178 120 l3 6 7 1 -5 4 2 7 -7 -4 -6 4 2 -7 -5 -4 7 -1 z"/></g>
+<g class="fumaca"><path class="preenche" style="fill:#d9cbb3" d="M56 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/><path class="preenche" style="fill:#d9cbb3" d="M150 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/></g>
+<g class="zzz"><text x="146" y="60">z</text><text x="154" y="48">z</text><text x="162" y="36">Z</text></g>
+<path class="gota preenche" style="fill:#8ec5ef" d="M150 82 C 146 90, 146 96, 150 96 C 154 96, 154 90, 150 82 Z"/>
+</g>
+</svg>
+</template>
+
+<script src="_deps/node_modules/gsap/dist/gsap.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/DrawSVGPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/MorphSVGPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/MotionPathPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/SplitText.min.js"></script>
+<script src="16_landing/landing.js"></script>
+</body>
+</html>

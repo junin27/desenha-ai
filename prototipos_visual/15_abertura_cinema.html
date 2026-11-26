@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abertura cinema</title>
+<!-- Protótipo 15: abertura cinematográfica em capítulos ("landing page" sem rolar a página).
+     A roda do mouse / setas avançam a história; parado por alguns segundos, ela roda sozinha.
+     Tudo local: GSAP em _deps/ (só protótipos), fontes e Zé do jogo, fundo toon do Veo em 14_midia/. -->
+<link rel="stylesheet" href="../app/src/presentation/ze/ze.css">
+<style>
+@font-face { font-family: "Gochi Hand"; src: url("../app/node_modules/@fontsource/gochi-hand/files/gochi-hand-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Patrick Hand"; src: url("../app/node_modules/@fontsource/patrick-hand/files/patrick-hand-latin-400-normal.woff2") format("woff2"); }
+:root {
+  --papel: #f7ecd4; --quadro: #fffdf6; --tinta: #2b1a0a; --tinta-suave: #6b4f2e; --creme: #fff6df;
+  --terracota: #b5401f; --mostarda: #c98a00; --verde: #2f7d32; --azul: #3d6c9e;
+  --torto: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  --titulo: "Gochi Hand", system-ui, sans-serif; --texto: "Patrick Hand", system-ui, sans-serif;
+  --sombra-toon: 4px 4px 0 var(--tinta);
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--papel); color: var(--tinta); font-family: var(--texto); }
+body { cursor: default; }
+
+/* Palco fixo: nada rola de verdade; a "rolagem" é virtual e move a linha do tempo */
+#cena { position: fixed; inset: 0; overflow: hidden; }
+.camada { position: absolute; inset: 0; pointer-events: none; }
+
+/* Papel da abertura, com grão leve feito de gradientes (sem imagem externa) */
+#papel { background:
+  radial-gradient(circle at 20% 30%, #fbf3e2 0 20%, transparent 45%),
+  radial-gradient(circle at 80% 75%, #f1e2c2 0 15%, transparent 40%), var(--papel); }
+
+/* Roça (vídeo toon do Veo) com câmera: escala e deslocamento vêm do GSAP */
+#roca { opacity: 0; }
+#roca video { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: cover; transform-origin: 50% 60%; }
+#veu { background: var(--papel); opacity: 0; }
+
+/* Textos dos capítulos: grandes, com sombra "toon" */
+.capitulo { position: absolute; font-family: var(--titulo); text-transform: uppercase; line-height: .95;
+  color: var(--tinta); text-shadow: 3px 3px 0 var(--creme), 6px 6px 0 var(--tinta); visibility: hidden; }
+.capitulo small { display: block; font-family: var(--texto); text-transform: none; text-shadow: none;
+  font-size: clamp(26px, 2.3vw, 40px); color: var(--tinta-suave); margin-top: 12px; line-height: 1.15; }
+.capitulo .destaque { color: var(--terracota); }
+#t-titulo { left: 50%; top: 50%; font-size: clamp(72px, 10vw, 170px); text-align: center; white-space: nowrap; }
+#t-titulo small { font-size: clamp(28px, 2.6vw, 46px); color: var(--creme); }
+#t-roca { left: 5vw; top: 8vh; font-size: clamp(52px, 6vw, 110px); }
+#t-desenha { left: 5vw; top: 8vh; font-size: clamp(52px, 6vw, 110px); }
+#t-ia { left: 5vw; top: 6vh; font-size: clamp(48px, 5.2vw, 96px); }
+#t-ze { left: 5vw; top: 8vh; font-size: clamp(48px, 5.2vw, 96px); }
+#t-vez { left: 50%; top: 40%; font-size: clamp(80px, 11vw, 190px); text-align: center;
+  color: var(--creme); text-shadow: 6px 6px 0 var(--terracota); white-space: nowrap; }
+
+/* Gota e manchas de tinta (SVG) */
+#tinta-abertura { width: 100%; height: 100%; }
+#tinta-abertura path, #cobre path { fill: var(--tinta); }
+
+/* Desenho do sol feito pelo lápis */
+#desenho svg { position: absolute; left: 50%; top: 56%; width: min(46vh, 34vw); height: min(46vh, 34vw); overflow: visible; }
+#desenho .traco { fill: none; stroke: var(--terracota); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Redes neurais palpitando */
+#ia .rede { position: absolute; left: 34vw; top: 30vh; width: 28vw; height: 46vh; overflow: visible; }
+.rede line { stroke: var(--tinta); stroke-width: 2.5; opacity: .35; }
+.rede .pulso { stroke: var(--mostarda); stroke-width: 5; opacity: 1; stroke-dasharray: 10 400; stroke-linecap: round; }
+.rede circle { fill: var(--creme); stroke: var(--tinta); stroke-width: 4; }
+.cartao { position: absolute; right: 4vw; width: min(30vw, 440px); background: var(--creme); border: 4px solid var(--tinta);
+  border-radius: var(--torto); box-shadow: 8px 8px 0 var(--tinta); padding: 12px 22px; font-size: clamp(24px, 1.9vw, 32px); }
+.cartao h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; font-size: 1.15em; }
+.cartao h3 span { font-family: var(--texto); text-transform: none; color: var(--tinta-suave); font-size: max(24px, .8em); }
+.cartao li { list-style: none; position: relative; display: flex; justify-content: space-between; padding: 0 8px; z-index: 0; }
+.cartao ol { padding: 0; }
+.cartao .barra { position: absolute; left: 0; top: 12%; height: 76%; width: 10%; z-index: -1; border-radius: 6px 30px 8px 24px; background: var(--mostarda); opacity: .5; }
+.cartao li:first-child .barra { background: var(--terracota); }
+#cnn { top: 24vh; } #lstm { top: 56vh; }
+
+/* Zé e o carimbo */
+#ze-palco { position: absolute; right: 8vw; bottom: 4vh; width: auto; height: 56vh; }
+#ze-palco .ze-svg { width: auto; height: 100%; }
+#carimbo { position: absolute; left: 30vw; top: 52vh; font-family: var(--titulo); text-transform: uppercase; font-size: clamp(64px, 8vw, 140px);
+  color: var(--verde); border: 8px solid var(--verde); border-radius: var(--torto); background: #fffdf6ee; padding: 0 36px;
+  visibility: hidden; }
+
+/* Cobertura de tinta entre capítulos */
+#cobre { width: 100%; height: 100%; }
+
+/* Partículas (tinta, pétalas) e rastro do mouse */
+#particulas, #rastro { width: 100%; height: 100%; }
+
+/* Interface fixa: JOGAR, pular, progresso e dica */
+.ui { position: fixed; z-index: 20; }
+#jogar { right: 4vw; bottom: 5vh; font-family: var(--titulo); text-transform: uppercase; font-size: clamp(36px, 3.4vw, 58px);
+  color: var(--creme); background: var(--terracota); border: 4px solid var(--tinta); border-radius: var(--torto);
+  padding: 4px 44px; cursor: pointer; box-shadow: var(--sombra-toon); }
+#jogar:focus-visible, #pular:focus-visible { outline: 4px dashed var(--azul); outline-offset: 6px; }
+#pular { right: 4vw; top: 4vh; font: inherit; font-size: 26px; background: var(--creme); border: 3px solid var(--tinta);
+  border-radius: var(--torto); padding: 2px 18px; cursor: pointer; }
+#progresso { left: 4vw; bottom: 5vh; display: flex; gap: 10px; align-items: center; }
+#progresso span { width: 54px; height: 12px; border: 3px solid var(--tinta); border-radius: 8px 20px 6px 18px; background: var(--creme); overflow: hidden; position: relative; }
+#progresso span i { position: absolute; inset: 0; background: var(--terracota); transform-origin: left; transform: scaleX(0); }
+#dica { left: 4vw; bottom: calc(5vh + 28px); font-size: 26px; color: var(--tinta-suave); }
+
+@media (prefers-reduced-motion: reduce) { #roca video { display: none; } }
+</style>
+</head>
+<body>
+<div id="cena">
+  <div class="camada" id="papel"></div>
+  <div class="camada" id="roca">
+    <video id="roca-video" src="14_midia/fundo-roca-toon.mp4" autoplay muted playsinline aria-hidden="true"></video>
+  </div>
+  <div class="camada" id="veu"></div>
+
+  <!-- Gota que cai e vira mancha na abertura -->
+  <div class="camada"><svg id="tinta-abertura" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g id="mancha-abertura" transform="translate(800 450)">
+      <path id="gota" d="M0 -60 C12 -40 20 -28 20 -16 C20 -2 11 8 0 8 C-11 8 -20 -2 -20 -16 C-20 -28 -12 -40 0 -60 Z"/>
+      <g id="respingos-fixos"></g>
+    </g>
+    <path id="forma-mancha" style="visibility:hidden" d="M0 -300 C90 -290 110 -190 200 -210 C310 -230 350 -130 300 -50 C260 20 380 50 360 140 C340 240 230 230 180 290 C120 360 40 340 -10 300 C-80 250 -170 330 -240 260 C-310 190 -250 110 -300 50 C-360 -20 -330 -120 -240 -140 C-160 -160 -140 -250 -70 -280 C-50 -290 -25 -300 0 -300 Z"/>
+  </svg></div>
+
+  <div class="camada" id="desenho"><svg viewBox="-110 -110 220 220" aria-hidden="true">
+    <path class="traco" id="sol-circulo" d="M0 -48 C27 -48 48 -27 48 0 C48 27 27 48 0 48 C-27 48 -48 27 -48 0 C-48 -27 -27 -48 0 -48"/>
+    <g id="raios"></g>
+    <g id="lapis"><g transform="rotate(-35)">
+      <rect x="-7" y="-78" width="14" height="60" rx="2" fill="#e8b64c" stroke="#2b1a0a" stroke-width="3"/>
+      <rect x="-7" y="-92" width="14" height="14" rx="3" fill="#e79aa6" stroke="#2b1a0a" stroke-width="3"/>
+      <path d="M-7 -18 L0 0 L7 -18 Z" fill="#f3d6a8" stroke="#2b1a0a" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M-2.5 -6 L0 0 L2.5 -6 Z" fill="#b5401f"/>
+    </g></g>
+  </svg></div>
+
+  <div class="camada" id="ia">
+    <svg class="rede" id="rede" viewBox="0 0 400 300" aria-hidden="true"></svg>
+    <div class="cartao" id="cnn"><h3>CNN <span>· olha a imagem</span></h3><ol></ol></div>
+    <div class="cartao" id="lstm"><h3>LSTM <span>· olha o traço</span></h3><ol></ol></div>
+  </div>
+
+  <div class="camada" id="ze-camada">
+    <div id="ze-palco">
+      <svg class="ze-svg humor-pensando" id="ze" viewBox="0 0 200 230" aria-hidden="true">
+<defs>
+<pattern id="xadrez-abertura" width="16" height="16" patternUnits="userSpaceOnUse">
+<rect width="16" height="16" fill="#c98a00"/><rect width="8" height="16" fill="#b5401f" opacity=".55"/><rect width="16" height="8" fill="#b5401f" opacity=".45"/>
+</pattern>
+</defs>
+<g class="corpo">
+<!-- Braços (atrás do tronco) -->
+<g class="braco-e"><path class="preenche xadrez" fill="url(#xadrez-abertura)" d="M66 150 C 50 158, 40 172, 38 186 L 50 190 C 54 178, 62 168, 74 162 Z"/><circle class="preenche pele" cx="43" cy="192" r="9"/></g>
+<g class="braco-d"><path class="preenche xadrez" fill="url(#xadrez-abertura)" d="M134 150 C 150 158, 160 172, 162 186 L 150 190 C 146 178, 138 168, 126 162 Z"/><circle class="preenche pele" cx="157" cy="192" r="9"/></g>
+<!-- Tronco com camisa xadrez, suspensório e calça -->
+<path class="preenche xadrez" fill="url(#xadrez-abertura)" d="M68 146 C 72 140, 128 140, 132 146 L 138 200 L 62 200 Z"/>
+<path class="linha" d="M84 146 L 80 200 M116 146 L 120 200"/>
+<path class="preenche" style="fill:#3d6c9e" d="M62 198 L 138 198 L 136 222 L 104 222 L 100 208 L 96 222 L 64 222 Z"/>
+<g class="cabeca">
+<!-- Orelhas e rosto -->
+<ellipse class="preenche pele" cx="58" cy="100" rx="9" ry="12"/><ellipse class="preenche pele" cx="142" cy="100" rx="9" ry="12"/>
+<ellipse class="preenche pele" cx="100" cy="102" rx="44" ry="42"/>
+<!-- Cabelo espetado saindo do chapéu -->
+<path class="preenche" style="fill:#7a4a22" d="M62 76 L 70 92 L 76 78 L 84 92 L 92 78 L 100 90 L 108 78 L 116 92 L 124 78 L 130 92 L 138 76 Z"/>
+<circle class="bochecha" cx="72" cy="118" r="9"/><circle class="bochecha" cx="128" cy="118" r="9"/>
+<circle class="sarda" cx="80" cy="110" r="1.8"/><circle class="sarda" cx="86" cy="114" r="1.8"/><circle class="sarda" cx="114" cy="114" r="1.8"/><circle class="sarda" cx="120" cy="110" r="1.8"/>
+<path class="linha" d="M98 104 C 94 112, 102 114, 104 110"/>
+<g class="sobrancelhas"><path class="linha e" d="M74 86 C 80 82, 88 82, 92 85"/><path class="linha d" d="M108 85 C 112 82, 120 82, 126 86"/></g>
+<g class="olhos">
+<g class="aberto"><ellipse class="olho" cx="84" cy="97" rx="4.5" ry="6"/><ellipse class="olho" cx="116" cy="97" rx="4.5" ry="6"/></g>
+<g class="cima"><ellipse class="olho" cx="86" cy="92" rx="4.5" ry="5"/><ellipse class="olho" cx="118" cy="92" rx="4.5" ry="5"/></g>
+<g class="feliz"><path class="linha" d="M78 98 Q 84 90 90 98 M110 98 Q 116 90 122 98"/></g>
+<g class="meio"><path class="linha" d="M78 97 L 90 97 M110 97 L 122 97"/><ellipse class="olho" cx="84" cy="99" rx="4" ry="2.5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="2.5"/></g>
+<g class="triste"><ellipse class="olho" cx="84" cy="99" rx="4" ry="5"/><ellipse class="olho" cx="116" cy="99" rx="4" ry="5"/></g>
+<g class="arregalado"><circle cx="84" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="84" cy="96" r="3"/><circle cx="116" cy="96" r="8" fill="#fff" stroke="#2b1a0a" stroke-width="3"/><circle class="olho" cx="116" cy="96" r="3"/></g>
+</g>
+<g class="boca">
+<path class="linha sorriso" d="M84 124 Q 100 136 116 124"/>
+<path class="preenche fala" style="fill:#7a2a14" d="M88 122 Q 100 140 112 122 Z"/>
+<path class="linha hum" d="M90 128 Q 100 124 110 128"/>
+<path class="preenche aberta" style="fill:#7a2a14" d="M82 120 Q 100 148 118 120 Z"/>
+<path class="linha brava" d="M86 130 Q 100 120 114 130"/>
+<ellipse class="preenche tedio" style="fill:#7a2a14" cx="100" cy="127" rx="5" ry="3"/>
+<path class="linha torta" d="M86 130 C 94 124, 104 132, 114 126"/>
+<ellipse class="preenche oh" style="fill:#7a2a14" cx="100" cy="128" rx="7" ry="9"/>
+</g>
+<!-- Capim no canto da boca e lápis atrás da orelha -->
+<path class="linha capim" style="stroke:#2f7d32;stroke-width:3" d="M116 126 L 140 118 M128 122 L 136 112"/>
+<path class="preenche lapis" d="M146 70 L 154 74 L 140 104 L 132 100 Z"/><path class="preenche" style="fill:#f3c79b" d="M132 100 L 140 104 L 132 110 Z"/>
+</g>
+<!-- Chapéu de palha com remendo e faixa -->
+<g class="chapeu">
+<ellipse class="preenche palha" cx="100" cy="74" rx="68" ry="12"/>
+<path class="preenche palha" d="M66 72 C 66 40, 134 40, 134 72 Z"/>
+<path class="preenche faixa" d="M67 64 C 90 70, 110 70, 133 64 L 134 72 C 110 78, 90 78, 66 72 Z"/>
+<path class="preenche" style="fill:#2f7d32" d="M108 52 L 121 54 L 120 64 L 107 62 Z"/>
+<path class="linha" style="stroke-width:2" d="M80 50 L 84 60 M96 44 L 96 58 M42 76 L 38 84 M158 76 L 162 84 M50 80 L 48 86"/>
+</g>
+</g>
+<!-- Efeitos de cada humor -->
+<g class="extras">
+<g class="bolhas"><circle class="preenche" style="fill:#fff" cx="160" cy="54" r="5"/><circle class="preenche" style="fill:#fff" cx="172" cy="38" r="8"/><circle class="preenche" style="fill:#fff" cx="184" cy="16" r="12"/></g>
+<g class="estrelas"><path class="preenche" style="fill:#c98a00" d="M28 40 l4 9 10 1 -8 6 3 10 -9 -5 -9 5 3 -10 -8 -6 10 -1 z"/><path class="preenche" style="fill:#b5401f" d="M172 30 l3 7 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 z"/><path class="preenche" style="fill:#2f7d32" d="M178 120 l3 6 7 1 -5 4 2 7 -7 -4 -6 4 2 -7 -5 -4 7 -1 z"/></g>
+<g class="fumaca"><path class="preenche" style="fill:#d9cbb3" d="M56 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/><path class="preenche" style="fill:#d9cbb3" d="M150 46 c -8 -2 -10 -12 -2 -14 c 2 -8 14 -6 12 2 c 8 2 6 12 -2 12 z"/></g>
+<g class="zzz"><text x="146" y="60">z</text><text x="154" y="48">z</text><text x="162" y="36">Z</text></g>
+<path class="gota preenche" style="fill:#8ec5ef" d="M150 82 C 146 90, 146 96, 150 96 C 154 96, 154 90, 150 82 Z"/>
+</g>
+</svg>
+    </div>
+    <div id="carimbo">Acertou!</div>
+  </div>
+
+  <canvas class="camada" id="particulas"></canvas>
+
+  <h1 class="capitulo" id="t-titulo">Desenha aí, <span class="destaque">sô!</span><small>um jogo de desenho que conversa com a IA</small></h1>
+  <h2 class="capitulo" id="t-roca">Lá na roça<br>do <span class="destaque">Zé</span>…<small>tem um caipira que adora rabisco</small></h2>
+  <h2 class="capitulo" id="t-desenha">Você<br><span class="destaque">desenha</span>…<small>com o mouse, o dedo ou a mão no ar</small></h2>
+  <h2 class="capitulo" id="t-ia">…duas redes<br><span class="destaque">adivinham</span><small>a CNN olha a imagem, a LSTM olha o traço</small></h2>
+  <h2 class="capitulo" id="t-ze">…e o Zé dá<br>o <span class="destaque">veredito!</span><small>um modelo de linguagem pequeno, rodando aqui</small></h2>
+
+  <div class="camada"><svg id="cobre" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path id="mancha-cobre" transform="translate(800 450) scale(0)" d=""/>
+  </svg></div>
+  <h2 class="capitulo" id="t-vez">Sua vez, sô!</h2>
+
+  <canvas class="camada" id="rastro"></canvas>
+</div>
+
+<button class="ui" id="pular">Pular ›</button>
+<div class="ui" id="dica">Role a rodinha — ou só assista</div>
+<div class="ui" id="progresso" aria-hidden="true"></div>
+<button class="ui" id="jogar">Jogar!</button>
+
+<script src="_deps/node_modules/gsap/dist/gsap.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/DrawSVGPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/MorphSVGPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/MotionPathPlugin.min.js"></script>
+<script src="_deps/node_modules/gsap/dist/SplitText.min.js"></script>
+<script>
+gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin, MotionPathPlugin, SplitText);
+
+const CORES = ["#b5401f", "#c98a00", "#2f7d32", "#3d6c9e"];
+const SEGUNDOS_PARADO_PARA_AUTOPLAY = 4;
+const SEGUNDOS_POR_TOQUE_DA_RODINHA = 0.0045; // segundos de história por pixel de deltaY
+const SEGUNDOS_POR_TECLA = 2.5;
+const SEGUNDOS_NO_FIM_ANTES_DA_VITRINE = 3;
+const SUAVIZACAO = 0.09; // fração do caminho até o alvo, por quadro
+const VITRINE = "14_vitrine_viva.html";
+const movimentoReduzido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (s) => document.querySelector(s);
+
+/* ---------- Partículas: tinta com contorno (toon), pétalas de ipê ---------- */
+const tela = $("#particulas"), ctx = tela.getContext("2d");
+const particulas = [];
+function ajustarTelas() {
+  for (const c of [tela, $("#rastro")]) { c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; }
+}
+ajustarTelas(); addEventListener("resize", ajustarTelas);
+function explodirTinta(xRel, yRel, quantidade, forca = 14) {
+  const x = xRel * tela.width, y = yRel * tela.height, d = devicePixelRatio;
+  for (let i = 0; i < quantidade; i++) {
+    const a = Math.random() * Math.PI * 2, v = (4 + Math.random() * forca) * d;
+    particulas.push({ tipo: "tinta", x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4 * d, r: (4 + Math.random() * 10) * d,
+      cor: CORES[i % 4], vida: 1, queda: .5 * d });
+  }
+}
+function soltarPetala() {
+  const d = devicePixelRatio;
+  particulas.push({ tipo: "petala", x: (.55 + Math.random() * .5) * tela.width, y: -20 * d, vx: -(1 + Math.random() * 2) * d,
+    vy: (1 + Math.random() * 1.5) * d, r: (7 + Math.random() * 6) * d, giro: Math.random() * 6, vida: 1, queda: 0 });
+}
+function desenharParticula(p) {
+  ctx.globalAlpha = Math.min(1, p.vida * 1.5);
+  ctx.lineWidth = 2.5 * devicePixelRatio; ctx.strokeStyle = "#2b1a0a";
+  ctx.beginPath();
+  if (p.tipo === "petala") { ctx.ellipse(p.x, p.y, p.r, p.r * .55, p.giro, 0, Math.PI * 2); ctx.fillStyle = "#e3b322"; }
+  else { ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = p.cor; }
+  ctx.fill(); ctx.stroke();
+}
+let petalasLigadas = false;
+gsap.ticker.add((tempo, dtMs) => {
+  ctx.clearRect(0, 0, tela.width, tela.height);
+  if (petalasLigadas && Math.random() < .12) soltarPetala();
+  for (let i = particulas.length - 1; i >= 0; i--) {
+    const p = particulas[i];
+    p.vy += p.queda; p.x += p.vx; p.y += p.vy; p.vx *= .985;
+    if (p.tipo === "petala") { p.giro += .05; p.x += Math.sin(tempo * 2 + p.y * .01) * devicePixelRatio; p.vida -= .002; }
+    else p.vida -= .012;
+    if (p.vida <= 0 || p.y > tela.height + 40) { particulas.splice(i, 1); continue; }
+    desenharParticula(p);
+  }
+  ctx.globalAlpha = 1;
+});
+
+/* ---------- Rastro de tinta do mouse ---------- */
+const rastro = $("#rastro"), cr = rastro.getContext("2d"), pontos = [];
+addEventListener("pointermove", (e) => pontos.push({ x: e.clientX * devicePixelRatio, y: e.clientY * devicePixelRatio, t: performance.now() }));
+gsap.ticker.add(() => {
+  const agora = performance.now();
+  cr.clearRect(0, 0, rastro.width, rastro.height);
+  while (pontos.length && agora - pontos[0].t > 500) pontos.shift();
+  cr.lineCap = cr.lineJoin = "round";
+  for (let i = 1; i < pontos.length; i++) {
+    const a = pontos[i - 1], b = pontos[i], vida = 1 - (agora - b.t) / 500;
+    cr.globalAlpha = vida * .85; cr.strokeStyle = "#b5401f"; cr.lineWidth = (3 + 13 * vida) * devicePixelRatio;
+    cr.beginPath(); cr.moveTo(a.x, a.y); cr.lineTo(b.x, b.y); cr.stroke();
+  }
+  cr.globalAlpha = 1;
+});
+
+/* ---------- Peças montadas por código: raios do sol, rede neural, palpites ---------- */
+function montarRaios() {
+  const g = $("#raios");
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4, c = Math.cos(a), s = Math.sin(a);
+    g.insertAdjacentHTML("beforeend", `<path class="traco raio" d="M${(c * 64).toFixed(1)} ${(s * 64).toFixed(1)} L${(c * 92).toFixed(1)} ${(s * 92).toFixed(1)}"/>`);
+  }
+}
+function montarRede() {
+  const camadas = [3, 5, 5, 3], svg = $("#rede"), nos = [];
+  camadas.forEach((n, c) => { for (let i = 0; i < n; i++) nos.push({ c, x: 30 + c * 113, y: 150 + (i - (n - 1) / 2) * 56 }); });
+  let linhas = "", pulsos = "";
+  for (const a of nos) for (const b of nos) if (b.c === a.c + 1) {
+    linhas += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+    if (Math.random() < .45) pulsos += `<line class="pulso" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`;
+  }
+  svg.innerHTML = linhas + pulsos + nos.map((n) => `<circle cx="${n.x}" cy="${n.y}" r="13"/>`).join("");
+  gsap.fromTo("#rede .pulso", { strokeDashoffset: 10 }, { strokeDashoffset: -130, duration: .7, ease: "none", repeat: -1,
+    stagger: { each: .07, repeat: -1 } });
+  gsap.to("#rede circle", { scale: 1.25, transformOrigin: "50% 50%", duration: .35, yoyo: true, repeat: -1,
+    stagger: { each: .05, from: "random", repeat: -1, yoyo: true } });
+}
+function montarPalpites() {
+  const palpites = { cnn: [["sol", 82], ["flor", 9], ["roda", 4]], lstm: [["sol", 74], ["relógio", 12], ["bola", 6]] };
+  for (const [id, lista] of Object.entries(palpites)) {
+    $(`#${id} ol`).innerHTML = lista.map(([c, p]) =>
+      `<li data-p="${p}"><span class="barra"></span><span>${c}</span><span class="pct">${p}%</span></li>`).join("");
+  }
+  // "Palpitar": as barras tremem em volta do valor final, como redes reavaliando o traço
+  gsap.to(".cartao .barra", { width: (i, el) => `${Math.min(100, +el.closest("li").dataset.p + gsap.utils.random(-12, 12))}%`,
+    duration: .28, ease: "power1.inOut", repeat: -1, repeatRefresh: true });
+}
+
+/* ---------- Linha do tempo da história (cada capítulo tem um rótulo) ---------- */
+const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+let tempoAnterior = 0;
+const soIndoPraFrente = (fn) => () => { if (tl.time() >= tempoAnterior) fn(); };
+
+function letras(sel) { return new SplitText(`${sel}`, { type: "chars,words" }).chars; }
+function entrarTexto(sel, rotulo) {
+  tl.set(sel, { visibility: "visible" }, rotulo)
+    .from(letras(sel), { yPercent: 130, rotate: () => gsap.utils.random(-25, 25), opacity: 0, duration: .7, ease: "back.out(2.2)",
+      stagger: .025 }, rotulo)
+    .from(`${sel} small`, { y: 30, opacity: 0, duration: .5 }, `${rotulo}+=.5`);
+}
+function sairTexto(sel, quando) {
+  tl.to(sel, { y: -60, opacity: 0, duration: .45, ease: "power2.in" }, quando).set(sel, { visibility: "hidden" });
+}
+function cobrirComTinta(quando, aoCobrir) {
+  // Mancha cresce do centro até cobrir a tela, troca a cena e encolhe revelando a próxima
+  tl.fromTo("#mancha-cobre", { scale: 0, rotation: -30, transformOrigin: "50% 50%" },
+    { scale: 4.2, rotation: 0, duration: .7, ease: "power2.in" }, quando)
+    .call(aoCobrir, null, `${quando}+=.7`)
+    .to("#mancha-cobre", { scale: 0, rotation: 40, duration: .7, ease: "power2.out" }, `${quando}+=.75`);
+}
+
+function capituloAbertura() {
+  tl.addLabel("abertura", 0)
+    .from("#gota", { y: -560, duration: .6, ease: "power2.in" }, .2)
+    .to("#gota", { morphSVG: "#forma-mancha", duration: .4, ease: "back.out(2.5)" }, .8)
+    .call(soIndoPraFrente(() => explodirTinta(.5, .5, 60, 18)), null, .8)
+    .to("#mancha-abertura", { scale: 1.75, svgOrigin: "800 450", duration: .4, ease: "power1.inOut" }, 1.1)
+    .set("#t-titulo", { color: "var(--creme)", textShadow: "6px 6px 0 #b5401f" }, 1);
+  entrarTexto("#t-titulo", 1.1);
+  tl.to("#mancha-abertura", { scale: 1.85, svgOrigin: "800 450", duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.6);
+  sairTexto("#t-titulo", 4.6);
+}
+function capituloRoca() {
+  tl.addLabel("roca", 5);
+  cobrirComTinta(5, () => {});
+  // tl.set (e não gsap.set): ao voltar a rodinha, a troca de cena se desfaz sozinha
+  tl.set("#tinta-abertura", { visibility: "hidden" }, 5.7)
+    .to("#roca", { opacity: 1, duration: .01 }, 5.7)
+    .fromTo("#roca video", { scale: 1.45, xPercent: 6 }, { scale: 1.05, xPercent: 0, duration: 5, ease: "power2.out" }, 5.7);
+  entrarTexto("#t-roca", 6.2);
+  sairTexto("#t-roca", 9.6);
+}
+function capituloDesenha() {
+  tl.addLabel("desenha", 10)
+    .to("#veu", { opacity: .55, duration: .6 }, 10)
+    .to("#roca video", { scale: 1.12, duration: 5, ease: "none" }, 10);
+  entrarTexto("#t-desenha", 10.2);
+  tl.from("#lapis", { y: -400, opacity: 0, duration: .5, ease: "back.out(1.6)" }, 10.6)
+    .fromTo("#sol-circulo", { drawSVG: "0%" }, { drawSVG: "100%", duration: 1.8, ease: "power1.inOut" }, 11.1)
+    .to("#lapis", { motionPath: { path: "#sol-circulo", align: "#sol-circulo", alignOrigin: [.5, .5] }, duration: 1.8, ease: "power1.inOut" }, 11.1)
+    .fromTo("#raios .raio", { drawSVG: "0%" }, { drawSVG: "100%", duration: .18, stagger: .14, ease: "none" }, 12.9)
+    .to("#lapis", { x: 140, y: -140, rotation: 20, opacity: 0, duration: .5, ease: "power2.in" }, 14.1)
+    .call(soIndoPraFrente(() => explodirTinta(.5, .56, 26, 8)), null, 13);
+  sairTexto("#t-desenha", 14.4);
+}
+function capituloIA() {
+  tl.addLabel("ia", 15)
+    .to("#desenho svg", { left: "20vw", top: "62vh", scale: .62, duration: .9, ease: "power3.inOut" }, 15)
+    .to("#veu", { opacity: .8, duration: .6 }, 15);
+  entrarTexto("#t-ia", 15.2);
+  tl.from("#rede", { scale: .3, opacity: 0, duration: .8, ease: "back.out(1.8)" }, 15.6)
+    .from("#cnn", { x: 520, rotation: 8, duration: .8, ease: "back.out(1.4)" }, 15.9)
+    .from("#lstm", { x: 520, rotation: -8, duration: .8, ease: "back.out(1.4)" }, 16.15);
+  sairTexto("#t-ia", 19.4);
+}
+function capituloZe() {
+  tl.addLabel("ze", 20)
+    .to(["#rede", "#cnn", "#lstm"], { y: 900, rotation: 10, duration: .7, ease: "power2.in", stagger: .06 }, 20)
+    .to("#desenho svg", { left: "30vw", top: "52vh", scale: .9, duration: .8, ease: "power3.inOut" }, 20.1)
+    .from("#ze-palco", { yPercent: 120, duration: .8, ease: "back.out(1.5)" }, 20.3)
+    .call(() => $("#ze").setAttribute("class", `ze-svg humor-${tl.time() >= 22.6 ? "comemorando" : "pensando"}`), null, 20.3);
+  entrarTexto("#t-ze", 20.4);
+  tl.set("#carimbo", { visibility: "visible" }, 22.4)
+    .fromTo("#carimbo", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: .35, ease: "back.out(3)" }, 22.4)
+    .call(() => $("#ze").setAttribute("class", `ze-svg humor-${tl.time() >= 22.6 ? "comemorando" : "pensando"}`), null, 22.6)
+    .call(soIndoPraFrente(() => { explodirTinta(.3, .52, 110, 22); gsap.fromTo("#cena", { x: -14, y: 8 }, { x: 0, y: 0, duration: .6, ease: "elastic.out(1, .25)" }); }), null, 22.6);
+  sairTexto("#t-ze", 24.4);
+}
+function capituloSuaVez() {
+  tl.addLabel("vez", 25)
+    .fromTo("#mancha-cobre", { scale: 0, rotation: -30, transformOrigin: "50% 50%" }, { scale: 4.2, rotation: 0, duration: .9, ease: "power2.in" }, 25);
+  entrarTexto("#t-vez", 25.8);
+  tl.fromTo("#jogar", { scale: 1 }, { scale: 1.25, duration: .5, ease: "back.out(3)", yoyo: true, repeat: 3 }, 26.6)
+    .to({}, { duration: 1.4 }, 28);
+}
+
+/* ---------- Progresso e controle (rodinha, teclas, toque, autoplay) ---------- */
+const ROTULOS = ["abertura", "roca", "desenha", "ia", "ze", "vez"];
+function montarProgresso() {
+  $("#progresso").innerHTML = ROTULOS.map(() => "<span><i></i></span>").join("");
+}
+function atualizarProgresso() {
+  const t = tl.time(), inicios = ROTULOS.map((r) => tl.labels[r]).concat(tl.duration());
+  document.querySelectorAll("#progresso i").forEach((el, i) =>
+    gsap.set(el, { scaleX: gsap.utils.clamp(0, 1, (t - inicios[i]) / (inicios[i + 1] - inicios[i])) }));
+}
+let alvo = 0, ultimaInteracao = -1e9, fimDesde = null, saindo = false;
+function mexeu(segundos) {
+  alvo = gsap.utils.clamp(0, tl.duration(), alvo + segundos);
+  ultimaInteracao = performance.now();
+  gsap.to("#dica", { opacity: 0, duration: .4 });
+}
+addEventListener("wheel", (e) => { e.preventDefault(); mexeu(e.deltaY * SEGUNDOS_POR_TOQUE_DA_RODINHA); }, { passive: false });
+addEventListener("keydown", (e) => {
+  if (["ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); mexeu(SEGUNDOS_POR_TECLA); }
+  if (["ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); mexeu(-SEGUNDOS_POR_TECLA); }
+});
+let toqueY = null;
+addEventListener("touchstart", (e) => { toqueY = e.touches[0].clientY; });
+addEventListener("touchmove", (e) => { const y = e.touches[0].clientY; mexeu((toqueY - y) * SEGUNDOS_POR_TOQUE_DA_RODINHA * 3); toqueY = y; });
+
+function irParaVitrine() {
+  if (saindo) return; saindo = true;
+  gsap.timeline({ onComplete: () => { location.href = VITRINE; } })
+    .fromTo("#mancha-cobre", { scale: tl.time() > 25.9 ? 4.2 : 0, transformOrigin: "50% 50%" }, { scale: 4.2, duration: .6, ease: "power2.in" })
+    .to("#cena", { opacity: 0, duration: .25 });
+}
+$("#jogar").addEventListener("click", irParaVitrine);
+$("#pular").addEventListener("click", () => { alvo = tl.labels.vez; ultimaInteracao = performance.now(); });
+
+// Botão magnético
+addEventListener("pointermove", (e) => {
+  const b = $("#jogar"), r = b.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+  gsap.to(b, { x: Math.hypot(dx, dy) < 200 ? dx * .3 : 0, y: Math.hypot(dx, dy) < 200 ? dy * .3 : 0, duration: .4, ease: "power3.out" });
+});
+
+function passo(_, dtMs) {
+  const parado = (performance.now() - ultimaInteracao) / 1000 > SEGUNDOS_PARADO_PARA_AUTOPLAY;
+  if (parado) alvo = Math.min(tl.duration(), alvo + dtMs / 1000);
+  tempoAnterior = tl.time();
+  tl.time(tempoAnterior + (alvo - tempoAnterior) * (parado ? 1 : SUAVIZACAO));
+  petalasLigadas = tl.time() >= 5.7 && tl.time() < 16;
+  atualizarProgresso();
+  if (tl.time() >= tl.duration() - .05) {
+    fimDesde ??= performance.now();
+    if (parado && (performance.now() - fimDesde) / 1000 > SEGUNDOS_NO_FIM_ANTES_DA_VITRINE) irParaVitrine();
+  } else fimDesde = null;
+}
+
+/* Vídeo em loop recarregando a fonte (servidor sem Range não deixa buscar o início) */
+const video = $("#roca-video");
+video.addEventListener("ended", () => { video.src = video.getAttribute("src"); video.load(); video.play().catch(() => {}); });
+
+document.fonts.ready.then(() => {
+  $("#mancha-cobre").setAttribute("d", $("#forma-mancha").getAttribute("d"));
+  // Centralização pelo GSAP (xPercent/yPercent) para não brigar com as escalas e deslocamentos animados
+  gsap.set(["#t-titulo", "#t-vez", "#desenho svg", "#carimbo"], { xPercent: -50, yPercent: -50 });
+  gsap.set("#carimbo", { rotation: -10 });
+  montarRaios(); montarRede(); montarPalpites(); montarProgresso();
+  capituloAbertura(); capituloRoca(); capituloDesenha(); capituloIA(); capituloZe(); capituloSuaVez();
+  if (movimentoReduzido) { tl.progress(1); alvo = tl.duration(); atualizarProgresso(); return; }
+  gsap.ticker.add(passo);
+});
+</script>
+</body>
+</html>
