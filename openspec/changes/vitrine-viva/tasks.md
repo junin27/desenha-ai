@@ -2,16 +2,16 @@
 
 ## 1. Desenhos da vitrine (Python + contrato)
 
-- [ ] 1.1 Teste falhando em `ml/tests/test_vitrine.py` para `escolher_desenhos_da_vitrine` (D5: acerto do ensemble ≥ 0,8, 2 a 8 traços, um por categoria, ordem estável); implementar em `desenha_ml/vitrine.py` com type hints e mypy strict
-- [ ] 1.2 Teste falhando para `exportar_vitrine` (formato JSON: categoria, índice da categoria, traços em pontos inteiros); implementar
-- [ ] 1.3 Célula no notebook das redes (Colab) que chama 1.1/1.2 sobre o conjunto de teste e salva `vitrine_tracos.json`; usuário roda no Colab e traz o arquivo para `app/public/modelos/`
-- [ ] 1.4 Gerar fixture `contratos/vitrine.json` (entrada 28×28 e sequência stroke-3 de cada desenho) com `desenha_ml.contratos`; teste Python do contrato
+- [x] 1.1 Teste falhando em `ml/tests/test_vitrine.py` para `escolher_desenhos_da_vitrine` (D5: acerto do ensemble ≥ 0,8, 2 a 8 traços, um por categoria, ordem estável); implementar em `desenha_ml/vitrine.py` com type hints e mypy strict
+- [x] 1.2 Teste falhando para `exportar_vitrine` (formato JSON: categoria, índice da categoria, traços em pontos inteiros); implementar
+- [x] 1.3 Script local `scripts/gerar_desenhos_da_vitrine.py` (em vez da célula no Colab: com o OK do usuário em 26/11, baixa por streaming só as 8 categorias e roda as mesmas redes ONNX do jogo no avaliador de referência do `onnx`), grava `notebooks/resultados/modelos_redes/vitrine_tracos.json` (versionado; `copiar_modelos.sh` leva ao jogo)
+- [x] 1.4 Gerar fixture `contratos/vitrine.json` (entrada 28×28 e sequência stroke-3 de cada desenho) com `desenha_ml.contratos`; teste Python do contrato
 
 ## 2. Domínio da vitrine (TypeScript, sem DOM)
 
-- [ ] 2.1 Teste falhando `test geometria_do_portal...`: escala inicial, matrizes em u = 0 e u = 1 (identidade), recorte do círculo e do retângulo (cenários "Prévia dentro do objeto" e "Fim do portal"); implementar `domain/vitrine/portal.ts`
-- [ ] 2.2 Teste falhando para a lista de capítulos (11, na ordem da spec) e para a escolha do próximo desenho sem repetir o anterior; implementar `domain/vitrine/capitulos.ts`
-- [ ] 2.3 Teste de contrato TypeScript: `contratos/vitrine.json` bate com `rasterizar`/`sequenciar` (1e-6) para os desenhos da vitrine
+- [x] 2.1 Teste falhando `test geometria_do_portal...`: escala inicial, matrizes em u = 0 e u = 1 (identidade), recorte do círculo e do retângulo (cenários "Prévia dentro do objeto" e "Fim do portal"); implementar `domain/vitrine/portal.ts`
+- [x] 2.2 Teste falhando para a lista de capítulos (11, na ordem da spec) e para a escolha do próximo desenho sem repetir o anterior; implementar `domain/vitrine/capitulos.ts`
+- [x] 2.3 Teste de contrato TypeScript: `contratos/vitrine.json` bate com `rasterizar`/`sequenciar` (1e-6) para os desenhos da vitrine
 
 ## 3. Aplicação e infraestrutura
 

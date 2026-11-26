@@ -30,6 +30,10 @@ const contrato = JSON.parse(
   readFileSync(resolve(import.meta.dirname, "..", "..", "contratos", "pre_processamento.json"), "utf8"),
 ) as { casos: CasoDoContrato[] };
 
+const vitrine = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, "..", "..", "contratos", "vitrine.json"), "utf8"),
+) as { casos: CasoDoContrato[] };
+
 function esperarPontosProximos(obtido: readonly (readonly Ponto[])[], esperado: PontosDoContrato): void {
   expect(obtido.map((t) => t.length)).toEqual(esperado.map((t) => t.length));
   obtido.forEach((traco, i) => {
@@ -56,7 +60,15 @@ describe("contrato de pré-processamento (Python → TypeScript)", () => {
     expect(nomes.some((n) => n.startsWith("quickdraw_"))).toBe(true);
   });
 
-  describe.each(contrato.casos.map((caso) => [caso.nome, caso] as const))("caso %s", (_, caso) => {
+  it("os desenhos reais da vitrine também estão no contrato (change vitrine-viva)", () => {
+    expect(vitrine.casos.length).toBeGreaterThanOrEqual(1);
+    expect(vitrine.casos.every((c) => c.nome.startsWith("vitrine_"))).toBe(true);
+  });
+
+  // Os desenhos da vitrine passam pelas mesmas verificações: a grade 28×28 e a sequência que a vitrine mostra
+  // são as entradas que as redes recebem (spec vitrine-da-abertura, "Grade 28×28 é a entrada da CNN").
+  const todos = [...contrato.casos, ...vitrine.casos];
+  describe.each(todos.map((caso) => [caso.nome, caso] as const))("caso %s", (_, caso) => {
     const desenho = criarDesenho(caso.tracos);
 
     it("normalização e simplificação batem", () => {

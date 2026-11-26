@@ -3,7 +3,11 @@
 import json
 from pathlib import Path
 
-from desenha_ml.contratos import CASOS_OBRIGATORIOS, gerar_contrato_de_pre_processamento
+from desenha_ml.contratos import (
+    CASOS_OBRIGATORIOS,
+    gerar_contrato_da_vitrine,
+    gerar_contrato_de_pre_processamento,
+)
 from desenha_ml.contratos_conversa import FALAS_COMPLETAS, gerar_contrato_da_conversa
 from desenha_ml.contratos_prompt import gerar_contrato_do_prompt
 from desenha_ml.contratos_regras import gerar_contrato_de_regras
@@ -136,3 +140,23 @@ def test_contrato_do_prompt_versionado_esta_atualizado() -> None:
         "contratos/prompt_qwen.json está desatualizado; rode "
         "`ml/.venv/Scripts/python -m desenha_ml.contratos contratos/`"
     )
+
+
+VITRINE_VERSIONADA = (
+    Path(__file__).parents[2] / "notebooks" / "resultados" / "modelos_redes" / "vitrine_tracos.json"
+)
+CONTRATO_DA_VITRINE = Path(__file__).parents[2] / "contratos" / "vitrine.json"
+
+
+def test_contrato_da_vitrine_tem_um_caso_por_desenho_com_imagem_28x28() -> None:
+    arquivo = json.loads(VITRINE_VERSIONADA.read_text(encoding="utf8"))
+    contrato = gerar_contrato_da_vitrine(arquivo)
+    assert [c["nome"] for c in contrato["casos"]] == [
+        f"vitrine_{d['categoria']}" for d in arquivo["desenhos"]
+    ]
+    assert all(len(c["imagem"]) == 28 * 28 for c in contrato["casos"])
+
+
+def test_contrato_da_vitrine_versionado_esta_atualizado() -> None:
+    arquivo = json.loads(VITRINE_VERSIONADA.read_text(encoding="utf8"))
+    assert json.loads(CONTRATO_DA_VITRINE.read_text(encoding="utf8")) == gerar_contrato_da_vitrine(arquivo)

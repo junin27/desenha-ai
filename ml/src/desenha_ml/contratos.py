@@ -18,7 +18,7 @@ from typing import TypedDict
 from desenha_ml.contratos_conversa import gerar_contrato_da_conversa
 from desenha_ml.contratos_prompt import gerar_contrato_do_prompt
 from desenha_ml.contratos_regras import gerar_contrato_de_regras
-from desenha_ml.desenho import Desenho
+from desenha_ml.desenho import Desenho, desenho_de_pontos
 from desenha_ml.leitura_quickdraw import ler_desenhos_ndjson
 from desenha_ml.normalizacao import normalizar
 from desenha_ml.prefixo import prefixo
@@ -26,11 +26,15 @@ from desenha_ml.rasterizacao import ESPESSURA_PADRAO, LADO_DA_CAIXA, LADO_DA_IMA
 from desenha_ml.resultado import Ok
 from desenha_ml.sequencia import MAXIMO_DE_PONTOS, sequenciar
 from desenha_ml.simplificacao import EPSILON_PADRAO, preparar_desenho_capturado
+from desenha_ml.vitrine import ArquivoDaVitrine
 
 FRACAO_DO_PREFIXO = 0.5
 DESENHOS_REAIS_NO_CONTRATO = 6
 CASOS_OBRIGATORIOS = ("ponto_unico", "traco_unico", "mais_de_130_pontos", "linha_vertical", "denso_capturado")
 AMOSTRA_PADRAO = Path(__file__).resolve().parents[2] / "tests" / "amostras" / "quickdraw_amostra.ndjson"
+VITRINE_PADRAO = (
+    Path(__file__).resolve().parents[3] / "notebooks" / "resultados" / "modelos_redes" / "vitrine_tracos.json"
+)
 
 Pontos = list[list[list[float]]]
 
@@ -54,6 +58,21 @@ class ContratoDePreProcessamento(TypedDict):
     versao: int
     parametros: dict[str, float]
     casos: list[CasoDoContrato]
+
+
+class ContratoDaVitrine(TypedDict):
+    versao: int
+    casos: list[CasoDoContrato]
+
+
+def gerar_contrato_da_vitrine(arquivo: ArquivoDaVitrine) -> ContratoDaVitrine:
+    """Desenhos reais da vitrine (change vitrine-viva): o TypeScript tem de gerar a mesma entrada."""
+    casos = []
+    for desenho in arquivo["desenhos"]:
+        lido = desenho_de_pontos([[(float(x), float(y)) for x, y in traco] for traco in desenho["tracos"]])
+        assert isinstance(lido, Ok), f"desenho da vitrine {desenho['categoria']} inválido: {lido}"
+        casos.append(_caso(f"vitrine_{desenho['categoria']}", lido.valor))
+    return {"versao": 1, "casos": casos}
 
 
 def gerar_contrato_de_pre_processamento(
@@ -109,6 +128,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Gera os contratos de pré-processamento para o TypeScript.")
     parser.add_argument("pasta", type=Path, help="pasta de saída (ex.: contratos/)")
     parser.add_argument("--amostra", type=Path, default=AMOSTRA_PADRAO, help="ndjson do Quick, Draw!")
+    parser.add_argument("--vitrine", type=Path, default=VITRINE_PADRAO, help="vitrine_tracos.json do jogo")
     argumentos = parser.parse_args()
     with argumentos.amostra.open(encoding="utf8") as arquivo:
         contrato = gerar_contrato_de_pre_processamento(ler_desenhos_ndjson(arquivo))
@@ -117,6 +137,9 @@ def main() -> None:
     _gravar(argumentos.pasta / "regras.json", gerar_contrato_de_regras())
     _gravar(argumentos.pasta / "conversa.json", gerar_contrato_da_conversa())
     _gravar(argumentos.pasta / "prompt_qwen.json", gerar_contrato_do_prompt())
+    if argumentos.vitrine.exists():
+        vitrine = json.loads(argumentos.vitrine.read_text(encoding="utf8"))
+        _gravar(argumentos.pasta / "vitrine.json", gerar_contrato_da_vitrine(vitrine))
 
 
 def _gravar(destino: Path, contrato: object) -> None:

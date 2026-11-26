@@ -51,6 +51,15 @@ if [[ -n "$METRICAS_SLM" ]]; then
   fi
 fi
 
+# Desenhos reais da vitrine (change vitrine-viva), gerados por scripts/gerar_desenhos_da_vitrine.py. Sem eles, a
+# vitrine mostra os capítulos sem os desenhos e sem os palpites das redes.
+VITRINE="notebooks/resultados/modelos_redes/vitrine_tracos.json"
+if [[ -f "$VITRINE" ]]; then
+  cp "$VITRINE" "$DESTINO/"
+else
+  echo "AVISO: $VITRINE não encontrado; a vitrine ficará sem os desenhos reais." >&2
+fi
+
 # Modo Mão (change desenho-com-a-mao): modelo da mão do MediaPipe e o wasm da biblioteca, servidos pelo
 # próprio jogo para o desenho com a mão funcionar offline. Sem eles, o jogo cai para o mouse com aviso.
 MODELO_DA_MAO="notebooks/resultados/modelo_mao/hand_landmarker.task"
