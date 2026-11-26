@@ -108,7 +108,30 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - **Feito nesta sessão:** charada sem vazamento na tela; parâmetros corrigidos (1,72 bi, LoRA 1,01%, FP16 3,44 GB) no notebook e no banner; revisão offline do treino (`scripts/revisar_dataset.py`); jogo com temperatura 0,3 e sem penalidade; `docs/cadastro.md` com os campos do formulário e o padrão da planilha do professor (repetição = vermelho).
 - **Próximo passo:** change na demo-offline para usar o GGUF Q8_0 (hoje `preparar_demo.py` grava o Zé com o nome `…Q4_K_M.gguf`); `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf`; ensaio real; voltar o formato do Zé a ✗ no checklist; preencher os `[PENDENTE]` de banner e pitch; arquivar as 6 changes. Cadastro no formulário até 27/11 (com o usuário).
 
-## Estado em 25/11/2026 (manhã) — LEIA PRIMEIRO
+## Estado em 26/11/2026 (tarde) — LEIA PRIMEIRO (change `vitrine-viva`)
+
+**Onde paramos:** implementando a change `openspec/changes/vitrine-viva` (aprovada pelo usuário em 26/11). 27 de 33 tarefas feitas e no GitHub; `bash scripts/verificar.sh` verde (485 testes Python, 701 TS, OpenSpec 13/13).
+
+**O que é:** a primeira tela do jogo virou uma "vitrine" (landing em 11 capítulos: Início, O jogo, O desenho, A CNN, A LSTM, O Zé (SLM), Destilação, QLoRA, Quantização GGUF, Engenharia, Sua vez) ligada por **portais** (a cena seguinte aparece dentro de um objeto — o "ô" do título, a janela da casa, o desenho, a grade, a resposta da LSTM, a cabeça do Zé, o jarro, um peso — e uma câmera única atravessa; dois afastamentos: GGUF→hexágono do llama.cpp, engenharia→janela da casa). Rodinha/teclas/toque movem a história sem rolar; 4 s parado anda sozinha; 10 s no fim recomeça. "Jogar!"/"Jogar agora ›" abrem o apelido por portal; "‹ Voltar à história" desfaz. Protótipo aprovado: `prototipos_visual/16_landing_viva.html`.
+
+**Código:** `app/src/domain/vitrine/` (portal.ts = geometria pura do portal; capitulos.ts), `app/src/application/` (palpites-da-vitrine.ts, resumo-da-vitrine.ts, desenhos-da-vitrine.ts), `app/src/infrastructure/arquivos/desenhos-da-vitrine.ts`, `app/src/presentation/vitrine/` (tela-vitrine.ts, cenas-*.ts, animacao-da-vitrine.ts + entradas-dos-capitulos.ts com GSAP, controle-da-historia.ts, medidor-de-quadros.ts, portal-do-apelido.ts, motor-do-portal.ts, textos-da-vitrine.ts, vitrine.css). `interface-do-jogo.ts` usa `TelaVitrine` no lugar da antiga `TelaAbertura` (removida). Ligação real em `main.ts` (`lerConteudoDaVitrine`).
+
+**Dados:** `notebooks/resultados/modelos_redes/vitrine_tracos.json` (8 desenhos reais do conjunto de teste do Quick, Draw!, escolhidos por `desenha_ml/vitrine.py` com as redes ONNX do jogo; gerado por `scripts/gerar_desenhos_da_vitrine.py`, que baixa por streaming — só rodar de novo com OK do usuário). `copiar_modelos.sh` leva ao `app/public/modelos` (pasta ignorada pelo Git). `contratos/vitrine.json` confere Python×TS. `ficha_da_vitrine.json` (contagem de testes) é gerada pelo `verificar.sh`. Vídeo: `app/public/vitrine/fundo-roca-toon.mp4` (Google Flow/Veo 3.1 Lite, 1280×720, 1,56 MB; mantém as credenciais C2PA de "gerado por IA", aceitas só em vídeo pelo teste de distribuição). GSAP 3.15.1 no `app/package.json` (OK do usuário).
+
+**Falta (tarefas abertas em `tasks.md`):**
+- 5.6 conferir no navegador o afastamento GGUF→hexágono e engenharia→janela (só existe na animação; não há teste em happy-dom).
+- 7.1 `npm --prefix app run build` + `vite preview` (launch "jogo-build", porta 4173): percorrer os 11 capítulos em 1366×768 e 1920×1080 (sem rolagem, fonte ≥ 24 px), capturas. **Ainda não foi visto no navegador o jogo de verdade** — só o protótipo 16. Esperar ajustes de CSS/tempo (o CSS foi portado do protótipo e nunca renderizado no app).
+- 7.2 medir FPS (portal da janela ≈ 25×) aqui e no ensaio de 29/11.
+- 8.1 atualizar `docs/decisoes.md` (vitrine, portal, GSAP local, C2PA).
+- 9.1 só com `visual-tinta-cinetica` arquivada (quando o usuário pedir): delta de `tela-de-abertura` (REMOVED "Demonstração em loop"; limite 1,2 s → 2,2 s).
+- 9.2 verificação completa final.
+- CSS morto da abertura antiga em `app/src/estilo.css` (`.tela-abertura`, `.chamada-da-abertura`, `.ze-da-abertura`) pode sair.
+
+**Decisões desta sessão (não reabrir sem o usuário):** vídeos do Wan 2.2 (Hugging Face) reprovados por realismo/baixa resolução; só o fundo toon do Veo ficou. Transições reprovadas: "zoom num ponto e a tela muda de cor"; aprovadas: portal em que o objeto vira a próxima tela inteira (recorte começa no formato do objeto e abre até a tela; nada de "cartão" com borda). Barra de progresso e "Role a rodinha" foram removidas a pedido. Rolagem: "os dois" (rodinha + modo atração), sem rolar a página. A vitrine não roda o Zé ao vivo (fala gravada, marcada). Mão não controla a vitrine. Abaixo de 30 fps por 3 s: corte direto + vídeo parado, mas continua andando sozinha.
+
+**Pendências do usuário:** medir FPS do modo Mão no ensaio de 29/11 (tarefa 5.1 de `desenho-com-a-mao`); arquivar changes só quando ele pedir; liberar a câmera para localhost no checklist do evento.
+
+## Estado em 25/11/2026 (manhã) — histórico
 
 **A parte técnica está pronta.** O Zé v7 foi aprovado no critério oficial (100% em formato, CHARADA, VEREDITO e PERGUNTA) e a demo com o GGUF **Q8_0** passou no ensaio real: `conferir_demo.py` deu "Pronto para o evento" e uma partida de 3 rodadas rodou no navegador, com a comparação base × destilado (detalhes em `docs/capturas/README.md`). Treino, dataset e avaliação estão encerrados.
 
