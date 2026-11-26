@@ -33,6 +33,7 @@ export class TelaInicio implements Tela {
     aoVerPlacar: () => void,
     opcoesDoZe: OpcoesDoPersonagem = {},
     modo: ModoDeDesenhoAtual = new ModoDeDesenhoAtual("mouse"),
+    aoVoltarAHistoria?: () => void,
   ) {
     this.pergunta = new TelaPergunta(conversa, opcoesDoZe);
     this.campo.maxLength = TAMANHO_MAXIMO_DO_APELIDO;
@@ -64,7 +65,9 @@ export class TelaInicio implements Tela {
       criar("p", { classe: "dica", texto: "3 rodadas · acertou rápido vale mais · quase (top 3) vale 30" }),
       this.aviso,
     ]);
+    const voltar = botaoDeVoltarAHistoria(aoVoltarAHistoria);
     this.raiz = criar("section", { classe: "tela tela-inicio", dados: { tela: "inicio" } }, [
+      ...voltar,
       apelido,
       this.pergunta.raiz,
     ]);
@@ -117,4 +120,16 @@ export class TelaInicio implements Tela {
   private jogar(): void {
     void this.comandos.comecar(this.campo.value);
   }
+}
+
+/** Vindo da vitrine (change vitrine-viva): desfaz o portal e volta ao capítulo de onde o visitante saiu. */
+function botaoDeVoltarAHistoria(aoVoltar: (() => void) | undefined): HTMLElement[] {
+  if (aoVoltar === undefined) return [];
+  const botao = criar("button", {
+    classe: "voltar-a-historia",
+    texto: "‹ Voltar à história",
+    dados: { acao: "voltar-a-historia" },
+  });
+  botao.addEventListener("click", aoVoltar);
+  return [botao];
 }

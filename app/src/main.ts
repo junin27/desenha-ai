@@ -20,6 +20,10 @@ import { buscarJson } from "./infrastructure/arquivos/buscar-json";
 import { lerCasosDeParidade } from "./infrastructure/arquivos/casos-de-paridade";
 import { lerClassesDoJogo, type ClassesDoJogo } from "./infrastructure/arquivos/classes-do-jogo";
 import { lerMetricasDasRedes, lerMetricasDoSlm } from "./infrastructure/arquivos/metricas-do-treino";
+import { lerDesenhosDaVitrine } from "./infrastructure/arquivos/desenhos-da-vitrine";
+import { palpitesDaVitrine } from "./application/palpites-da-vitrine";
+import { montarResumoDaVitrine } from "./application/resumo-da-vitrine";
+import type { ConteudoDaVitrine } from "./presentation/vitrine/tela-vitrine";
 import { enderecosDoZe } from "./infrastructure/enderecos-do-ze";
 import { NarradorLlamaServer, type Buscador } from "./infrastructure/narrador-llama-server";
 import { carregarRedesNoNavegador } from "./infrastructure/onnx/redes-no-navegador";
@@ -83,7 +87,9 @@ async function iniciar(raiz: HTMLElement): Promise<void> {
   contarFalasDaConversa(conversa, medicoes);
 
   const metricas = await lerMetricasDoTreino();
-  const tela = ligarTela(raiz, partida, conversa, telaDoPlacar(classes, placar, metricas));
+  // A vitrine usa as redes sem medição: os palpites dela não entram nas medições da partida (painel técnico).
+  const vitrine = await lerConteudoDaVitrine(classes, redes.valor);
+  const tela = ligarTela(raiz, partida, conversa, telaDoPlacar(classes, placar, metricas), vitrine);
   montarBarraDoEstande(leitor, medicoes, narrador, metricas);
   void conferirRedesAoAbrir(redes.valor, tela, medicoes);
   instalarAtalhoDeZerarPlacar(document, {
@@ -115,10 +121,18 @@ function ligarTela(
   partida: Partida,
   conversa: ConversaComOZe,
   informacoes: InformacoesDoJogo,
+  vitrine: ConteudoDaVitrine,
 ): InterfaceDoJogo {
   const preferencias = new PreferenciasDoDesenhoLocalStorage(window.localStorage);
   const tela = new InterfaceDoJogo(raiz, partida, informacoes, conversa, {
     atrasoDaTrocaMs: ATRASO_DA_TROCA_DE_TELA_MS,
+    vitrine: {
+      conteudo: vitrine,
+      opcoes: {
+        animar: true,
+        movimentoReduzido: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      },
+    },
     desenho: {
       somLigado: preferencias.somLigado(),
       aoMudarSom: (ligado) => {
@@ -231,6 +245,34 @@ async function lerMetricasDoTreino(): Promise<MetricasDoTreino> {
   return {
     metricasDasRedes: redes.ok ? lerMetricasDasRedes(redes.valor) : undefined,
     metricasDoSlm: slm.ok ? lerMetricasDoSlm(slm.valor) : undefined,
+  };
+}
+
+/** Vitrine (change vitrine-viva): desenhos reais, números das métricas e da ficha; o que faltar some da tela. */
+async function lerConteudoDaVitrine(
+  classes: ClassesDoJogo,
+  redes: ClassificadorDeDesenho,
+): Promise<ConteudoDaVitrine> {
+  const [desenhos, metricasRedes, metricasSlm, ficha] = await Promise.all(
+    ["vitrine_tracos", "metricas_redes", "metricas_slm", "ficha_da_vitrine"].map((nome) =>
+      buscarJson(buscar, `${PASTA_DOS_MODELOS}/${nome}.json`),
+    ),
+  );
+  const lidos =
+    desenhos === undefined ? undefined : desenhos.ok ? lerDesenhosDaVitrine(desenhos.valor) : desenhos;
+  if (lidos !== undefined && !lidos.ok) console.warn("Vitrine sem desenhos reais:", lidos.erro.detalhe);
+  const conteudo = (resultado: typeof ficha): unknown =>
+    resultado?.ok === true ? resultado.valor : undefined;
+  return {
+    desenhos: lidos?.ok === true ? lidos.valor : undefined,
+    resumo: montarResumoDaVitrine({
+      redes: conteudo(metricasRedes),
+      slm: conteudo(metricasSlm),
+      ficha: conteudo(ficha),
+    }),
+    nomesDasCategorias: classes.nomesDasCategorias,
+    palpitesDe: (desenho) => palpitesDaVitrine(desenho, redes, classes.pesoDaCnn),
+    sortear: () => Math.random(),
   };
 }
 

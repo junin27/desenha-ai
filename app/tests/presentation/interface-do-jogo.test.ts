@@ -247,3 +247,43 @@ describe("placar no fim da partida", () => {
     expect(comandos.chamadas).toEqual(["nova"]);
   });
 });
+
+describe("vitrine (spec vitrine-da-abertura)", () => {
+  it("test_jogo_recem_aberto_vitrine_no_capitulo_de_abertura_sem_campo_de_apelido", () => {
+    tela.mostrar(ESTADO_INICIAL);
+    expect(visivel()).toEqual(["abertura"]);
+    const vitrine = raiz.querySelector<HTMLElement>("[data-tela=abertura]");
+    expect(vitrine?.querySelector("[data-campo=apelido]")).toBeNull();
+  });
+
+  it("test_pular_a_historia_jogar_agora_abre_o_apelido_com_foco_no_campo", () => {
+    tela.mostrar(ESTADO_INICIAL);
+    clicar("[data-acao=jogar-agora]");
+    expect(visivel()).toEqual(["inicio"]);
+    expect(document.activeElement?.getAttribute("data-campo")).toBe("apelido");
+  });
+
+  it("test_jogar_pelo_convite_abre_o_apelido", async () => {
+    tela.mostrar(ESTADO_INICIAL);
+    await new Promise((resolver) => setTimeout(resolver, 0)); // cenas montadas (palpites são assíncronos)
+    clicar("[data-acao=jogar-convite]");
+    expect(visivel()).toEqual(["inicio"]);
+  });
+
+  it("test_voltar_ao_convite_vitrine_de_novo_sem_transformacao_nem_recorte", () => {
+    tela.mostrar(ESTADO_INICIAL);
+    clicar("[data-acao=jogar-agora]");
+    clicar("[data-acao=voltar-a-historia]");
+    expect(visivel()).toEqual(["abertura"]);
+    const vitrine = raiz.querySelector<HTMLElement>("[data-tela=abertura]");
+    expect([vitrine?.style.transform, vitrine?.style.clipPath]).toEqual(["", ""]);
+  });
+
+  it("test_inicio_depois_da_partida_volta_a_vitrine", () => {
+    tela.mostrar(estado({ etapa: "fim", resultados: [RESULTADO_ACERTOU] }));
+    clicar("[data-acao=voltar-do-placar]");
+    expect(comandos.chamadas).toContain("nova");
+    tela.mostrar(ESTADO_INICIAL);
+    expect(visivel()).toEqual(["abertura"]);
+  });
+});

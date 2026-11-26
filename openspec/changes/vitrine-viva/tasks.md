@@ -22,29 +22,29 @@
 
 ## 4. Base da apresentação
 
-- [ ] 4.1 Pedir OK ao usuário e instalar `gsap@3.15.1` no app; registrar a URL do comentário de licença em `TEXTOS_DE_TERCEIROS_PERMITIDOS` com teste que prova que é só comentário; teste do build continua sem endereço externo
-- [ ] 4.2 Copiar `fundo-roca-toon.mp4` para `app/public/vitrine/`; teste da distribuição confere que o arquivo existe e tem menos de 3 MB
-- [ ] 4.3 Controle de entrada (rodinha, teclas, toque, autoplay em 4 s, recomeço em 10 s) com relógio falso; testes dos cenários "Avançar com a tecla", "Visitante parado", "Recomeço do modo vitrine" e "Rodinha não rola a página"
-- [ ] 4.4 Motor do portal na apresentação aplicando o domínio 2.1 (medição preguiçosa D3, entrar e afastar); teste em happy-dom: ao fim do portal a cena nova tem transformação e recorte vazios
+- [x] 4.1 Pedir OK ao usuário e instalar `gsap@3.15.1` no app; registrar a URL do comentário de licença em `TEXTOS_DE_TERCEIROS_PERMITIDOS` com teste que prova que é só comentário; teste do build continua sem endereço externo
+- [x] 4.2 Copiar `fundo-roca-toon.mp4` para `app/public/vitrine/`; teste da distribuição confere que o arquivo existe e tem menos de 3 MB
+- [x] 4.3 Controle de entrada (rodinha, teclas, toque, autoplay em 4 s, recomeço em 10 s) com relógio falso; testes dos cenários "Avançar com a tecla", "Visitante parado", "Recomeço do modo vitrine" e "Rodinha não rola a página"
+- [x] 4.4 Motor do portal na apresentação aplicando o domínio 2.1 (medição preguiçosa D3, entrar e afastar); teste em happy-dom: ao fim do portal a cena nova tem transformação e recorte vazios
 
 ## 5. Capítulos
 
-- [ ] 5.1 Abertura e o jogo (gota, título, roça com o Zé); teste: primeira tela é a vitrine, sem campo de apelido
-- [ ] 5.2 O desenho (traço real ponto a ponto, com o crédito "Quick, Draw! · CC BY 4.0"); testes: categoria igual nos capítulos do desenho, CNN e LSTM, e "Crédito no capítulo do desenho"
-- [ ] 5.3 A CNN (grade 28×28 da entrada real, filtros, palpites reais); testes "Mesma entrada" e "Palpite com o desenho completo"
-- [ ] 5.4 A LSTM (sequência, células, chute por prefixo); teste "Redes indisponíveis" sem percentuais
-- [ ] 5.5 O Zé (SLM), destilação, QLoRA e GGUF com números do `ResumoDaVitrine`; teste "Métrica ausente"
+- [x] 5.1 Abertura e o jogo (gota, título, roça com o Zé); teste: primeira tela é a vitrine, sem campo de apelido
+- [x] 5.2 O desenho (traço real ponto a ponto, com o crédito "Quick, Draw! · CC BY 4.0"); testes: categoria igual nos capítulos do desenho, CNN e LSTM, e "Crédito no capítulo do desenho"
+- [x] 5.3 A CNN (grade 28×28 da entrada real, filtros, palpites reais); testes "Mesma entrada" e "Palpite com o desenho completo"
+- [x] 5.4 A LSTM (sequência, células, chute por prefixo); teste "Redes indisponíveis" sem percentuais
+- [x] 5.5 O Zé (SLM), destilação, QLoRA e GGUF com números do `ResumoDaVitrine`; teste "Métrica ausente"
 - [ ] 5.6 Engenharia e convite; afastamentos (hexágono do Zé, janela da casa); teste "GGUF dentro do hexágono"
 
 ## 6. Integração com o jogo
 
-- [ ] 6.1 `tela-vitrine.ts` no lugar da abertura em `interface-do-jogo.ts`; testes "Jogar pelo convite" e "Pular a história" (apelido em até 2,2 s, foco no campo)
-- [ ] 6.2 "Voltar à história" na tela de apelido vinda da vitrine; teste "Voltar ao convite"
-- [ ] 6.3 Vitrine parada fora da tela (vídeo pausado, sem novas classificações); teste "Partida em andamento"
-- [ ] 6.4 Movimento reduzido (corte direto, vídeo parado, sem autoplay); teste "Reduzir movimento ligado"
-- [ ] 6.5 Degradação em notebook lento: medidor de quadros com relógio falso (média < 30 fps por 3 s liga corte direto e pausa o vídeo, sem parar o avanço automático); teste "Taxa baixa"
-- [ ] 6.6 "Início" no placar volta à vitrine no capítulo de abertura; teste "Início depois da partida"
-- [ ] 6.7 Remover `tela-abertura.ts` e testes da demonstração antiga quando a vitrine cobrir os cenários equivalentes; teste de arquitetura continua verde
+- [x] 6.1 `tela-vitrine.ts` no lugar da abertura em `interface-do-jogo.ts`; testes "Jogar pelo convite" e "Pular a história" (apelido em até 2,2 s, foco no campo)
+- [x] 6.2 "Voltar à história" na tela de apelido vinda da vitrine; teste "Voltar ao convite"
+- [x] 6.3 Vitrine parada fora da tela (vídeo pausado, sem novas classificações); teste "Partida em andamento"
+- [x] 6.4 Movimento reduzido (corte direto, vídeo parado, sem autoplay); teste "Reduzir movimento ligado"
+- [x] 6.5 Degradação em notebook lento: medidor de quadros com relógio falso (média < 30 fps por 3 s liga corte direto e pausa o vídeo, sem parar o avanço automático); teste "Taxa baixa"
+- [x] 6.6 "Início" no placar volta à vitrine no capítulo de abertura; teste "Início depois da partida"
+- [x] 6.7 Remover `tela-abertura.ts` e testes da demonstração antiga quando a vitrine cobrir os cenários equivalentes; teste de arquitetura continua verde
 
 ## 7. Verificação no navegador
 

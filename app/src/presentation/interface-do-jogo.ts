@@ -3,7 +3,6 @@ import { ESTADO_INICIAL, type Etapa, type EstadoDaPartida } from "../application
 import { Confete } from "./confete";
 import { criar } from "./dom";
 import type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo, Tela } from "./telas/tela";
-import { TelaAbertura } from "./telas/tela-abertura";
 import { TelaCharada } from "./telas/tela-charada";
 import { type OpcoesDaTelaDeDesenho, TelaDesenho } from "./telas/tela-desenho";
 import { TelaInicio } from "./telas/tela-inicio";
@@ -13,6 +12,7 @@ import { TransicaoPorPincelada } from "./transicao";
 import type { OpcoesDoPersonagem, PersonagemDoZe } from "./ze/personagem";
 import { ModoDeDesenhoAtual } from "./mao/seletor-de-modo";
 import { VigiaDoTedio } from "./ze/vigia-do-tedio";
+import { TelaVitrine, type ConteudoDaVitrine, type OpcoesDaVitrine } from "./vitrine/tela-vitrine";
 
 export type { ComandosDaConversa, ComandosDoJogo, InformacoesDoJogo } from "./telas/tela";
 
@@ -21,10 +21,12 @@ export interface OpcoesDaInterface extends OpcoesDoPersonagem {
   readonly desenho?: Omit<OpcoesDaTelaDeDesenho, "esperar">;
   /** Quando a pincelada cobre a tela e a troca acontece; 0 (padrão, testes) troca na hora. */
   readonly atrasoDaTrocaMs?: number;
+  /** Conteúdo e opções da vitrine (change vitrine-viva); sem isso, vitrine sem desenhos e sem animação (testes). */
+  readonly vitrine?: { readonly conteudo: ConteudoDaVitrine; readonly opcoes?: OpcoesDaVitrine };
 }
 
 type NomeDaTela = "abertura" | "inicio" | "charada" | "desenho" | "veredito" | "placar";
-/** Na etapa `inicio`, a apresentação escolhe entre abertura, apelido e placar (D1 do design). */
+/** Na etapa `inicio`, a apresentação escolhe entre a vitrine ("abertura"), apelido e placar (D1 do design). */
 type TelaDoInicio = "abertura" | "inicio" | "placar";
 
 /** Etapa da partida → tela (spec `interface-do-jogo`, "Telas da partida"; `fim` mostra o placar). */
@@ -45,7 +47,9 @@ const TELA_DA_ETAPA: Readonly<Record<Exclude<Etapa, "inicio">, NomeDaTela>> = {
  * partida.aoMudar((estado) => tela.mostrar(estado));
  */
 export class InterfaceDoJogo {
-  private readonly abertura: TelaAbertura;
+  private readonly abertura: TelaVitrine;
+  private origemDoPortal: HTMLElement | undefined;
+  private portalAberto = false;
   private readonly inicio: TelaInicio;
   private readonly desenho: TelaDesenho;
   private readonly veredito: TelaVeredito;
@@ -72,9 +76,16 @@ export class InterfaceDoJogo {
     const irPara = (tela: TelaDoInicio) => (): void => {
       this.irParaOInicio(tela);
     };
-    this.abertura = new TelaAbertura(informacoes, irPara("inicio"), opcoesDoZe);
+    this.abertura = new TelaVitrine(
+      opcoes.vitrine?.conteudo ?? vitrineSemConteudo(informacoes),
+      (origem) => {
+        this.origemDoPortal = origem;
+        this.irParaOInicio("inicio");
+      },
+      { animar: false, ...opcoesDoZe, ...opcoes.vitrine?.opcoes },
+    );
     const modo = opcoes.desenho?.modo ?? new ModoDeDesenhoAtual("mouse");
-    this.inicio = new TelaInicio(comandos, conversa, irPara("placar"), opcoesDoZe, modo);
+    this.inicio = new TelaInicio(comandos, conversa, irPara("placar"), opcoesDoZe, modo, irPara("abertura"));
     this.charada = new TelaCharada(comandos, opcoesDoZe);
     this.desenho = new TelaDesenho(comandos, informacoes, { ...opcoesDoZe, ...opcoes.desenho, modo });
     this.veredito = new TelaVeredito(comandos, informacoes, {
@@ -131,10 +142,11 @@ export class InterfaceDoJogo {
     if (tela === "inicio") this.inicio.focar();
   }
 
-  /** "Início" no placar: antes da partida volta ao apelido; no fim, começa outra partida pela abertura. */
+  /** "Início" no placar: antes da partida volta ao apelido; no fim, começa outra partida pela vitrine. */
   private voltarDoPlacar(): void {
     if (this.partida.etapa === "fim") {
       this.telaDoInicio = "abertura";
+      this.abertura.voltarAoComeco();
       this.comandos.novaPartida();
       return;
     }
@@ -150,7 +162,43 @@ export class InterfaceDoJogo {
     if (atual === "abertura") this.abertura.mostrar();
     else this.abertura.esconder();
     if (anterior === undefined || anterior === atual) mostrar();
+    else if (anterior === "abertura" && atual === "inicio") this.entrarPeloPortal(mostrar);
+    else if (anterior === "inicio" && atual === "abertura" && this.portalAberto)
+      this.voltarPeloPortal(mostrar);
     else this.transicao.trocar(mostrar);
+  }
+
+  /** "Jogar!" / "Jogar agora ›": a tela de apelido cresce de dentro do botão (spec vitrine-da-abertura). */
+  private entrarPeloPortal(mostrar: () => void): void {
+    const origem = this.origemDoPortal ?? this.abertura.raiz;
+    this.inicio.raiz.hidden = false;
+    this.inicio.raiz.classList.add("em-portal");
+    const terminar = (): void => {
+      this.inicio.raiz.classList.remove("em-portal");
+      this.portalAberto = true;
+      if (this.telaAtual === "inicio") mostrar();
+      this.inicio.focar();
+    };
+    const fim = this.abertura.portal.abrir(this.abertura.raiz, this.inicio.raiz, origem);
+    if (this.abertura.portal.anima) void fim.then(terminar);
+    else terminar(); // corte direto (movimento reduzido, notebook lento, testes): na hora
+  }
+
+  /** "Voltar à história": desfaz o portal e a vitrine continua do capítulo onde estava. */
+  private voltarPeloPortal(mostrar: () => void): void {
+    this.abertura.raiz.hidden = false;
+    this.inicio.raiz.classList.add("em-portal");
+    const terminar = (): void => {
+      this.inicio.raiz.classList.remove("em-portal");
+      for (const raiz of [this.abertura.raiz, this.inicio.raiz]) {
+        Object.assign(raiz.style, { transform: "", clipPath: "", opacity: "" });
+      }
+      this.portalAberto = false;
+      if (this.telaAtual === "abertura") mostrar();
+    };
+    const fim = this.abertura.portal.voltar();
+    if (this.abertura.portal.anima) void fim.then(terminar);
+    else terminar(); // corte direto: na hora
   }
 
   /** 30 s sem interação: o Zé da tela atual se entedia (spec `personagem-do-ze`). */
@@ -166,7 +214,7 @@ export class InterfaceDoJogo {
   }
 
   private zesVisiveis(): PersonagemDoZe[] {
-    const porTela: Partial<Record<NomeDaTela, PersonagemDoZe>> = {
+    const porTela: Partial<Record<NomeDaTela, PersonagemDoZe | undefined>> = {
       abertura: this.abertura.personagem,
       inicio: this.inicio.personagem,
       charada: this.charada.personagem,
@@ -175,4 +223,15 @@ export class InterfaceDoJogo {
     const ze = this.telaAtual === undefined ? undefined : porTela[this.telaAtual];
     return ze === undefined ? [] : [ze];
   }
+}
+
+/** Vitrine sem desenhos nem palpites (testes e jogo sem os arquivos da vitrine): os números somem, nada quebra. */
+function vitrineSemConteudo(informacoes: InformacoesDoJogo): ConteudoDaVitrine {
+  return {
+    desenhos: undefined,
+    resumo: {},
+    nomesDasCategorias: informacoes.nomesDasCategorias,
+    palpitesDe: () => Promise.resolve(undefined),
+    sortear: () => 0,
+  };
 }
