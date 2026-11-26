@@ -16,17 +16,18 @@ Uso (a partir de `projeto_final/`): python scripts/figuras_do_banner.py
 """
 
 import json
+from html import escape
 from pathlib import Path
-
-from PIL import Image, ImageDraw, ImageFont
 
 PASTA_DE_SAIDA = Path("docs/banner/figuras")
 METRICAS_DAS_REDES = Path("notebooks/resultados/modelos_redes/metricas_redes.json")
 METRICAS_DO_SLM = Path("notebooks/resultados/rodada5/metricas_slm.json")
 
 PIXELS_POR_CM = 100
-ESCALA_FINAL = 1.5  # resolução da imagem salva em relação aos pixels lógicos
-SUPERAMOSTRAGEM = 2  # desenha com o dobro e reduz no fim, para suavizar as bordas
+# Para ler impresso a 1,5–2 m: linhas, contornos e pontos 1,5x mais grossos e letras 5% maiores (mais que isso, o texto encosta nas bordas das caixas) que no
+# desenho original (as coordenadas e o layout continuam os mesmos).
+FATOR_DE_ESPESSURA = 1.5
+FATOR_DE_TEXTO = 1.05
 AZUL_UNIRV = "#004AAD"
 AZUL_CLARO = "#E8F0FB"
 TINTA = "#111827"
@@ -35,41 +36,35 @@ LARANJA = "#D9822B"
 AZUL = "#1F6FBF"
 VERDE = "#2E8456"
 CINZA_AZULADO = "#A3AEBD"
-FONTES = {
-    "normal": ["segoeui.ttf", "arial.ttf"],
-    "negrito": ["segoeuib.ttf", "arialbd.ttf"],
-}
-
-
-def fonte(estilo: str, tamanho: int) -> ImageFont.FreeTypeFont:
-    for nome in FONTES[estilo]:
-        try:
-            return ImageFont.truetype(
-                nome, round(tamanho * SUPERAMOSTRAGEM * ESCALA_FINAL)
-            )
-        except OSError:
-            continue
-    raise SystemExit(
-        f"nenhuma fonte de {FONTES[estilo]} encontrada; instale uma delas ou ajuste FONTES"
-    )
-
-
-def ss(valor: float) -> int:
-    return round(valor * SUPERAMOSTRAGEM * ESCALA_FINAL)
+FAMILIA = "'Segoe UI', Arial, sans-serif"
+PESOS = {"normal": 400, "negrito": 700}
+# Âncoras no estilo do PIL (horizontal l/m/r + vertical a/m/s) traduzidas para SVG.
+ANCORA_HORIZONTAL = {"l": "start", "m": "middle", "r": "end"}
+# Distância da linha de base em relação ao ponto pedido, em frações do tamanho da letra (Segoe UI):
+# "a" = topo das letras, "m" = meio, "s" = a própria linha de base.
+DESLOCAMENTO_DA_BASE = {"a": 0.78, "m": 0.36, "s": 0.0}
+# Tamanho dos textos: 100 px lógicos por cm; o tamanho em "pt lógico" do desenho original vira px do SVG.
+PX_POR_PONTO = 1.0
 
 
 def virgula(valor: float, casas: int = 1) -> str:
     return f"{valor:.{casas}f}".replace(".", ",")
 
 
+def numero(valor: float) -> str:
+    return f"{valor:.1f}".rstrip("0").rstrip(".")
+
+
 class Quadro:
-    """Tela de desenho em pixels lógicos; cada chamada já aplica a escala e a superamostragem."""
+    """Figura vetorial (SVG) em pixels lógicos (100 por cm): nítida em qualquer tamanho de impressão."""
 
     def __init__(self, largura_cm: float, altura_cm: float) -> None:
+        self.largura_cm, self.altura_cm = largura_cm, altura_cm
         self.largura = round(largura_cm * PIXELS_POR_CM)
         self.altura = round(altura_cm * PIXELS_POR_CM)
-        self.imagem = Image.new("RGB", (ss(self.largura), ss(self.altura)), "white")
-        self.pincel = ImageDraw.Draw(self.imagem)
+        self.elementos: list[str] = [
+            f'<rect width="{self.largura}" height="{self.altura}" fill="white"/>'
+        ]
 
     def texto(
         self,
@@ -82,16 +77,24 @@ class Quadro:
         ancora: str = "la",
         contorno: int = 0,
     ) -> None:
-        """`contorno` > 0 desenha um halo branco, para o rótulo não ser riscado pela grade."""
-        self.pincel.text(
-            (ss(x), ss(y)),
-            texto,
-            font=fonte(estilo, tamanho),
-            fill=cor,
-            anchor=ancora,
-            stroke_width=ss(contorno),
-            stroke_fill="white",
+        """`contorno` > 0 desenha um halo branco por baixo, para o rótulo não ser riscado pela grade.
+
+        O PowerPoint ignora `dominant-baseline` e `paint-order` no SVG: a altura é ajustada aqui (a linha de
+        base fica abaixo do ponto pedido) e o halo é uma cópia branca desenhada antes do texto.
+        """
+        corpo = tamanho * FATOR_DE_TEXTO * PX_POR_PONTO
+        base = y + corpo * DESLOCAMENTO_DA_BASE[ancora[1]]
+        atributos = (
+            f'x="{numero(x)}" y="{numero(base)}" font-family="{FAMILIA}" font-weight="{PESOS[estilo]}"'
+            f' font-size="{numero(corpo)}" text-anchor="{ANCORA_HORIZONTAL[ancora[0]]}"'
         )
+        if contorno:
+            largura = numero(contorno * 2 * FATOR_DE_ESPESSURA)
+            self.elementos.append(
+                f'<text {atributos} fill="white" stroke="white" stroke-width="{largura}"'
+                f' stroke-linejoin="round">{escape(texto)}</text>'
+            )
+        self.elementos.append(f'<text {atributos} fill="{cor}">{escape(texto)}</text>')
 
     def retangulo(
         self,
@@ -101,28 +104,29 @@ class Quadro:
         raio: int = 0,
         espessura: int = 4,
     ) -> None:
-        esquerda, topo, direita, base = (ss(v) for v in caixa)
-        self.pincel.rounded_rectangle(
-            (esquerda, topo, direita, base),
-            radius=ss(raio),
-            fill=preenchimento,
-            outline=borda,
-            width=ss(espessura),
+        esquerda, topo, direita, base = caixa
+        traco = (
+            f' stroke="{borda}" stroke-width="{numero(espessura * FATOR_DE_ESPESSURA)}"'
+            if borda
+            else ""
+        )
+        self.elementos.append(
+            f'<rect x="{numero(esquerda)}" y="{numero(topo)}" width="{numero(direita - esquerda)}"'
+            f' height="{numero(base - topo)}" rx="{raio}" fill="{preenchimento}"{traco}/>'
         )
 
     def linha(
         self, pontos: list[tuple[float, float]], cor: str, espessura: int
     ) -> None:
-        self.pincel.line(
-            [(ss(x), ss(y)) for x, y in pontos],
-            fill=cor,
-            width=ss(espessura),
-            joint="curve",
+        caminho = " ".join(f"{numero(x)},{numero(y)}" for x, y in pontos)
+        self.elementos.append(
+            f'<polyline points="{caminho}" fill="none" stroke="{cor}"'
+            f' stroke-width="{numero(espessura * FATOR_DE_ESPESSURA)}" stroke-linecap="round" stroke-linejoin="round"/>'
         )
 
     def circulo(self, x: float, y: float, raio: int, cor: str) -> None:
-        self.pincel.ellipse(
-            (ss(x - raio), ss(y - raio), ss(x + raio), ss(y + raio)), fill=cor
+        self.elementos.append(
+            f'<circle cx="{numero(x)}" cy="{numero(y)}" r="{numero(raio * FATOR_DE_ESPESSURA)}" fill="{cor}"/>'
         )
 
     def seta(
@@ -138,16 +142,19 @@ class Quadro:
             (para[0] - 62, para[1] - 40),
             (para[0] - 62, para[1] + 40),
         ]
-        self.pincel.polygon([(ss(x), ss(y)) for x, y in ponta], fill=cor)
+        pontos = " ".join(f"{numero(x)},{numero(y)}" for x, y in ponta)
+        self.elementos.append(f'<polygon points="{pontos}" fill="{cor}"/>')
 
     def salvar(self, caminho: Path) -> None:
         caminho.parent.mkdir(parents=True, exist_ok=True)
-        tamanho = (
-            round(self.largura * ESCALA_FINAL),
-            round(self.altura * ESCALA_FINAL),
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.largura_cm}cm" height="{self.altura_cm}cm"'
+            f' viewBox="0 0 {self.largura} {self.altura}">\n'
+            + "\n".join(self.elementos)
+            + "\n</svg>\n"
         )
-        self.imagem.resize(tamanho, Image.LANCZOS).save(caminho, optimize=True)
-        print(f"{caminho}: {tamanho[0]}x{tamanho[1]}px")
+        caminho.write_text(svg, encoding="utf8", newline="\n")
+        print(f"{caminho}: {self.largura_cm} x {self.altura_cm} cm, vetorial")
 
 
 def caixa_com_titulo(
@@ -345,8 +352,8 @@ def resultados() -> Quadro:
 
 
 def main() -> None:
-    arquitetura().salvar(PASTA_DE_SAIDA / "arquitetura.png")
-    resultados().salvar(PASTA_DE_SAIDA / "resultados.png")
+    arquitetura().salvar(PASTA_DE_SAIDA / "arquitetura.svg")
+    resultados().salvar(PASTA_DE_SAIDA / "resultados.svg")
 
 
 if __name__ == "__main__":

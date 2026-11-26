@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="41.6cm" height="9.0cm" viewBox="0 0 4160 900">
+<rect width="4160" height="900" fill="white"/>
+<rect x="40" y="30" width="900" height="600" rx="36" fill="#E8F0FB" stroke="#004AAD" stroke-width="15"/>
+<rect x="40" y="30" width="900" height="150" rx="36" fill="#004AAD"/>
+<rect x="40" y="120" width="900" height="60" rx="0" fill="#004AAD"/>
+<text x="490" y="138.3" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="92.4" text-anchor="middle" fill="white">1. Desenho</text>
+<text x="490" y="314.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">Mouse ou mão no ar</text>
+<text x="490" y="439.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">(webcam + MediaPipe)</text>
+<text x="490" y="564.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">20 s, traço a traço</text>
+<polyline points="954,330 1036,330" fill="none" stroke="#111827" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="1076,330 1014,290 1014,370" fill="#111827"/>
+<rect x="1090" y="30" width="900" height="600" rx="36" fill="#E8F0FB" stroke="#004AAD" stroke-width="15"/>
+<rect x="1090" y="30" width="900" height="150" rx="36" fill="#004AAD"/>
+<rect x="1090" y="120" width="900" height="60" rx="0" fill="#004AAD"/>
+<text x="1540" y="138.3" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="92.4" text-anchor="middle" fill="white">2. Redes neurais</text>
+<text x="1540" y="314.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">CNN: imagem 28×28</text>
+<text x="1540" y="439.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">LSTM: sequência</text>
+<text x="1540" y="564.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">Ensemble: média</text>
+<polyline points="2004,330 2086,330" fill="none" stroke="#111827" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="2126,330 2064,290 2064,370" fill="#111827"/>
+<rect x="2140" y="30" width="900" height="600" rx="36" fill="#E8F0FB" stroke="#004AAD" stroke-width="15"/>
+<rect x="2140" y="30" width="900" height="150" rx="36" fill="#004AAD"/>
+<rect x="2140" y="120" width="900" height="60" rx="0" fill="#004AAD"/>
+<text x="2590" y="138.3" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="92.4" text-anchor="middle" fill="white">3. Regra fixa</text>
+<text x="2590" y="314.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">Acertou, quase, errou</text>
+<text x="2590" y="439.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">+ pontuação fixa</text>
+<text x="2590" y="564.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">(não depende do Zé)</text>
+<polyline points="3054,330 3136,330" fill="none" stroke="#111827" stroke-width="27" stroke-linecap="round" stroke-linejoin="round"/>
+<polygon points="3176,330 3114,290 3114,370" fill="#111827"/>
+<rect x="3190" y="30" width="900" height="600" rx="36" fill="#E8F0FB" stroke="#004AAD" stroke-width="15"/>
+<rect x="3190" y="30" width="900" height="150" rx="36" fill="#004AAD"/>
+<rect x="3190" y="120" width="900" height="60" rx="0" fill="#004AAD"/>
+<text x="3640" y="138.3" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="92.4" text-anchor="middle" fill="white">4. Zé do Rabisco</text>
+<text x="3640" y="314.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">Qwen3-1,7B + QLoRA</text>
+<text x="3640" y="439.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">GGUF Q8_0 (llama.cpp)</text>
+<text x="3640" y="564.5" font-family="'Segoe UI', Arial, sans-serif" font-weight="400" font-size="81.9" text-anchor="middle" fill="#111827">charada e narração</text>
+<text x="2080" y="796.8" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="88.2" text-anchor="middle" fill="#004AAD">Tudo offline: redes no navegador (ONNX) e SLM em CPU, sem internet e sem GPU</text>
+</svg>
