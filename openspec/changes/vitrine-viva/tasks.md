@@ -15,10 +15,10 @@
 
 ## 3. Aplicação e infraestrutura
 
-- [ ] 3.1 Teste falhando para o caso de uso de palpites por prefixo (frações 0,25/0,5/0,75/1,0; top-3 CNN, LSTM e ensemble; erro do classificador vira "sem palpites") com classificador falso; implementar
-- [ ] 3.2 Teste falhando para `ResumoDaVitrine` lido das métricas (cada campo opcional; "92,4%" e "94,7%" com os valores da spec; campo ausente omitido); implementar
-- [ ] 3.3 Adaptador que lê `vitrine_tracos.json` e `ficha_da_vitrine.json` com erro como valor; testes com arquivo ausente e malformado
-- [ ] 3.4 Script de verificação gera `ficha_da_vitrine.json` (contagem de testes Python/TS e tamanho do GGUF); teste do formato
+- [x] 3.1 Teste falhando para o caso de uso de palpites por prefixo (frações 0,25/0,5/0,75/1,0; top-3 CNN, LSTM e ensemble; erro do classificador vira "sem palpites") com classificador falso; implementar
+- [x] 3.2 Teste falhando para `ResumoDaVitrine` lido das métricas (cada campo opcional; "92,4%" e "94,7%" com os valores da spec; campo ausente omitido); implementar
+- [x] 3.3 Adaptador que lê `vitrine_tracos.json` e `ficha_da_vitrine.json` com erro como valor; testes com arquivo ausente e malformado
+- [x] 3.4 Script de verificação gera `ficha_da_vitrine.json` (contagem de testes Python/TS e tamanho do GGUF); teste do formato
 
 ## 4. Base da apresentação
 
