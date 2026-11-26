@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { carregamentosExternos, enderecosExternos, TEXTOS_DE_TERCEIROS_PERMITIDOS } from "./enderecos";
+import { carregamentosExternos, citacaoPermitida, enderecosExternos } from "./enderecos";
 
 // Spec `interface-do-jogo`, requisito "Funcionamento offline". O `scripts/verificar.sh` faz o build antes
 // dos testes, então lá o `dist/` sempre existe; sem build, só a parte do dist é pulada.
@@ -47,6 +47,14 @@ describe("varredura de endereços", () => {
   });
 });
 
+describe("procedência de vídeo gerado por IA", () => {
+  it("prefixos C2PA só valem em vídeo; em outro arquivo, o mesmo endereço reprova", () => {
+    expect(citacaoPermitida("dist/vitrine/fundo.mp4", "http://pki.goog/c2pa/root-g3.crt0")).toBe(true);
+    expect(citacaoPermitida("dist/assets/index.js", "http://pki.goog/c2pa/root-g3.crt0")).toBe(false);
+    expect(citacaoPermitida("dist/vitrine/fundo.mp4", "https://cdn.exemplo.com/a.js")).toBe(false);
+  });
+});
+
 describe("funcionamento offline", () => {
   it("o código do jogo (src/ e index.html) não contém endereços externos", () => {
     const doJogo = [...arquivos(join(RAIZ_DO_APP, "src")), join(RAIZ_DO_APP, "index.html")].filter(
@@ -62,8 +70,10 @@ describe("funcionamento offline", () => {
   it.skipIf(!existsSync(PASTA_DO_BUILD))(
     "endereço externo novo no build reprova: só a lista fechada de textos de terceiros é aceita",
     () => {
-      const novos = porArquivo(arquivos(PASTA_DO_BUILD), (texto) =>
-        enderecosExternos(texto).filter((url) => !TEXTOS_DE_TERCEIROS_PERMITIDOS.has(url)),
+      const novos = arquivos(PASTA_DO_BUILD).flatMap((caminho) =>
+        enderecosExternos(conteudo(caminho))
+          .filter((url) => !citacaoPermitida(caminho, url))
+          .map((url) => `${relative(RAIZ_DO_APP, caminho)}: ${url}`),
       );
       expect(novos).toEqual([]);
     },

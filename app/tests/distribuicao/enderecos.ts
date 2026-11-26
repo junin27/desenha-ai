@@ -64,4 +64,26 @@ export const TEXTOS_DE_TERCEIROS_PERMITIDOS: ReadonlySet<string> = new Set([
   // Registro de uso do MediaPipe (POST a cada 60 s): bloqueado pela política de conteúdo do build
   // (connect-src só localhost), conferida em politica-de-conteudo.test.ts.
   "https://odml.pa.googleapis.com/v1/log",
+  // GSAP (change vitrine-viva): aviso de licença no console e identificadores de namespace (não são carregamentos).
+  "https://gsap.com",
+  "http://www.w3.org/1999/xhtml",
+  "http://www.w3.org/2000/svg",
 ]);
+
+/**
+ * Credenciais de conteúdo (C2PA) que o Google grava nos vídeos gerados por IA (o fundo da roça da vitrine veio do
+ * Google Flow/Veo). São certificados e o rótulo IPTC "trainedAlgorithmicMedia", que declaram que a mídia é gerada
+ * por IA: texto dentro do binário, nunca carregado. Aceitos só em vídeos, e só com estes prefixos.
+ */
+export const PROCEDENCIA_DE_VIDEO_GERADO_POR_IA: readonly string[] = [
+  "http://pki.goog/c2pa/",
+  "http://c2pa-ocsp.pki.goog/",
+  "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+];
+
+export function citacaoPermitida(arquivo: string, url: string): boolean {
+  if (TEXTOS_DE_TERCEIROS_PERMITIDOS.has(url)) return true;
+  return (
+    arquivo.endsWith(".mp4") && PROCEDENCIA_DE_VIDEO_GERADO_POR_IA.some((prefixo) => url.startsWith(prefixo))
+  );
+}
