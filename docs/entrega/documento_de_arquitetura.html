@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Desenha Aí, Sô! — Documento de Engenharia</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; line-height: 1.42; color: #222; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 2mm; color: #5c3b1e; }
+  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; color: #b5401f; border-bottom: 1.5px solid #e6d3b3; padding-bottom: 1mm; }
+  h3 { font-size: 11pt; margin: 4mm 0 1.5mm; color: #5c3b1e; }
+  p { margin: 0 0 2.2mm; text-align: justify; }
+  ul, ol { margin: 0 0 2.5mm; padding-left: 5.5mm; }
+  li { margin-bottom: 1mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1mm 0 3mm; font-size: 9.6pt; }
+  th, td { border: 1px solid #d9c7a7; padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f6ecd9; }
+  .subtitulo { color: #666; margin-bottom: 4mm; }
+  .quebra { break-before: page; }
+  .figura { text-align: center; margin: 2mm 0 3mm; }
+  .legenda { font-size: 9pt; color: #555; text-align: center; margin-top: 1mm; }
+  code { font-family: Consolas, monospace; font-size: 9.2pt; background: #f6f1e7; padding: 0 1mm; }
+  .ok { color: #2f7d32; font-weight: 600; }
+  .falta { color: #b5401f; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Desenha Aí, Sô!</h1>
+<div class="subtitulo">Documento de engenharia e arquitetura · 5º Workshop de IA da FASOFT/UniRV · 30/11/2026</div>
+
+<h2>1. Identificação do projeto</h2>
+<table>
+  <tr><th style="width:32%">Título</th><td>Desenha Aí, Sô!: redes neurais que adivinham seu rabisco e um SLM caipira que julga e narra</td></tr>
+  <tr><th>Trilha tecnológica</th><td><b>Híbrida: Redes Neurais + SLM.</b> Uma CNN e uma LSTM reconhecem o desenho; um SLM destilado e quantizado (o "Zé do Rabisco") cria charadas, julga e narra.</td></tr>
+  <tr><th>Integrantes</th><td><b>Gilberto Aparecido Dias Junior</b> (projeto individual): todas as funções. Especificação (OpenSpec), coleta e preparação dos dados, treino das redes e do SLM no Google Colab, desenvolvimento do jogo web, testes, preparação da demo e material de divulgação (banner e pitch).</td></tr>
+  <tr><th>Disciplinas</th><td>Redes Neurais · Pequenos Modelos de Linguagem e IA Corporativa (TES 2) · Prof. Sandro Silva Moreira</td></tr>
+  <tr><th>Repositório</th><td>https://github.com/junin27/desenha-ai (branch <code>main</code>)</td></tr>
+</table>
+
+<h2>2. Descritivo técnico da solução</h2>
+
+<h3>2.1 Problema e público-alvo</h3>
+<p>Redes neurais e modelos de linguagem costumam ser apresentados como caixas-pretas, em slides ou gráficos que não prendem a atenção de quem passa por uma feira. O projeto transforma esses conceitos numa brincadeira de 1 minuto: o visitante <b>vê ao vivo</b> duas redes neurais tentando adivinhar o que ele desenha e um modelo de linguagem pequeno conversando com ele, tudo rodando num notebook comum, <b>sem internet e sem placa de vídeo</b>. Isso mostra, na prática, que IA útil pode rodar localmente, com privacidade e baixo custo.</p>
+<p><b>Público da demonstração:</b> visitantes do workshop (estudantes, professores, comunidade), de qualquer idade e sem conhecimento técnico. Quem quiser se aprofundar abre o painel técnico (F2) e a "vitrine" de abertura, que explica cada parte com as redes reais funcionando e os números lidos dos arquivos de métricas.</p>
+
+<h3>2.2 Funcionamento e fluxo de uso</h3>
+<ol>
+  <li><b>Vitrine:</b> a primeira tela conta, em 11 capítulos navegados pela roda do mouse, como o jogo funciona por dentro (CNN, LSTM, SLM, destilação, QLoRA, quantização). O botão "Jogar" leva ao jogo.</li>
+  <li><b>Apelido:</b> o visitante digita um apelido para o placar.</li>
+  <li><b>Charada:</b> o Zé do Rabisco cria uma charada com sotaque goiano cuja resposta é uma das 30 categorias (ex.: vaca, trator, violão, fogueira). Se o SLM não responder a tempo, entra uma charada pronta da reserva.</li>
+  <li><b>Desenho (20 s):</b> o visitante desenha a resposta com o mouse, a caneta ou <b>a mão no ar pela webcam</b> (o MediaPipe localiza os pontos da mão e o gesto de pinça liga e desliga o traço).</li>
+  <li><b>Reconhecimento em tempo real:</b> a cada traço, o desenho passa pelo mesmo pré-processamento do treino; a CNN recebe a imagem 28×28 e a LSTM a sequência de traços. O ensemble mostra o top-3 ao vivo, em barras.</li>
+  <li><b>Veredito:</b> uma regra determinística decide "acertou", "quase" (resposta no top-3) ou "errou" e soma os pontos. O Zé recebe as probabilidades e narra o resultado como um locutor de rodeio, em texto e em voz (síntese de fala do navegador).</li>
+  <li><b>Placar:</b> após 3 rodadas o visitante vê sua pontuação no ranking do estande. Ele também pode fazer perguntas ao Zé.</li>
+</ol>
+
+<h3>2.3 Stack tecnológica e modelos</h3>
+<table>
+  <tr><th style="width:24%">Camada</th><th>Tecnologias</th></tr>
+  <tr><td>Treino das redes</td><td>Python, <b>PyTorch</b>, Google Colab (GPU T4), exportação para <b>ONNX</b>; pacote próprio <code>desenha_ml</code> (pré-processamento, regras e curadoria, com pytest e mypy --strict)</td></tr>
+  <tr><td>SLM (Zé do Rabisco)</td><td><b>Qwen3-1.7B</b> + <b>Unsloth</b> (QLoRA sobre o modelo em 4 bits, LoRA r = 16, 1,01% dos parâmetros treináveis), exportado para <b>GGUF Q8_0</b> (1,83 GB) e servido pelo <b>llama.cpp</b> (<code>llama-server</code>) em CPU</td></tr>
+  <tr><td>Destilação</td><td>Teacher: LLM <b>Gemini</b> via API (gemini-3.5-flash-lite), com Evol-Instruct e Chain-of-Thought; destilação em nível de sequência (a API não expõe logits)</td></tr>
+  <tr><td>Jogo (front-end)</td><td><b>TypeScript</b> + Vite, arquitetura hexagonal; <b>onnxruntime-web</b> (redes no navegador, WebAssembly); <b>MediaPipe Tasks Vision</b> (Hand Landmarker); Web Speech API (voz Microsoft Maria); GSAP (animações da vitrine); Vitest e ESLint</td></tr>
+  <tr><td>Processo</td><td><b>OpenSpec</b> (especificação antes do código) e TDD; Git/GitHub</td></tr>
+</table>
+<table>
+  <tr><th style="width:24%">Modelo</th><th>Arquitetura</th><th style="width:30%">Resultado no conjunto de teste</th></tr>
+  <tr><td>CNN</td><td>Convoluções com blocos residuais sobre a imagem 28×28</td><td>acurácia 92,4% · top-3 98,8%</td></tr>
+  <tr><td>LSTM</td><td>Recorrente bidirecional sobre a sequência de pontos (Δx, Δy, fim de traço)</td><td>acurácia 92,8% · top-3 98,9%</td></tr>
+  <tr><td>Ensemble</td><td>Média ponderada das probabilidades (peso 0,5 para cada rede)</td><td>acurácia <b>94,7%</b> · top-3 99,3% · 78,6% com só metade do desenho</td></tr>
+  <tr><td>Zé do Rabisco</td><td>Qwen3-1.7B destilado + QLoRA, GGUF Q8_0</td><td>formato 100% e acerto de 100% em charada, veredito e pergunta (46 exemplos); o Qwen3 base: 78% de formato e 0% em charada e veredito. Perplexidade de validação: 88,4 → 7,8</td></tr>
+</table>
+
+<h3>2.4 Bases de dados e fontes de conhecimento</h3>
+<ul>
+  <li><b>Google Quick, Draw!</b> (CC BY 4.0): 30 categorias do universo caipira e do cotidiano, 9.000 desenhos por categoria no treino, com divisão em treino, validação e teste.</li>
+  <li><b>Dataset destilado do Zé:</b> 455 exemplos aprovados por curadoria automática (363 treino, 46 validação, 46 teste) para três tarefas: criar charada, dar veredito e responder pergunta, gerados pelo Teacher a partir de sementes ampliadas com Evol-Instruct.</li>
+  <li><b>Charadas de reserva:</b> geradas no mesmo processo e embutidas no jogo, usadas quando o SLM não responde.</li>
+  <li>Sem RAG, banco vetorial ou API externa na demonstração: <b>tudo roda offline</b>.</li>
+</ul>
+
+<h2 class="quebra">3. Diagrama de arquitetura do sistema</h2>
+<div class="figura">
+<svg viewBox="0 0 760 700" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5c3b1e"/>
+    </marker>
+    <marker id="setaCinza" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+  </defs>
+  <style>
+    .faixa { stroke-width: 1.5; rx: 10; }
+    .rotulo { font-size: 13px; font-weight: 700; fill: #5c3b1e; }
+    .halo { paint-order: stroke; stroke: #ffffff; stroke-width: 5px; stroke-linejoin: round; }
+    .caixa { fill: #fff; stroke: #5c3b1e; stroke-width: 1.3; rx: 7; }
+    .t { font-size: 11px; fill: #222; }
+    .tb { font-size: 11.5px; font-weight: 700; fill: #222; }
+    .p { font-size: 10px; fill: #555; }
+    .linha { stroke: #5c3b1e; stroke-width: 1.6; fill: none; marker-end: url(#seta); }
+    .linhaCinza { stroke: #888; stroke-width: 1.3; fill: none; stroke-dasharray: 5 4; marker-end: url(#setaCinza); }
+  </style>
+
+  <!-- Faixa 1: entrada -->
+  <rect x="10" y="10" width="740" height="110" class="faixa" fill="#eef5fb" stroke="#7aa6c9"/>
+  <rect x="22" y="42" width="170" height="66" class="caixa"/>
+  <text x="32" y="62" class="tb">Mouse ou caneta</text><text x="32" y="78" class="t">traços (x, y, tempo)</text><text x="32" y="94" class="p">canvas do jogo</text>
+  <rect x="204" y="42" width="170" height="66" class="caixa"/>
+  <text x="214" y="62" class="tb">Webcam</text><text x="214" y="78" class="t">MediaPipe Hand Landmarker</text><text x="214" y="94" class="p">pinça = caneta no ar</text>
+  <rect x="386" y="42" width="170" height="66" class="caixa"/>
+  <text x="396" y="62" class="tb">Teclado</text><text x="396" y="78" class="t">apelido e perguntas ao Zé</text><text x="396" y="94" class="p">roda do mouse na vitrine</text>
+  <rect x="568" y="42" width="170" height="66" class="caixa"/>
+  <text x="578" y="62" class="tb">Vitrine e painel F2</text><text x="578" y="78" class="t">explicação técnica ao vivo</text><text x="578" y="94" class="p">números das métricas</text>
+
+  <!-- Faixa 2: orquestração -->
+  <rect x="10" y="140" width="740" height="190" class="faixa" fill="#fbf4e6" stroke="#d1a85e"/>
+  <rect x="22" y="172" width="230" height="74" class="caixa"/>
+  <text x="32" y="192" class="tb">Pré-processamento</text><text x="32" y="208" class="t">rasterização 28×28 e sequência</text><text x="32" y="223" class="p">igual ao treino (contrato Python ↔ TS)</text><text x="32" y="237" class="p">a cada traço novo</text>
+  <rect x="265" y="172" width="230" height="74" class="caixa"/>
+  <text x="275" y="192" class="tb">Casos de uso da rodada</text><text x="275" y="208" class="t">charada → 20 s de desenho → veredito</text><text x="275" y="223" class="p">3 rodadas por visitante</text><text x="275" y="237" class="p">ensemble: média das probabilidades</text>
+  <rect x="508" y="172" width="230" height="74" class="caixa"/>
+  <text x="518" y="192" class="tb">Prompt do Zé + leitura da fala</text><text x="518" y="208" class="t">ChatML com top-3 e tarefa</text><text x="518" y="223" class="p">parser valida o formato da resposta</text><text x="518" y="237" class="p">timeout → contingência</text>
+  <rect x="22" y="256" width="350" height="62" class="caixa"/>
+  <text x="32" y="276" class="tb">Regra do veredito (determinística)</text><text x="32" y="292" class="t">acertou (top-1) · quase (top-3) · errou</text><text x="32" y="307" class="p">define os pontos; o Zé só narra (placar justo)</text>
+  <rect x="388" y="256" width="350" height="62" class="caixa"/>
+  <text x="398" y="276" class="tb">Contingência e placar</text><text x="398" y="292" class="t">charadas e narrações de reserva embutidas</text><text x="398" y="307" class="p">placar salvo no navegador (localStorage)</text>
+
+  <!-- Faixa 3: inferência -->
+  <rect x="10" y="350" width="740" height="150" class="faixa" fill="#eef7ee" stroke="#7fb27f"/>
+  <rect x="22" y="382" width="170" height="106" class="caixa"/>
+  <text x="32" y="402" class="tb">CNN (ONNX)</text><text x="32" y="418" class="t">imagem 28×28</text><text x="32" y="434" class="p">blocos residuais</text><text x="32" y="450" class="p">onnxruntime-web (WASM)</text><text x="32" y="466" class="p">no navegador</text>
+  <rect x="204" y="382" width="170" height="106" class="caixa"/>
+  <text x="214" y="402" class="tb">LSTM (ONNX)</text><text x="214" y="418" class="t">sequência de traços</text><text x="214" y="434" class="p">bidirecional</text><text x="214" y="450" class="p">onnxruntime-web (WASM)</text><text x="214" y="466" class="p">no navegador</text>
+  <rect x="386" y="382" width="170" height="106" class="caixa"/>
+  <text x="396" y="402" class="tb">Zé do Rabisco</text><text x="396" y="418" class="t">Qwen3-1.7B destilado</text><text x="396" y="434" class="p">QLoRA · GGUF Q8_0 (1,83 GB)</text><text x="396" y="450" class="p">llama-server :8080</text><text x="396" y="466" class="p">(também serve o jogo)</text>
+  <rect x="568" y="382" width="170" height="106" class="caixa"/>
+  <text x="578" y="402" class="tb">Qwen3-1.7B base</text><text x="578" y="418" class="t">mesmo tamanho, sem ajuste</text><text x="578" y="434" class="p">GGUF Q8_0 · :8081</text><text x="578" y="450" class="p">comparação base × destilado</text><text x="578" y="466" class="p">no painel técnico</text>
+
+  <!-- Faixa 4: saída -->
+  <rect x="10" y="520" width="740" height="92" class="faixa" fill="#fbecea" stroke="#d48a7a"/>
+  <rect x="22" y="550" width="170" height="52" class="caixa"/><text x="32" y="570" class="tb">Top-3 ao vivo</text><text x="32" y="586" class="p">barras de probabilidade</text>
+  <rect x="204" y="550" width="170" height="52" class="caixa"/><text x="214" y="570" class="tb">Veredito e pontos</text><text x="214" y="586" class="p">acertou · quase · errou</text>
+  <rect x="386" y="550" width="170" height="52" class="caixa"/><text x="396" y="570" class="tb">Narração do Zé</text><text x="396" y="586" class="p">texto + voz pt-BR</text>
+  <rect x="568" y="550" width="170" height="52" class="caixa"/><text x="578" y="570" class="tb">Placar do estande</text><text x="578" y="586" class="p">ranking dos visitantes</text>
+
+  <!-- Fluxos principais: setas retas entre camadas, com o dado que passa -->
+  <style>.dado { font-size: 9.5px; fill: #7a4a1e; font-style: italic; }</style>
+  <path d="M107,108 L107,140" class="linha"/><text x="112" y="130" class="dado">traços</text>
+  <path d="M289,108 L289,128 L150,128 L150,140" class="linha"/><text x="190" y="124" class="dado">pontos da mão</text>
+  <path d="M471,108 L471,170" class="linha"/><text x="476" y="130" class="dado">apelido, pergunta</text>
+  <path d="M252,209 L263,209" class="linha"/>
+  <path d="M495,209 L506,209" class="linha"/>
+  <path d="M107,330 L107,350" class="linha"/><text x="112" y="343" class="dado">imagem 28×28</text>
+  <path d="M289,330 L289,350" class="linha"/><text x="294" y="343" class="dado">sequência</text>
+  <path d="M623,330 L623,340 L471,340 L471,350" class="linha"/><text x="630" y="345" class="dado">prompt ChatML + top-3</text>
+  <path d="M556,435 L566,435" class="linhaCinza"/>
+  <path d="M107,500 L107,520" class="linha"/><text x="112" y="515" class="dado">probabilidades</text>
+  <path d="M289,500 L289,520" class="linha"/><text x="294" y="515" class="dado">top-1 / top-3</text>
+  <path d="M471,500 L471,520" class="linha"/><text x="476" y="515" class="dado">fala do Zé</text>
+  <path d="M700,330 L700,336 L745,336 L745,508 L653,508 L653,520" class="linha"/><text x="660" y="517" class="dado">pontos</text>
+
+  <!-- Treino (fora da demo) -->
+  <rect x="10" y="630" width="740" height="62" rx="10" fill="#f3f3f3" stroke="#999" stroke-dasharray="5 4"/>
+  <text x="22" y="668" class="t">Quick, Draw! (30 categorias × 9.000) → PyTorch → cnn.onnx + lstm.onnx · Gemini (Teacher, CoT) → 455 exemplos → Unsloth QLoRA → GGUF Q8_0</text>
+  <text x="22" y="684" class="p">Os artefatos treinados são copiados para a pasta da demo; no estande nada é baixado.</text>
+  <!-- títulos das faixas por cima das setas -->
+  <text x="22" y="30" class="rotulo halo">1 · Interface / Entrada (navegador em tela cheia)</text>
+  <text x="22" y="160" class="rotulo halo">2 · Orquestração e processamento (TypeScript, arquitetura hexagonal)</text>
+  <text x="22" y="370" class="rotulo halo">3 · Inferência / modelos (tudo local, em CPU, sem internet)</text>
+  <text x="22" y="540" class="rotulo halo">4 · Saída / ação</text>
+  <text x="22" y="650" class="rotulo halo" fill="#555">Treino (antes do evento, Google Colab GPU T4)</text>
+</svg>
+</div>
+<div class="legenda">Figura 1. Arquitetura do Desenha Aí, Sô! Setas: fluxo de dados numa partida, com o dado que passa entre as camadas. Tracejado: comparação com o modelo base e treino fora da demo.</div>
+
+<p><b>Principais fluxos.</b> (1) <b>Reconhecimento:</b> cada traço do mouse, da caneta ou da mão (MediaPipe) é convertido pelo pré-processamento, que é idêntico ao do treino e garantido por um teste de contrato entre Python e TypeScript, em uma imagem 28×28 para a CNN e uma sequência para a LSTM. As duas redes rodam no próprio navegador via onnxruntime-web, e o ensemble devolve o top-3 em poucos milissegundos, atualizado enquanto o visitante desenha. (2) <b>Linguagem:</b> o caso de uso da rodada monta um prompt ChatML com a tarefa (charada, veredito ou pergunta) e as probabilidades das redes e o envia ao <code>llama-server</code> local, que executa o Zé destilado em GGUF Q8_0 na CPU. A resposta é validada por um parser; se falhar ou demorar, entra a contingência com falas prontas, e o jogo nunca trava. (3) <b>Decisão e saída:</b> os pontos vêm de uma regra determinística (top-1 acerta, top-3 é "quase"), não do SLM, para o placar ser justo; o Zé apenas narra o resultado em texto e voz, e o placar é guardado no navegador. O Qwen3 base roda em paralelo (porta 8081) só para a comparação "base × destilado" no painel técnico.</p>
+
+<h2>4. Status atual e próximos passos</h2>
+
+<h3>4.1 Implementado e validado</h3>
+<ul>
+  <li><span class="ok">✔</span> Dados do Quick, Draw! coletados, CNN e LSTM treinadas e exportadas para ONNX, com critério mínimo aprovado (ensemble 94,7% ≥ 85%; cada rede ≥ 80%).</li>
+  <li><span class="ok">✔</span> Paridade das redes conferida: as saídas no navegador diferem das do PyTorch em no máximo 6·10⁻⁷ em 8 desenhos de referência.</li>
+  <li><span class="ok">✔</span> Dataset destilado (455 exemplos) e fine-tuning QLoRA do Zé: a 5ª rodada passou em todos os critérios (formato ≥ 95%, charada ≥ 85%, veredito ≥ 90%, pergunta ≥ 85% e melhor que o modelo base).</li>
+  <li><span class="ok">✔</span> Quantização GGUF Q8_0 rodando em CPU no llama.cpp; a demo sobe com um clique (<code>Iniciar Desenha Aí.bat</code>) e um verificador automático (<code>Conferir Desenha Aí.bat</code>) checa arquivos, portas, memória, voz e uma fala real do Zé.</li>
+  <li><span class="ok">✔</span> Jogo completo: charada, desenho por mouse, caneta ou mão (webcam), palpites ao vivo, veredito, narração com voz, placar, contingência offline e vitrine explicativa.</li>
+  <li><span class="ok">✔</span> Qualidade: 485 testes em Python e 720 em TypeScript passando, tipagem estrita (mypy --strict e TypeScript strict), lint e especificações OpenSpec validadas.</li>
+  <li><span class="ok">✔</span> Banner do evento montado no modelo oficial.</li>
+</ul>
+
+<h3>4.2 O que falta para a demonstração</h3>
+<ul>
+  <li><span class="falta">☐</span> Últimos ajustes visuais da vitrine (transição do primeiro capítulo e itens restantes da especificação <code>vitrine-viva</code>).</li>
+  <li><span class="falta">☐</span> Medir a taxa de quadros da câmera no notebook do evento (desenho com a mão).</li>
+  <li><span class="falta">☐</span> Ensaio geral em 29/11: partida completa de 3 rodadas, painel técnico aberto e comparação base × destilado.</li>
+  <li><span class="falta">☐</span> Preparar o notebook do estande: voz pt-BR (Microsoft Maria), portas 8080/8081 livres, modo de alto desempenho e Wi-Fi desligado no teste.</li>
+  <li><span class="falta">☐</span> Imprimir o banner.</li>
+</ul>
+
+<h3>4.3 Gargalos e desafios técnicos</h3>
+<ul>
+  <li><b>Treino sem GPU local:</b> a placa da máquina de desenvolvimento (RTX 3050, 4 GB) não comporta o QLoRA do Qwen3-1.7B; todo o treino foi feito no Colab, o que exige empacotar a lógica (<code>desenha_ml</code>) e baixar os artefatos a cada rodada.</li>
+  <li><b>Fine-tuning do SLM:</b> as quatro primeiras rodadas foram reprovadas (o formato da resposta quebrava e as charadas não seguiam a regra). Foram necessárias mudanças no dataset e no treino até a 5ª rodada passar em todos os critérios.</li>
+  <li><b>Quantização × qualidade:</b> o GGUF Q4_K_M (1,1 GB) quebrava o formato das falas do Zé; a demo usa o Q8_0 (1,83 GB), que mantém a qualidade e ainda cabe na memória do notebook.</li>
+  <li><b>Destilação sem logits:</b> a API do Teacher não expõe logits, então a destilação é em nível de sequência (o aluno imita as respostas do professor), e não por divergência KL.</li>
+  <li><b>Mesmo pré-processamento em duas linguagens:</b> canvas e OpenCV desenham com antialiasing diferente, o que geraria diferença entre treino e jogo. A solução foi uma rasterização própria, implementada em Python e em TypeScript e verificada por testes de contrato.</li>
+  <li><b>Desempenho num notebook sem GPU:</b> as animações da vitrine e o SLM disputam a CPU. A vitrine mede a taxa de quadros e troca para cortes diretos abaixo de 30 fps; o SLM tem contingência por tempo limite.</li>
+  <li><b>Ponto de orientação desejado:</b> como medir, no estande, se o público entendeu a diferença entre o modelo base e o destilado (hoje mostrada lado a lado no painel técnico).</li>
+</ul>
+
+</body>
+</html>
