@@ -2,6 +2,8 @@
 .tela-vitrine {
   position: fixed;
   inset: 0;
+  /* a regra geral .tela limita a 1600 px; a vitrine cobre a janela inteira em qualquer tamanho */
+  width: 100%;
   overflow: hidden;
   background: var(--papel);
   z-index: 5;
@@ -32,6 +34,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* véu na cor do objeto do portal, por cima de tudo da cena seguinte */
+.veu-do-portal {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
 }
 .objeto-do-portal {
   position: absolute;
