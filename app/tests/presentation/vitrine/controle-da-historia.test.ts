@@ -5,7 +5,9 @@ import {
   ControleDaHistoria,
   DURACAO_DA_HISTORIA,
   ligarEntrada,
+  PARADAS_DOS_CAPITULOS,
 } from "../../../src/presentation/vitrine/controle-da-historia";
+import { CAPITULOS } from "../../../src/domain/vitrine/capitulos";
 
 class RelogioFalso {
   ms = 0;
@@ -23,21 +25,62 @@ function rodar(controle: ControleDaHistoria, relogio: RelogioFalso, ms: number):
 }
 
 describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", () => {
-  it("test_avancar_com_a_tecla_tres_toques_avancam_9_segundos", () => {
+  it("test_avancar_com_a_tecla_vai_ate_a_parada_do_jogo", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
     ligarEntrada(window, controle, () => true);
-    for (let i = 0; i < 3; i++) window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
-    expect(rodar(controle, relogio, 3000)).toBeCloseTo(9, 1);
+    rodar(controle, relogio, 6000);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
+    expect(capituloEm(controle.segundos)).toBe("jogo");
   });
 
-  it("test_seta_para_cima_volta", () => {
+  it("test_seta_para_cima_volta_a_parada_anterior", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
-    controle.irPara(20);
+    controle.irPara(PARADAS_DOS_CAPITULOS[2] ?? -1);
     ligarEntrada(window, controle, () => true);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageUp" }));
-    expect(rodar(controle, relogio, 3000)).toBeCloseTo(17, 1);
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
+  });
+
+  it("test_varios_giros_da_roda_no_mesmo_gesto_avancam_um_capitulo", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    ligarEntrada(window, controle, () => true);
+    rodar(controle, relogio, 6000);
+    for (let i = 0; i < 12; i++) {
+      window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+      rodar(controle, relogio, 30);
+    }
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
+  });
+
+  it("test_dois_gestos_separados_da_roda_avancam_dois_capitulos", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    ligarEntrada(window, controle, () => true);
+    rodar(controle, relogio, 6000);
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+    rodar(controle, relogio, 800);
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+    expect(rodar(controle, relogio, 10_000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[2] ?? -1, 5);
+  });
+
+  it("test_passagem_toca_inteira_sem_pular_quadros", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    rodar(controle, relogio, 6000);
+    controle.avancarCapitulo();
+    let anterior = controle.segundos;
+    let maiorSalto = 0;
+    for (let i = 0; i < 400; i++) {
+      relogio.ms += 16;
+      const agora = controle.passo();
+      maiorSalto = Math.max(maiorSalto, Math.abs(agora - anterior));
+      anterior = agora;
+    }
+    expect(maiorSalto).toBeLessThan(0.05);
   });
 
   it("test_rodinha_nao_rola_a_pagina", () => {
@@ -48,36 +91,28 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
     expect(rodinha.defaultPrevented).toBe(true);
     expect(window.scrollY).toBe(0);
   });
+
+  it("test_cada_capitulo_tem_uma_parada_em_ordem_dentro_dele", () => {
+    expect(PARADAS_DOS_CAPITULOS).toHaveLength(11);
+    PARADAS_DOS_CAPITULOS.forEach((parada, indice) => {
+      expect(capituloEm(parada)).toBe(CAPITULOS[indice]?.id);
+    });
+    expect(PARADAS_DOS_CAPITULOS.at(-1)).toBe(DURACAO_DA_HISTORIA);
+  });
 });
 
-describe("Requisito: História anda sozinha (spec vitrine-da-abertura)", () => {
-  it("test_visitante_parado_10_segundos_avanca_ao_menos_5", () => {
+describe("Requisito: História só anda com o visitante (spec vitrine-da-abertura)", () => {
+  it("test_visitante_parado_30_segundos_continua_na_abertura", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
-    expect(rodar(controle, relogio, 10_000)).toBeGreaterThanOrEqual(5);
-  });
-
-  it("test_interacao_reinicia_a_contagem_de_4_segundos", () => {
-    const relogio = new RelogioFalso();
-    const controle = new ControleDaHistoria(relogio.agora);
-    controle.irPara(10);
-    expect(rodar(controle, relogio, 3500)).toBeCloseTo(10, 1);
-  });
-
-  it("test_recomeco_do_modo_vitrine_depois_de_10_segundos_no_fim", () => {
-    const relogio = new RelogioFalso();
-    const controle = new ControleDaHistoria(relogio.agora);
-    controle.irPara(DURACAO_DA_HISTORIA);
-    rodar(controle, relogio, 4100); // espera os 4 s de "parado"
-    expect(controle.segundos).toBe(DURACAO_DA_HISTORIA);
-    expect(rodar(controle, relogio, 10_100)).toBeLessThan(1);
+    expect(rodar(controle, relogio, 30_000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[0] ?? -1, 5);
     expect(capituloEm(controle.segundos)).toBe("abertura");
   });
 
-  it("test_sem_andar_sozinha_a_historia_fica_parada", () => {
+  it("test_parado_no_fim_nao_recomeca_sozinho", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
-    controle.definirAndarSozinha(false);
-    expect(rodar(controle, relogio, 10_000)).toBe(0);
+    controle.irPara(DURACAO_DA_HISTORIA);
+    expect(rodar(controle, relogio, 30_000)).toBe(DURACAO_DA_HISTORIA);
   });
 });

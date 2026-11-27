@@ -29,33 +29,33 @@ A vitrine SHALL caber em 1366×768 e em 1920×1080 sem barra de rolagem e sem co
 - **THEN** a posição de rolagem da página continua 0
 
 ### Requirement: Avançar e voltar a história
-A roda do mouse, as teclas Seta para baixo, PageDown e Espaço, e o arrastar do dedo para cima SHALL avançar a história; Seta para cima, PageUp e arrastar para baixo SHALL voltar. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
+Cada gesto (um giro da roda do mouse, Seta para baixo, PageDown, Espaço ou arrastar o dedo para cima) SHALL levar a história até a parada do capítulo seguinte, tocando a passagem inteira sem pular quadros; Seta para cima, PageUp e arrastar para baixo SHALL voltar à parada do capítulo anterior. Cada capítulo tem uma parada, logo antes do seu portal. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
 
 #### Scenario: Avançar com a tecla
-- **WHEN** a vitrine está no início e o visitante aperta Seta para baixo 3 vezes
-- **THEN** a história avança 9 s (3 s por toque)
+- **WHEN** a vitrine está parada no capítulo de abertura e o visitante aperta Seta para baixo uma vez
+- **THEN** a história anda até a parada do capítulo do jogo e para ali
+
+#### Scenario: Vários giros seguidos da roda
+- **WHEN** o visitante gira a roda várias vezes no mesmo gesto
+- **THEN** a história avança só um capítulo
 
 #### Scenario: Voltar por um portal
 - **WHEN** a história está no capítulo do desenho e o visitante volta até o capítulo do jogo
 - **THEN** só a cena do jogo fica visível, sem transformação nem recorte aplicado a ela
 
-### Requirement: História anda sozinha
-Sem interação por 4 s, a vitrine SHALL avançar sozinha em tempo real. Ao chegar ao fim, depois de 10 s sem interação, SHALL recomeçar do capítulo de abertura. Qualquer interação SHALL reiniciar a contagem.
+### Requirement: História só anda com o visitante
+A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fica ali até o visitante fazer um gesto. As animações de entrada do capítulo atual tocam até a parada dele.
 
 #### Scenario: Visitante parado
-- **WHEN** ninguém interage com a vitrine por 10 s a partir do início
-- **THEN** a história avançou pelo menos 5 s
-
-#### Scenario: Recomeço do modo vitrine
-- **WHEN** a história está no fim e ninguém interage por 10 s
-- **THEN** a vitrine volta ao capítulo de abertura
+- **WHEN** ninguém interage com a vitrine por 30 s depois de ela carregar
+- **THEN** a vitrine continua no capítulo de abertura
 
 ### Requirement: Transição por portal
-A passagem de um capítulo ao seguinte SHALL mostrar o capítulo seguinte dentro de um objeto do capítulo atual e ampliar os dois juntos até o seguinte ocupar a tela inteira. Os objetos SHALL ser: o "ô", a janela da casa, o sol desenhado, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
+O capítulo seguinte SHALL fazer parte do cenário do capítulo atual: desde que o objeto aparece, o capítulo seguinte já está visível dentro dele, acompanhando o objeto, e a passagem só amplia os dois juntos até o seguinte ocupar a tela inteira, sem a cena nova surgir na hora da passagem. Os objetos SHALL ser: o "ô", a janela da casa, o sol desenhado, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
 
 #### Scenario: Prévia dentro do objeto
-- **WHEN** começa a passagem do capítulo do jogo para o do desenho
-- **THEN** por pelo menos 0,4 s o capítulo do desenho aparece só dentro da janela da casa, e o resto da tela continua sendo o capítulo do jogo
+- **WHEN** a vitrine está parada no capítulo do jogo, antes de qualquer gesto
+- **THEN** o capítulo do desenho já aparece dentro da janela da casa, e o resto da tela continua sendo o capítulo do jogo
 
 #### Scenario: Fim do portal
 - **WHEN** termina a passagem para qualquer capítulo
@@ -127,7 +127,7 @@ A tela de apelido aberta pela vitrine SHALL ter "Voltar à história", que desfa
 - **THEN** o capítulo do convite fica visível de novo, sem transformação nem recorte
 
 ### Requirement: Movimento reduzido
-Com a preferência do sistema "reduzir movimento", a vitrine SHALL trocar de capítulo sem portal nem zoom (corte direto), SHALL NOT tocar o vídeo de fundo e SHALL NOT andar sozinha.
+Com a preferência do sistema "reduzir movimento", a vitrine SHALL trocar de capítulo sem portal nem zoom (corte direto), e SHALL NOT tocar o vídeo de fundo.
 
 #### Scenario: Reduzir movimento ligado
 - **WHEN** a preferência "reduzir movimento" está ativa e o visitante avança um capítulo
@@ -148,11 +148,11 @@ Ao apertar "Início" no placar depois de uma partida, o jogo SHALL mostrar a vit
 - **THEN** a vitrine está visível no capítulo de abertura
 
 ### Requirement: Degradação em notebook lento
-Se a média de quadros por segundo da vitrine ficar abaixo de 30 por 3 s seguidos, ela SHALL trocar de capítulo por corte direto e pausar o vídeo de fundo até o jogo ser recarregado, mas SHALL continuar andando sozinha (o modo vitrine do estande não para).
+Se a média de quadros por segundo da vitrine ficar abaixo de 30 por 3 s seguidos, ela SHALL trocar de capítulo por corte direto e pausar o vídeo de fundo até o jogo ser recarregado.
 
 #### Scenario: Taxa baixa
 - **WHEN** a taxa medida fica em 22 quadros por segundo durante 3 s
-- **THEN** a passagem seguinte de capítulo é um corte direto, sem escala aplicada às cenas, o vídeo de fundo está pausado e a história continua avançando sem interação
+- **THEN** a passagem seguinte de capítulo é um corte direto, sem escala aplicada às cenas, e o vídeo de fundo está pausado
 
 ### Requirement: Tudo carregado do próprio build
 A biblioteca de animação, as fontes, o vídeo de fundo, os desenhos e as métricas da vitrine SHALL vir do próprio build, sem nenhum carregamento de endereço externo.

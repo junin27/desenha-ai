@@ -19,14 +19,32 @@ export const INICIO_DOS_CAPITULOS: Readonly<Record<IdDoCapitulo, number>> = {
 };
 export const DURACAO_DA_HISTORIA = 75;
 
-/** Spec `vitrine-da-abertura`, "Avançar e voltar a história" e "História anda sozinha". */
-export const SEGUNDOS_POR_TECLA = 3;
-export const SEGUNDOS_POR_PIXEL_DA_RODINHA = 0.006;
-export const MS_PARADO_PARA_ANDAR_SOZINHA = 4000;
-export const MS_NO_FIM_PARA_RECOMECAR = 10_000;
-/** Fração do caminho até o alvo, por quadro, enquanto o visitante mexe (dá o "deslizar" da rolagem). */
-const SUAVIZACAO = 0.08;
-const QUASE_NO_FIM = 0.05;
+/**
+ * Paradas da história (spec "Avançar e voltar a história"): uma por capítulo, logo antes do portal que leva ao
+ * seguinte (os tempos dos portais estão em `PORTAIS`, em animacao-da-vitrine.ts); a última é o fim do convite.
+ */
+export const PARADAS_DOS_CAPITULOS: readonly number[] = [
+  4.45,
+  11.25,
+  18.55,
+  25.55,
+  32.55,
+  39.55,
+  46.55,
+  53.55,
+  60.55,
+  67.55,
+  DURACAO_DA_HISTORIA,
+];
+/** Segundos de história por segundo de relógio: entrada do capítulo, passagem para a frente e para trás. */
+const VELOCIDADE_DA_ENTRADA = 1;
+const VELOCIDADE_PARA_A_FRENTE = 2;
+const VELOCIDADE_PARA_TRAS = 2.5;
+/** Quadro mais longo considerado: uma engasgada do navegador não faz a passagem pular um pedaço. */
+const MAIOR_QUADRO_EM_SEGUNDOS = 1 / 60;
+/** Eventos da roda mais próximos que isso são o mesmo gesto (trackpads mandam dezenas por giro). */
+export const MS_ENTRE_GESTOS_DA_RODA = 400;
+const PIXELS_DO_GESTO_DE_TOQUE = 50;
 
 export function capituloEm(segundos: number): IdDoCapitulo {
   let atual: IdDoCapitulo = "abertura";
@@ -35,65 +53,62 @@ export function capituloEm(segundos: number): IdDoCapitulo {
 }
 
 /**
- * Tempo da história a cada quadro: o visitante move um alvo (rodinha, teclas, toque) e o tempo desliza até ele;
- * parado por 4 s, a história anda sozinha em tempo real; parada no fim por 10 s, recomeça.
+ * Tempo da história a cada quadro. Cada gesto move o alvo para a parada do capítulo seguinte (ou anterior) e o
+ * tempo anda até ela num ritmo fixo, sem saltos; sem gesto, a história fica parada (spec "História só anda com o
+ * visitante"). No começo, a abertura toca as animações de entrada até a primeira parada.
  */
 export class ControleDaHistoria {
-  private alvo = 0;
+  private alvo = PARADAS_DOS_CAPITULOS[0] ?? 0;
   private tempo = 0;
-  private ultimaInteracao = Number.NEGATIVE_INFINITY;
+  private velocidade = VELOCIDADE_DA_ENTRADA;
   private ultimoPasso: number | undefined;
-  private fimDesde: number | undefined;
-  private andarSozinha = true;
+  private ultimaRodinha = Number.NEGATIVE_INFINITY;
 
-  constructor(
-    private readonly agoraMs: () => number,
-    private readonly duracao = DURACAO_DA_HISTORIA,
-  ) {}
+  constructor(private readonly agoraMs: () => number) {}
 
   get segundos(): number {
     return this.tempo;
   }
 
-  /** Desliga o andar sozinho (movimento reduzido pede que a história só ande quando o visitante quiser). */
-  definirAndarSozinha(ligado: boolean): void {
-    this.andarSozinha = ligado;
+  avancarCapitulo(): void {
+    const proxima = PARADAS_DOS_CAPITULOS.find((parada) => parada > this.alvo + 1e-6);
+    if (proxima === undefined) return;
+    this.alvo = proxima;
+    this.velocidade = VELOCIDADE_PARA_A_FRENTE;
   }
 
-  mexer(segundos: number): void {
-    this.alvo = Math.min(this.duracao, Math.max(0, this.alvo + segundos));
-    this.ultimaInteracao = this.agoraMs();
+  voltarCapitulo(): void {
+    const anterior = [...PARADAS_DOS_CAPITULOS].reverse().find((parada) => parada < this.alvo - 1e-6);
+    this.alvo = anterior ?? 0;
+    this.velocidade = VELOCIDADE_PARA_TRAS;
+  }
+
+  /** Um giro da roda: só o primeiro evento de cada gesto conta. */
+  rodinha(deltaY: number): void {
+    const agora = this.agoraMs();
+    const novoGesto = agora - this.ultimaRodinha > MS_ENTRE_GESTOS_DA_RODA;
+    this.ultimaRodinha = agora;
+    if (!novoGesto || deltaY === 0) return;
+    if (deltaY > 0) this.avancarCapitulo();
+    else this.voltarCapitulo();
   }
 
   irPara(segundos: number): void {
-    this.alvo = this.tempo = Math.min(this.duracao, Math.max(0, segundos));
-    this.ultimaInteracao = this.agoraMs();
-    this.fimDesde = undefined;
+    this.alvo = this.tempo = Math.min(DURACAO_DA_HISTORIA, Math.max(0, segundos));
   }
 
   /** Avança um quadro e devolve o tempo da história. */
   passo(): number {
     const agora = this.agoraMs();
-    const dt = this.ultimoPasso === undefined ? 0 : (agora - this.ultimoPasso) / 1000;
+    const dt =
+      this.ultimoPasso === undefined
+        ? 0
+        : Math.min(MAIOR_QUADRO_EM_SEGUNDOS, (agora - this.ultimoPasso) / 1000);
     this.ultimoPasso = agora;
-    const parado = agora - this.ultimaInteracao > MS_PARADO_PARA_ANDAR_SOZINHA;
-    if (parado && this.andarSozinha) this.alvo = Math.min(this.duracao, this.alvo + dt);
-    this.tempo = parado ? this.alvo : this.tempo + (this.alvo - this.tempo) * SUAVIZACAO;
-    if (Math.abs(this.alvo - this.tempo) < 1e-3) this.tempo = this.alvo;
-    this.recomecarSeFicouNoFim(agora, parado);
+    const falta = this.alvo - this.tempo;
+    const andar = Math.min(Math.abs(falta), dt * this.velocidade);
+    this.tempo += Math.sign(falta) * andar;
     return this.tempo;
-  }
-
-  private recomecarSeFicouNoFim(agora: number, parado: boolean): void {
-    if (this.tempo < this.duracao - QUASE_NO_FIM || !parado) {
-      this.fimDesde = undefined;
-      return;
-    }
-    this.fimDesde ??= agora;
-    if (agora - this.fimDesde >= MS_NO_FIM_PARA_RECOMECAR) {
-      this.alvo = this.tempo = 0;
-      this.fimDesde = undefined;
-    }
   }
 }
 
@@ -104,7 +119,7 @@ export function ligarEntrada(alvo: EventTarget, controle: ControleDaHistoria, at
     (evento) => {
       if (!ativa()) return;
       evento.preventDefault();
-      controle.mexer((evento as WheelEvent).deltaY * SEGUNDOS_POR_PIXEL_DA_RODINHA);
+      controle.rodinha((evento as WheelEvent).deltaY);
     },
     { passive: false },
   );
@@ -114,17 +129,25 @@ export function ligarEntrada(alvo: EventTarget, controle: ControleDaHistoria, at
     const sentido = DIRECAO_DA_TECLA[tecla.key];
     if (sentido === undefined) return;
     tecla.preventDefault();
-    controle.mexer(sentido * SEGUNDOS_POR_TECLA);
+    if (sentido > 0) controle.avancarCapitulo();
+    else controle.voltarCapitulo();
   });
-  let toqueY: number | undefined;
+  ligarToque(alvo, controle, ativa);
+}
+
+/** Arrastar o dedo: um gesto por toque, quando passa de 50 px. */
+function ligarToque(alvo: EventTarget, controle: ControleDaHistoria, ativa: () => boolean): void {
+  let inicioY: number | undefined;
   alvo.addEventListener("touchstart", (evento) => {
-    toqueY = (evento as TouchEvent).touches[0]?.clientY;
+    inicioY = (evento as TouchEvent).touches[0]?.clientY;
   });
   alvo.addEventListener("touchmove", (evento) => {
     const y = (evento as TouchEvent).touches[0]?.clientY;
-    if (!ativa() || y === undefined || toqueY === undefined) return;
-    controle.mexer((toqueY - y) * SEGUNDOS_POR_PIXEL_DA_RODINHA * 3);
-    toqueY = y;
+    if (!ativa() || y === undefined || inicioY === undefined) return;
+    if (Math.abs(inicioY - y) < PIXELS_DO_GESTO_DE_TOQUE) return;
+    if (inicioY > y) controle.avancarCapitulo();
+    else controle.voltarCapitulo();
+    inicioY = undefined;
   });
 }
 

@@ -139,9 +139,7 @@ describe("Requisito: Movimento reduzido (spec vitrine-da-abertura)", () => {
       tela.passo();
     }
     expect(tela.capitulo).toBe("abertura"); // 11 s parado e a história não andou
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown" }));
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown" }));
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown" }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown" })); // um gesto = um capítulo
     for (let i = 0; i < 300; i++) {
       agora += 16;
       tela.passo();

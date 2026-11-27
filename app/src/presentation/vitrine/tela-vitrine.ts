@@ -72,7 +72,6 @@ export class TelaVitrine {
   ) {
     this.reduzido = opcoes.movimentoReduzido ?? false;
     this.controle = new ControleDaHistoria(opcoes.agoraMs ?? (() => performance.now()));
-    this.controle.definirAndarSozinha(!this.reduzido);
     this.portal = new PortalDoApelido(() => this.animado);
     const pular = criar("button", {
       classe: "pular-vitrine",

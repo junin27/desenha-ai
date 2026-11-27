@@ -9,13 +9,13 @@ Contribui para **as duas disciplinas**: Redes Neurais (CNN e LSTM classificando 
 ## What Changes
 
 - Nova **vitrine em capítulos** como primeira tela do jogo: abertura, o jogo, o desenho, a CNN, a LSTM, o Zé (SLM), destilação, QLoRA, GGUF, engenharia e o convite "Sua vez, sô!" — 11 capítulos, sem rolar a página.
-- **Avanço da história**: roda do mouse, setas/PageDown/espaço e toque avançam e voltam; parado por 4 s, a história anda sozinha; no fim, recomeça depois de 10 s parada (modo vitrine do estande).
+- **Avanço da história**: roda do mouse, setas/PageDown/espaço e toque avançam e voltam um capítulo por gesto; a história nunca anda sozinha (pedido do usuário, 27/11: o avanço automático atropelava quem estava lendo).
 - **Transições por portal**: cada capítulo termina com a câmera entrando num objeto da cena (a letra "ô", a janela da casa, o sol desenhado, a grade de pixels, a cabeça do Zé, o jarro, um peso…) em que o capítulo seguinte já aparece; dois capítulos fazem o caminho inverso (afastamento). O "Jogar!" do convite abre a tela de apelido pelo mesmo efeito.
 - **Redes reais na vitrine**: os capítulos do desenho, da CNN e da LSTM usam um desenho real do conjunto de teste do Quick, Draw!, traçado ponto a ponto; os palpites mostrados vêm da CNN e da LSTM em ONNX rodando no navegador sobre o traço parcial; a grade 28×28 mostrada é a mesma entrada que a CNN recebe.
 - **Números das métricas**: acurácias, top-3, curva antecipada, tamanho do dataset do Zé, parâmetros LoRA, tamanho do GGUF e contagem de testes vêm de arquivos carregados pelo jogo; ausentes, o número é omitido.
 - Novo arquivo de dados **`vitrine_tracos.json`** (um desenho de teste por categoria escolhida), gerado por função pura do `desenha_ml` e verificado por fixture em `contratos/`.
 - **BREAKING (comportamento da abertura)**: a demonstração ilustrativa da casa sai; o tempo de "Jogar" até o apelido passa de ≤ 1,2 s para ≤ 2,2 s (duração do portal).
-- **Desempenho no estande**: se a vitrine cair abaixo de 30 fps por 3 s, as transições viram corte direto e o vídeo pausa, mas a história continua andando sozinha.
+- **Desempenho no estande**: se a vitrine cair abaixo de 30 fps por 3 s, as transições viram corte direto e o vídeo pausa.
 - **Crédito do dataset** ("Quick, Draw! · CC BY 4.0") sempre que um desenho dele está na tela; "Início" no placar volta à vitrine.
 - Dependência **GSAP 3.15.1** (licença "no charge" da GSAP) empacotada localmente no build.
 
