@@ -21,15 +21,13 @@ function entradasDaHistoria(tl: gsap.core.Timeline, c: Cenas): void {
     { yPercent: 120, duration: 0.8, ease: "back.out(1.5)" },
     INICIO.jogo + 0.3,
   )
-    .from(
-      c.desenho.querySelector(".folha-vitrine"),
-      { y: 80, rotation: 8, opacity: 0, duration: 0.7, ease: "back.out(1.4)" },
-      INICIO.desenho,
-    )
+    // A folha não entra: ela já aparece dentro da janela da casa antes do portal (prévia com foco), com o
+    // desenho pronto, para a janela mostrar algo reconhecível; depois do zoom ele é retraçado traço a traço.
+    .set(de(c.desenho, ".traco-vitrine"), { drawSVG: "100%" }, 0)
     .fromTo(
       de(c.desenho, ".traco-vitrine"),
       { drawSVG: "0%" },
-      { drawSVG: "100%", duration: 0.5, stagger: 0.45, ease: "power1.inOut" },
+      { drawSVG: "100%", duration: 0.5, stagger: 0.45, ease: "power1.inOut", immediateRender: false },
       INICIO.desenho + 0.8,
     )
     .from(
@@ -42,15 +40,18 @@ function entradasDaHistoria(tl: gsap.core.Timeline, c: Cenas): void {
       { x: 120, opacity: 0, duration: 0.5, stagger: 0.15 },
       INICIO.cnn + 2.7,
     )
+    // pronto na prévia dentro da grade da CNN; depois do zoom é retraçado na ordem dos traços
+    .set(de(c.lstm, ".traco-vitrine"), { drawSVG: "100%" }, 0)
     .fromTo(
       de(c.lstm, ".traco-vitrine"),
       { drawSVG: "0%" },
-      { drawSVG: "100%", duration: 0.4, stagger: 0.3 },
+      { drawSVG: "100%", duration: 0.4, stagger: 0.3, immediateRender: false },
       INICIO.lstm + 0.3,
     )
     .from(
       de(c.lstm, ".celula"),
-      { y: 80, opacity: 0, duration: 0.5, stagger: 0.1, ease: "back.out(1.6)" },
+      // sem começar transparente: as células já aparecem dentro da grade da CNN (prévia com foco)
+      { y: 24, duration: 0.5, stagger: 0.1, ease: "back.out(1.6)" },
       INICIO.lstm + 0.2,
     )
     .fromTo(
@@ -72,10 +73,12 @@ function entradasTecnicas(tl: gsap.core.Timeline, c: Cenas): void {
       { y: -260, duration: 0.8, ease: "back.out(1.4)" },
       INICIO.destilacao,
     )
+    // cheio na prévia dentro da cabeça do Zé; depois do zoom esvazia e enche de novo com a destilação
+    .set(c.destilacao.querySelector(".nivel"), { height: "68%" }, 0)
     .fromTo(
       c.destilacao.querySelector(".nivel"),
       { height: "0%" },
-      { height: "68%", duration: 3.6, ease: "none" },
+      { height: "68%", duration: 3.6, ease: "none", immediateRender: false },
       INICIO.destilacao + 0.6,
     )
     .from(c.qlora.querySelector(".adaptador.a"), { x: -400, opacity: 0, duration: 0.6 }, INICIO.qlora + 1.3)

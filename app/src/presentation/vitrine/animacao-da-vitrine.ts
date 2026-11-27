@@ -11,6 +11,7 @@ import {
 } from "../../domain/vitrine/portal";
 import { INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
 import { entradasDosCapitulos, type Cenas } from "./entradas-dos-capitulos";
+import { CongeladorDeVideo } from "./congelador-de-video";
 import { aplicarQuadro, medirNaCena } from "./motor-do-portal";
 
 gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin, SplitText);
@@ -27,7 +28,12 @@ const FASE_DO_SUMIR = PREVIA_DO_AFASTAMENTO / TOTAL_DO_AFASTAMENTO;
 const ENTRADA_DO_OBJETO = 1;
 const SURGIMENTO_DA_PREVIA = 0.6;
 
+/** Antes da parada (0,05 s antes do portal), para a prévia que surge no fim já estar inteira quando a história para. */
+const ANTES_DA_PARADA = 0.05 + SURGIMENTO_DA_PREVIA + 0.2;
+
 export function inicioDaPrevia(fora: IdDoCapitulo): number {
+  const portal = PORTAIS.find((p) => p.fora === fora && p.sentido !== "sair");
+  if (portal?.previaNoFim) return portal.t - ANTES_DA_PARADA;
   return INICIO[fora] + ENTRADA_DO_OBJETO;
 }
 
@@ -37,6 +43,10 @@ interface Portal {
   readonly objeto: string;
   readonly forma?: "circulo";
   readonly canto?: number;
+  /** Elemento principal da cena seguinte: é ele que aparece dentro do objeto, e não a cena inteira encolhida. */
+  readonly foco?: string;
+  /** O objeto é o próprio conteúdo do capítulo: a cena seguinte só aparece nele no fim, antes da parada. */
+  readonly previaNoFim?: true;
   readonly t: number;
   readonly sentido?: "sair";
 }
@@ -44,13 +54,29 @@ interface Portal {
 /** O roteiro de transições do protótipo 16 aprovado (cada objeto já mostra o capítulo seguinte). */
 const PORTAIS: readonly Portal[] = [
   { fora: "abertura", dentro: "jogo", objeto: "so", forma: "circulo", t: 4.5 },
-  { fora: "jogo", dentro: "desenho", objeto: "janela", canto: 2, t: 11.3 },
-  { fora: "desenho", dentro: "cnn", objeto: "desenho", t: 18.6 },
-  { fora: "cnn", dentro: "lstm", objeto: "grade", t: 25.6 },
-  { fora: "lstm", dentro: "ze", objeto: "saida", canto: 24, t: 32.6 },
-  { fora: "ze", dentro: "destilacao", objeto: "cabeca", forma: "circulo", t: 39.6 },
-  { fora: "destilacao", dentro: "qlora", objeto: "jarro", canto: 40, t: 46.6 },
-  { fora: "qlora", dentro: "quantizacao", objeto: "peso", canto: 6, t: 53.6 },
+  { fora: "jogo", dentro: "desenho", objeto: "janela", canto: 2, foco: ".folha-vitrine", t: 11.3 },
+  { fora: "desenho", dentro: "cnn", objeto: "desenho", foco: ".grade-caixa", previaNoFim: true, t: 18.6 },
+  { fora: "cnn", dentro: "lstm", objeto: "grade", foco: ".trilha-vitrine", previaNoFim: true, t: 25.6 },
+  {
+    fora: "lstm",
+    dentro: "ze",
+    objeto: "saida",
+    canto: 24,
+    foco: ".lugar-do-ze",
+    previaNoFim: true,
+    t: 32.6,
+  },
+  { fora: "ze", dentro: "destilacao", objeto: "cabeca", forma: "circulo", foco: ".jarro", t: 39.6 },
+  {
+    fora: "destilacao",
+    dentro: "qlora",
+    objeto: "jarro",
+    canto: 40,
+    foco: ".pesos",
+    previaNoFim: true,
+    t: 46.6,
+  },
+  { fora: "qlora", dentro: "quantizacao", objeto: "peso", canto: 6, foco: ".arquivo", t: 53.6 },
   { fora: "engenharia", dentro: "quantizacao", objeto: "hex-ze", forma: "circulo", t: 60.6, sentido: "sair" },
   { fora: "convite", dentro: "engenharia", objeto: "janela", canto: 2, t: 67.6, sentido: "sair" },
 ];
@@ -122,7 +148,7 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
       ease: "none",
       immediateRender: false,
       onUpdate: () => {
-        geometria = geometriaDoPortal(objetoDoPortal(fora, portal), tela());
+        geometria = geometriaDoPortal(objetoDoPortal(fora, portal), tela(), focoDoPortal(dentro, portal));
         const surgiu = Math.min(1, (previa.r * (portal.t - inicio)) / SURGIMENTO_DA_PREVIA);
         aplicarQuadro(fora, dentro, quadroDoPortal(geometria, 0), surgiu);
       },
@@ -130,6 +156,7 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
     inicio,
   );
   const zoom = { r: 0 };
+  const congelar = congeladorDoPortal(fora, dentro);
   tl.fromTo(
     zoom,
     { r: 0 },
@@ -139,7 +166,8 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
       ease: "none",
       immediateRender: false,
       onUpdate: () => {
-        geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), tela());
+        geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), tela(), focoDoPortal(dentro, portal));
+        congelar(zoom.r);
         aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)));
       },
     },
@@ -153,12 +181,14 @@ function adicionarAfastamento(tl: gsap.core.Timeline, cenas: Cenas, portal: Port
     dentro = cenas[portal.dentro];
   const progresso = { r: 0 };
   let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
+  const congelar = congeladorDoPortal(fora, dentro);
   const atualizar = (): void => {
     geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), {
       largura: window.innerWidth,
       altura: window.innerHeight,
     });
     const r = progresso.r;
+    congelar(r);
     const u = 1 - suavizar(Math.min(1, r / (1 - FASE_DO_SUMIR)));
     aplicarQuadro(
       fora,
@@ -175,6 +205,23 @@ function adicionarAfastamento(tl: gsap.core.Timeline, cenas: Cenas, portal: Port
     portal.t,
   );
   tl.set(dentro, { autoAlpha: 0 }, portal.t + TOTAL_DO_AFASTAMENTO);
+}
+
+/** Vídeo das duas cenas parado (imagem) enquanto o zoom anda; volta a tocar no começo e no fim do portal. */
+function congeladorDoPortal(fora: HTMLElement, dentro: HTMLElement): (progresso: number) => void {
+  const congeladores = [new CongeladorDeVideo(fora), new CongeladorDeVideo(dentro)];
+  return (progresso) => {
+    const andando = progresso > 0 && progresso < 1;
+    for (const c of congeladores) {
+      if (andando) c.congelar();
+      else c.soltar();
+    }
+  };
+}
+
+function focoDoPortal(dentro: HTMLElement, portal: Portal): ReturnType<typeof medirNaCena> | undefined {
+  const elemento = portal.foco === undefined ? null : dentro.querySelector(portal.foco);
+  return elemento === null ? undefined : medirNaCena(elemento);
 }
 
 function objetoDoPortal(cena: HTMLElement, portal: Portal): ObjetoDoPortal {

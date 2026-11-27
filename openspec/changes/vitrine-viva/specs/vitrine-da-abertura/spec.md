@@ -51,11 +51,15 @@ A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fic
 - **THEN** a vitrine continua no capítulo de abertura
 
 ### Requirement: Transição por portal
-O capítulo seguinte SHALL fazer parte do cenário do capítulo atual: desde que o objeto aparece, o capítulo seguinte já está visível dentro dele, acompanhando o objeto, e a passagem só amplia os dois juntos até o seguinte ocupar a tela inteira, sem a cena nova surgir na hora da passagem. Os objetos SHALL ser: o "ô", a janela da casa, o sol desenhado, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
+O capítulo seguinte SHALL fazer parte do cenário do capítulo atual: o capítulo seguinte já está visível dentro do objeto quando a história para no capítulo, mostrando o elemento principal dele, e a passagem só amplia os dois juntos até o seguinte ocupar a tela inteira, sem a cena nova surgir na hora da passagem. Os objetos SHALL ser: o "ô", a janela da casa, o sol desenhado, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
 
 #### Scenario: Prévia dentro do objeto
 - **WHEN** a vitrine está parada no capítulo do jogo, antes de qualquer gesto
 - **THEN** o capítulo do desenho já aparece dentro da janela da casa, e o resto da tela continua sendo o capítulo do jogo
+
+#### Scenario: Objeto que é o conteúdo do capítulo
+- **WHEN** o objeto do portal é o próprio conteúdo do capítulo (a folha do desenho, a grade da CNN, a resposta da LSTM, o jarro)
+- **THEN** o capítulo seguinte só aparece nele no fim do capítulo, depois que o conteúdo foi mostrado, e antes da parada
 
 #### Scenario: Fim do portal
 - **WHEN** termina a passagem para qualquer capítulo

@@ -22,8 +22,6 @@
   background: var(--papel);
   transform-origin: 0 0;
   visibility: hidden;
-  /* Cada cena numa camada própria: o zoom do portal só move a camada, sem repintar a página a cada quadro. */
-  will-change: transform, clip-path;
 }
 .cena-vitrine .destaque {
   color: var(--terracota);

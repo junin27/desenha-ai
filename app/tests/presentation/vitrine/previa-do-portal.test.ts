@@ -20,3 +20,14 @@ describe("Requisito: Transição por portal (spec vitrine-da-abertura)", () => {
     }
   });
 });
+
+describe("Requisito: Transição por portal, objeto que é o conteúdo (spec vitrine-da-abertura)", () => {
+  it("test_objeto_que_e_o_conteudo_do_capitulo_recebe_a_previa_so_no_fim", () => {
+    for (const fora of ["desenho", "cnn", "lstm", "destilacao"] as const) {
+      const parada = PARADAS_DOS_CAPITULOS.find((p) => p > INICIO_DOS_CAPITULOS[fora]) ?? -1;
+      const previa = inicioDaPrevia(fora);
+      expect(previa).toBeGreaterThan(INICIO_DOS_CAPITULOS[fora] + 4); // depois do conteúdo do capítulo
+      expect(previa).toBeLessThan(parada); // e já inteira quando a história para
+    }
+  });
+});
