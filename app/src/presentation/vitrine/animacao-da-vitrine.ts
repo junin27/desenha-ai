@@ -89,6 +89,24 @@ const PORTAIS: readonly Portal[] = [
   { fora: "convite", dentro: "engenharia", objeto: "janela", canto: 2, t: 67.6, sentido: "sair" },
 ];
 
+/**
+ * Quando a história sai do capítulo: no mergulho o capítulo é o `fora`; no afastamento é o `dentro` (que encolhe).
+ * Comparar só `fora` pegava o afastamento em que a engenharia recebe a quantização e tirava o cartão dela antes
+ * de ela começar.
+ */
+export function saidaDoCapitulo(id: IdDoCapitulo): number {
+  const saida = PORTAIS.find((p) => (p.sentido === "sair" ? p.dentro : p.fora) === id);
+  return saida?.t ?? INICIO[id] + 6;
+}
+
+/**
+ * O cartão de texto só sai quando o portal começa: a parada fica 0,05 s antes do portal, e um cartão que saía
+ * 0,3 s antes deixava o capítulo parado sem texto nenhum.
+ */
+export function inicioDaSaidaDoCartao(id: IdDoCapitulo): number {
+  return saidaDoCapitulo(id);
+}
+
 /** Monta a linha do tempo pausada da história inteira; quem a dirige é o `ControleDaHistoria`. */
 export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
   const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
@@ -106,13 +124,7 @@ export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
     "quantizacao",
     "engenharia",
   ] as const) {
-    cartao(
-      tl,
-      cenas[id],
-      INICIO[id] + 0.1,
-      (PORTAIS.find((p) => p.fora === id || (p.sentido === "sair" && p.dentro === id))?.t ?? INICIO[id] + 6) -
-        0.3,
-    );
+    cartao(tl, cenas[id], INICIO[id] + 0.1, inicioDaSaidaDoCartao(id));
   }
   entradasDosCapitulos(tl, cenas);
   for (const portal of PORTAIS) adicionarPortal(tl, cenas, portal);
