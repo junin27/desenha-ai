@@ -202,6 +202,7 @@ export class TelaVitrine {
     const cenas = this.cenas as Record<IdDoCapitulo, HTMLElement>;
     const { montarAnimacao } = await import("./animacao-da-vitrine");
     if (this.cenas === cenas && this.animado) this.animacao = montarAnimacao(cenas);
+    this.medidor.aquecer((this.opcoes.agoraMs ?? (() => performance.now()))());
   }
 
   private cairParaCorteDireto(): void {

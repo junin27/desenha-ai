@@ -43,6 +43,21 @@ describe("Requisito: Degradação em notebook lento (spec vitrine-da-abertura)",
     expect(medir(22, 2).lento).toBe(false);
   });
 
+  it("test_carregamento_lento_nao_conta_so_mede_depois_do_aquecimento", () => {
+    const medidor = new MedidorDeQuadros();
+    medidor.aquecer(0);
+    for (let t = 0; t <= 2000; t += 1000 / 10) medidor.registrar(t); // 10 fps enquanto tudo carrega
+    for (let t = 2000; t <= 6000; t += 1000 / 60) medidor.registrar(t); // depois, 60 fps
+    expect(medidor.lento).toBe(false);
+  });
+
+  it("test_depois_do_aquecimento_taxa_baixa_ainda_liga_o_modo_lento", () => {
+    const medidor = new MedidorDeQuadros();
+    medidor.aquecer(0);
+    for (let t = 2000; t <= 5100; t += 1000 / 22) medidor.registrar(t);
+    expect(medidor.lento).toBe(true);
+  });
+
   it("test_modo_lento_nao_volta_atras_ate_recarregar", () => {
     const medidor = medir(22, 3);
     for (let i = 0; i < 300; i++) medidor.registrar(4000 + i * 16);
