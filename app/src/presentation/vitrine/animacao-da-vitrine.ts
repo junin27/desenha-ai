@@ -15,11 +15,21 @@ import { aplicarQuadro, medirNaCena } from "./motor-do-portal";
 
 gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin, SplitText);
 
-/** Prévia: a cena nova aparece dentro do objeto antes de a câmera andar (spec: pelo menos 0,4 s). */
-export const PREVIA_DO_PORTAL = 0.5;
+/** Afastamento (portais "sair"): a cena atual encolhe e some no fim, em `FASE_DO_SUMIR` do tempo. */
+const PREVIA_DO_AFASTAMENTO = 0.5;
 export const DURACAO_DO_PORTAL = 1.7;
-const TOTAL_DO_PORTAL = PREVIA_DO_PORTAL + DURACAO_DO_PORTAL;
-const FASE_DA_PREVIA = PREVIA_DO_PORTAL / TOTAL_DO_PORTAL;
+const TOTAL_DO_AFASTAMENTO = PREVIA_DO_AFASTAMENTO + DURACAO_DO_PORTAL;
+const FASE_DO_SUMIR = PREVIA_DO_AFASTAMENTO / TOTAL_DO_AFASTAMENTO;
+/**
+ * A cena seguinte faz parte do cenário (spec "Transição por portal"): aparece dentro do objeto 1 s depois do
+ * começo do capítulo, junto com a entrada dele, e acompanha o objeto até o gesto do visitante.
+ */
+const ENTRADA_DO_OBJETO = 1;
+const SURGIMENTO_DA_PREVIA = 0.6;
+
+export function inicioDaPrevia(fora: IdDoCapitulo): number {
+  return INICIO[fora] + ENTRADA_DO_OBJETO;
+}
 
 interface Portal {
   readonly fora: IdDoCapitulo;
@@ -44,6 +54,13 @@ const PORTAIS: readonly Portal[] = [
   { fora: "engenharia", dentro: "quantizacao", objeto: "hex-ze", forma: "circulo", t: 60.6, sentido: "sair" },
   { fora: "convite", dentro: "engenharia", objeto: "janela", canto: 2, t: 67.6, sentido: "sair" },
 ];
+
+export const INICIO_DOS_PORTAIS_DE_ENTRADA = PORTAIS.filter((p) => p.sentido !== "sair").map(
+  ({ fora, t }) => ({
+    fora,
+    t,
+  }),
+);
 
 /** Monta a linha do tempo pausada da história inteira; quem a dirige é o `ControleDaHistoria`. */
 export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
@@ -77,40 +94,87 @@ export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
 }
 
 function adicionarPortal(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): void {
+  if (portal.sentido === "sair") adicionarAfastamento(tl, cenas, portal);
+  else adicionarEntrada(tl, cenas, portal);
+}
+
+/**
+ * Prévia + zoom. Na prévia a geometria é medida a cada quadro, para a cena de dentro acompanhar o objeto enquanto
+ * ele entra; no zoom ela fica fixa na última medida (D3).
+ */
+function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): void {
+  const fora = cenas[portal.fora],
+    dentro = cenas[portal.dentro];
+  const tela = (): { largura: number; altura: number } => ({
+    largura: window.innerWidth,
+    altura: window.innerHeight,
+  });
+  let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
+  const inicio = inicioDaPrevia(portal.fora);
+  const previa = { r: 0 };
+  tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, inicio).set(fora, { zIndex: 1 }, inicio);
+  tl.fromTo(
+    previa,
+    { r: 0 },
+    {
+      r: 1,
+      duration: portal.t - inicio,
+      ease: "none",
+      immediateRender: false,
+      onUpdate: () => {
+        geometria = geometriaDoPortal(objetoDoPortal(fora, portal), tela());
+        const surgiu = Math.min(1, (previa.r * (portal.t - inicio)) / SURGIMENTO_DA_PREVIA);
+        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, 0), surgiu);
+      },
+    },
+    inicio,
+  );
+  const zoom = { r: 0 };
+  tl.fromTo(
+    zoom,
+    { r: 0 },
+    {
+      r: 1,
+      duration: DURACAO_DO_PORTAL,
+      ease: "none",
+      immediateRender: false,
+      onUpdate: () => {
+        geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), tela());
+        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)));
+      },
+    },
+    portal.t,
+  );
+  tl.set(fora, { autoAlpha: 0 }, portal.t + DURACAO_DO_PORTAL);
+}
+
+function adicionarAfastamento(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): void {
   const fora = cenas[portal.fora],
     dentro = cenas[portal.dentro];
   const progresso = { r: 0 };
   let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
   const atualizar = (): void => {
-    // medido na 1ª vez que a câmera chega aqui: as animações de entrada já terminaram (D3)
     geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), {
       largura: window.innerWidth,
       altura: window.innerHeight,
     });
     const r = progresso.r;
-    if (portal.sentido === "sair") {
-      const u = 1 - suavizar(Math.min(1, r / (1 - FASE_DA_PREVIA)));
-      aplicarQuadro(
-        fora,
-        dentro,
-        quadroDoPortal(geometria, u),
-        r < 1 - FASE_DA_PREVIA ? 1 : 1 - (r - (1 - FASE_DA_PREVIA)) / FASE_DA_PREVIA,
-      );
-    } else {
-      const u = r < FASE_DA_PREVIA ? 0 : suavizar((r - FASE_DA_PREVIA) / (1 - FASE_DA_PREVIA));
-      aplicarQuadro(fora, dentro, quadroDoPortal(geometria, u), Math.min(1, r / FASE_DA_PREVIA));
-    }
+    const u = 1 - suavizar(Math.min(1, r / (1 - FASE_DO_SUMIR)));
+    aplicarQuadro(
+      fora,
+      dentro,
+      quadroDoPortal(geometria, u),
+      r < 1 - FASE_DO_SUMIR ? 1 : 1 - (r - (1 - FASE_DO_SUMIR)) / FASE_DO_SUMIR,
+    );
   };
-  if (portal.sentido === "sair")
-    tl.set(fora, { autoAlpha: 1, zIndex: 1 }, portal.t).set(dentro, { zIndex: 2 }, portal.t);
-  else tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, portal.t).set(fora, { zIndex: 1 }, portal.t);
+  tl.set(fora, { autoAlpha: 1, zIndex: 1 }, portal.t).set(dentro, { zIndex: 2 }, portal.t);
   tl.fromTo(
     progresso,
     { r: 0 },
-    { r: 1, duration: TOTAL_DO_PORTAL, ease: "none", immediateRender: false, onUpdate: atualizar },
+    { r: 1, duration: TOTAL_DO_AFASTAMENTO, ease: "none", immediateRender: false, onUpdate: atualizar },
     portal.t,
   );
-  tl.set(portal.sentido === "sair" ? dentro : fora, { autoAlpha: 0 }, portal.t + TOTAL_DO_PORTAL);
+  tl.set(dentro, { autoAlpha: 0 }, portal.t + TOTAL_DO_AFASTAMENTO);
 }
 
 function objetoDoPortal(cena: HTMLElement, portal: Portal): ObjetoDoPortal {
