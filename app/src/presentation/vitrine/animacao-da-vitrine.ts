@@ -22,19 +22,13 @@ export const DURACAO_DO_PORTAL = 1.7;
 const TOTAL_DO_AFASTAMENTO = PREVIA_DO_AFASTAMENTO + DURACAO_DO_PORTAL;
 const FASE_DO_SUMIR = PREVIA_DO_AFASTAMENTO / TOTAL_DO_AFASTAMENTO;
 /**
- * A cena seguinte faz parte do cenário (spec "Transição por portal"): aparece dentro do objeto 1 s depois do
- * começo do capítulo, junto com a entrada dele, e acompanha o objeto até o gesto do visitante.
+ * A cena seguinte fica escondida no objeto (spec "Transição por portal"): parada, opacidade 0; no zoom ela
+ * surge de dentro do objeto e já está inteira na metade dele.
  */
-const ENTRADA_DO_OBJETO = 1;
-const SURGIMENTO_DA_PREVIA = 0.6;
+const FIM_DO_SURGIMENTO = 0.5;
 
-/** Antes da parada (0,05 s antes do portal), para a prévia que surge no fim já estar inteira quando a história para. */
-const ANTES_DA_PARADA = 0.05 + SURGIMENTO_DA_PREVIA + 0.2;
-
-export function inicioDaPrevia(fora: IdDoCapitulo): number {
-  const portal = PORTAIS.find((p) => p.fora === fora && p.sentido !== "sair");
-  if (portal?.previaNoFim) return portal.t - ANTES_DA_PARADA;
-  return INICIO[fora] + ENTRADA_DO_OBJETO;
+export function opacidadeDaCenaNova(progressoDoZoom: number): number {
+  return Math.min(1, Math.max(0, progressoDoZoom) / FIM_DO_SURGIMENTO);
 }
 
 interface Portal {
@@ -45,25 +39,40 @@ interface Portal {
   readonly canto?: number;
   /** Elemento principal da cena seguinte: é ele que aparece dentro do objeto, e não a cena inteira encolhida. */
   readonly foco?: string;
-  /** O objeto é o próprio conteúdo do capítulo: a cena seguinte só aparece nele no fim, antes da parada. */
-  readonly previaNoFim?: true;
+  /** Pedaço da cena seguinte (frações da tela) por onde a câmera entra, em vez de um elemento. */
+  readonly focoNaTela?: {
+    readonly x: number;
+    readonly y: number;
+    readonly largura: number;
+    readonly altura: number;
+  };
+  /** O objeto é o buraco do "ô" (o miolo da letra), e não a letra inteira. */
+  readonly buraco?: true;
   readonly t: number;
   readonly sentido?: "sair";
 }
 
-/** O roteiro de transições do protótipo 16 aprovado (cada objeto já mostra o capítulo seguinte). */
+/** O roteiro de transições: cada objeto esconde o capítulo seguinte até o gesto. */
 const PORTAIS: readonly Portal[] = [
-  { fora: "abertura", dentro: "jogo", objeto: "so", forma: "circulo", t: 4.5 },
+  {
+    fora: "abertura",
+    dentro: "jogo",
+    objeto: "so",
+    forma: "circulo",
+    buraco: true,
+    // a câmera entra pelo buraco do "ô" e cai na estradinha de terra da roça
+    focoNaTela: { x: 0.127, y: 0.733, largura: 0.07, altura: 0.125 },
+    t: 4.5,
+  },
   { fora: "jogo", dentro: "desenho", objeto: "janela", canto: 2, foco: ".folha-vitrine", t: 11.3 },
-  { fora: "desenho", dentro: "cnn", objeto: "desenho", foco: ".grade-caixa", previaNoFim: true, t: 18.6 },
-  { fora: "cnn", dentro: "lstm", objeto: "grade", foco: ".trilha-vitrine", previaNoFim: true, t: 25.6 },
+  { fora: "desenho", dentro: "cnn", objeto: "desenho", foco: ".grade-caixa", t: 18.6 },
+  { fora: "cnn", dentro: "lstm", objeto: "grade", foco: ".trilha-vitrine", t: 25.6 },
   {
     fora: "lstm",
     dentro: "ze",
     objeto: "saida",
     canto: 24,
     foco: ".lugar-do-ze",
-    previaNoFim: true,
     t: 32.6,
   },
   { fora: "ze", dentro: "destilacao", objeto: "cabeca", forma: "circulo", foco: ".jarro", t: 39.6 },
@@ -73,20 +82,12 @@ const PORTAIS: readonly Portal[] = [
     objeto: "jarro",
     canto: 40,
     foco: ".pesos",
-    previaNoFim: true,
     t: 46.6,
   },
   { fora: "qlora", dentro: "quantizacao", objeto: "peso", canto: 6, foco: ".arquivo", t: 53.6 },
   { fora: "engenharia", dentro: "quantizacao", objeto: "hex-ze", forma: "circulo", t: 60.6, sentido: "sair" },
   { fora: "convite", dentro: "engenharia", objeto: "janela", canto: 2, t: 67.6, sentido: "sair" },
 ];
-
-export const INICIO_DOS_PORTAIS_DE_ENTRADA = PORTAIS.filter((p) => p.sentido !== "sair").map(
-  ({ fora, t }) => ({
-    fora,
-    t,
-  }),
-);
 
 /** Monta a linha do tempo pausada da história inteira; quem a dirige é o `ControleDaHistoria`. */
 export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
@@ -125,38 +126,16 @@ function adicionarPortal(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): 
 }
 
 /**
- * Prévia + zoom. Na prévia a geometria é medida a cada quadro, para a cena de dentro acompanhar o objeto enquanto
- * ele entra; no zoom ela fica fixa na última medida (D3).
+ * Mergulho no objeto: a cena seguinte só aparece quando a câmera anda e surge de dentro do objeto. A geometria
+ * é medida no primeiro quadro do zoom, com as entradas do capítulo já terminadas (D3).
  */
 function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): void {
   const fora = cenas[portal.fora],
     dentro = cenas[portal.dentro];
-  const tela = (): { largura: number; altura: number } => ({
-    largura: window.innerWidth,
-    altura: window.innerHeight,
-  });
   let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
-  const inicio = inicioDaPrevia(portal.fora);
-  const previa = { r: 0 };
-  tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, inicio).set(fora, { zIndex: 1 }, inicio);
-  tl.fromTo(
-    previa,
-    { r: 0 },
-    {
-      r: 1,
-      duration: portal.t - inicio,
-      ease: "none",
-      immediateRender: false,
-      onUpdate: () => {
-        geometria = geometriaDoPortal(objetoDoPortal(fora, portal), tela(), focoDoPortal(dentro, portal));
-        const surgiu = Math.min(1, (previa.r * (portal.t - inicio)) / SURGIMENTO_DA_PREVIA);
-        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, 0), surgiu);
-      },
-    },
-    inicio,
-  );
   const zoom = { r: 0 };
   const congelar = congeladorDoPortal(fora, dentro);
+  tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, portal.t).set(fora, { zIndex: 1 }, portal.t);
   tl.fromTo(
     zoom,
     { r: 0 },
@@ -166,14 +145,22 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
       ease: "none",
       immediateRender: false,
       onUpdate: () => {
-        geometria ??= geometriaDoPortal(objetoDoPortal(fora, portal), tela(), focoDoPortal(dentro, portal));
+        geometria ??= geometriaDoPortal(
+          objetoDoPortal(fora, portal),
+          telaAtual(),
+          focoDoPortal(dentro, portal),
+        );
         congelar(zoom.r);
-        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)));
+        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)), opacidadeDaCenaNova(zoom.r));
       },
     },
     portal.t,
   );
   tl.set(fora, { autoAlpha: 0 }, portal.t + DURACAO_DO_PORTAL);
+}
+
+function telaAtual(): { largura: number; altura: number } {
+  return { largura: window.innerWidth, altura: window.innerHeight };
 }
 
 function adicionarAfastamento(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal): void {
@@ -220,6 +207,11 @@ function congeladorDoPortal(fora: HTMLElement, dentro: HTMLElement): (progresso:
 }
 
 function focoDoPortal(dentro: HTMLElement, portal: Portal): ReturnType<typeof medirNaCena> | undefined {
+  if (portal.focoNaTela) {
+    const { x, y, largura, altura } = portal.focoNaTela;
+    const [w, h] = [window.innerWidth, window.innerHeight];
+    return { x: x * w, y: y * h, largura: largura * w, altura: altura * h };
+  }
   const elemento = portal.foco === undefined ? null : dentro.querySelector(portal.foco);
   return elemento === null ? undefined : medirNaCena(elemento);
 }
@@ -227,15 +219,22 @@ function focoDoPortal(dentro: HTMLElement, portal: Portal): ReturnType<typeof me
 function objetoDoPortal(cena: HTMLElement, portal: Portal): ObjetoDoPortal {
   const alvo = cena.querySelector(`[data-objeto="${portal.objeto}"]`) ?? cena;
   const r = medirNaCena(alvo === cena ? cena : alvo);
-  if (portal.objeto === "so") return bolinhaDoO(alvo, r);
+  if (portal.objeto === "so") return bolinhaDoO(alvo, r, portal.buraco ? RAIO_DO_BURACO_DO_O : 0.3);
   return { ...r, forma: portal.forma ?? "retangulo", canto: portal.canto ?? 18 };
 }
 
 /** A bolinha do "ô" (o SplitText separa as letras): a roça aparece dentro dela. */
-function bolinhaDoO(alvo: Element, palavra: ReturnType<typeof medirNaCena>): ObjetoDoPortal {
+/** Raio do buraco (miolo) do "ô", em frações da largura da letra. */
+const RAIO_DO_BURACO_DO_O = 0.14;
+
+function bolinhaDoO(
+  alvo: Element,
+  palavra: ReturnType<typeof medirNaCena>,
+  fracaoDoRaio: number,
+): ObjetoDoPortal {
   const letra = [...alvo.querySelectorAll("div")].find((d) => d.textContent === "ô");
   const r = letra === undefined ? palavra : medirNaCena(letra);
-  const raio = r.largura * 0.3,
+  const raio = r.largura * fracaoDoRaio,
     cx = r.x + r.largura / 2,
     cy = r.y + r.altura * 0.62;
   return { x: cx - raio, y: cy - raio, largura: raio * 2, altura: raio * 2, forma: "circulo" };

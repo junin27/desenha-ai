@@ -51,15 +51,15 @@ A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fic
 - **THEN** a vitrine continua no capítulo de abertura
 
 ### Requirement: Transição por portal
-O capítulo seguinte SHALL fazer parte do cenário do capítulo atual: o capítulo seguinte já está visível dentro do objeto quando a história para no capítulo, mostrando o elemento principal dele, e a passagem só amplia os dois juntos até o seguinte ocupar a tela inteira, sem a cena nova surgir na hora da passagem. Os objetos SHALL ser: o "ô", a janela da casa, o sol desenhado, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
+O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado, o objeto aparece como sempre e nada do capítulo seguinte é visível. No gesto, a câmera mergulha no objeto e o capítulo seguinte surge de dentro dele durante a primeira metade do zoom, até ocupar a tela inteira. Os objetos SHALL ser: o buraco do "ô", a janela da casa, a folha do desenho, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
 
-#### Scenario: Prévia dentro do objeto
+#### Scenario: Escondido enquanto parado
 - **WHEN** a vitrine está parada no capítulo do jogo, antes de qualquer gesto
-- **THEN** o capítulo do desenho já aparece dentro da janela da casa, e o resto da tela continua sendo o capítulo do jogo
+- **THEN** o capítulo do desenho não está visível, e a janela da casa aparece como sempre
 
-#### Scenario: Objeto que é o conteúdo do capítulo
-- **WHEN** o objeto do portal é o próprio conteúdo do capítulo (a folha do desenho, a grade da CNN, a resposta da LSTM, o jarro)
-- **THEN** o capítulo seguinte só aparece nele no fim do capítulo, depois que o conteúdo foi mostrado, e antes da parada
+#### Scenario: Surge de dentro do objeto
+- **WHEN** a câmera já percorreu metade do zoom na janela da casa
+- **THEN** o capítulo do desenho está totalmente visível, recortado no formato da janela ampliada
 
 #### Scenario: Fim do portal
 - **WHEN** termina a passagem para qualquer capítulo
@@ -157,6 +157,10 @@ Se a média de quadros por segundo da vitrine ficar abaixo de 30 por 3 s seguido
 #### Scenario: Taxa baixa
 - **WHEN** a taxa medida fica em 22 quadros por segundo durante 3 s
 - **THEN** a passagem seguinte de capítulo é um corte direto, sem escala aplicada às cenas, e o vídeo de fundo está pausado
+
+#### Scenario: Carregamento lento não conta
+- **WHEN** a vitrine roda a 10 quadros por segundo nos 2 s depois de a animação ficar pronta e a 60 depois disso
+- **THEN** ela continua no modo normal, com portais e animações
 
 ### Requirement: Tudo carregado do próprio build
 A biblioteca de animação, as fontes, o vídeo de fundo, os desenhos e as métricas da vitrine SHALL vir do próprio build, sem nenhum carregamento de endereço externo.

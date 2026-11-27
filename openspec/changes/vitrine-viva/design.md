@@ -69,3 +69,7 @@
 ## Open Questions
 
 - Ordem final dos 8 desenhos da vitrine (qualquer ordem satisfaz a spec); decidir olhando os desenhos exportados.
+
+### D1c. Capítulo seguinte escondido no objeto (27/11/2026)
+
+O usuário recusou a prévia visível (miniatura "colada" no cenário) e o véu de cor. Agora, parado, o objeto aparece como sempre e a cena seguinte tem opacidade 0; no gesto ela surge de dentro do objeto durante a primeira metade do zoom (`opacidadeDaCenaNova`). No "ô" o objeto é o buraco da letra e a câmera entra pela estradinha de terra da roça (`focoNaTela`), que combina com o marrom da abertura. O medidor de quadros só mede 2 s depois de a animação ficar pronta (o carregamento derrubava a taxa e ligava o corte direto).
