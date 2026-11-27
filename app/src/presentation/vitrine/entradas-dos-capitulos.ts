@@ -1,6 +1,6 @@
 import { gsap } from "gsap";
 import type { IdDoCapitulo } from "../../domain/vitrine/capitulos";
-import { INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
+import { INICIO_DAS_ENTRADAS as INICIO } from "./controle-da-historia";
 
 export type Cenas = Readonly<Record<IdDoCapitulo, HTMLElement>>;
 
@@ -156,4 +156,41 @@ function mostrarChutesDaLstm(tl: gsap.core.Timeline, cena: HTMLElement): void {
       INICIO.lstm + 1.4 + i * 0.9,
     );
   });
+}
+
+/** Fundo do capítulo e elementos que não "nascem" (o vídeo é a própria tela; as marcas são invisíveis). */
+const NAO_NASCEM = ".fundo-video, .detalhes-do-fundo, .objeto-do-portal";
+
+/**
+ * Pedido do usuário (27/11): o portal termina numa tela só com a cor do objeto; 1 s depois os detalhes se desenham
+ * e os elementos nascem dela, crescendo um a um. Usa só `visibility` e `scale`: as entradas próprias de cada
+ * elemento (opacidade, x, y) continuam valendo sem conflito.
+ */
+export function nascerDaTela(
+  tl: gsap.core.Timeline,
+  cena: HTMLElement,
+  inicioDoPortal: number,
+  inicioDasEntradas: number,
+): void {
+  const elementos = [...cena.children].filter((filho) => !filho.matches(NAO_NASCEM));
+  const detalhes = cena.querySelector(".detalhes-do-fundo");
+  tl.set(elementos, { visibility: "hidden" }, inicioDoPortal).set(
+    elementos,
+    { visibility: "inherit" },
+    inicioDasEntradas,
+  );
+  tl.fromTo(
+    elementos,
+    { scale: 0.6 },
+    { scale: 1, duration: 0.6, ease: "back.out(1.7)", stagger: 0.12, immediateRender: false },
+    inicioDasEntradas,
+  );
+  if (detalhes) {
+    tl.set(detalhes, { opacity: 0 }, inicioDoPortal).fromTo(
+      detalhes,
+      { opacity: 0, scale: 1.08 },
+      { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out", immediateRender: false },
+      inicioDasEntradas - 0.3,
+    );
+  }
 }

@@ -20,6 +20,16 @@ export const INICIO_DOS_CAPITULOS: Readonly<Record<IdDoCapitulo, number>> = {
 export const DURACAO_DA_HISTORIA = 75;
 
 /**
+ * Quando o portal termina, a tela nova fica só com a cor do objeto por este tempo; depois os elementos do capítulo
+ * nascem dela (pedido do usuário em 27/11: "primeiro a tela sem nada e, depois de 1 s, os elementos").
+ */
+export const ATRASO_DA_CARGA = 1;
+/** Onde as entradas de cada capítulo começam: o portal termina no início do capítulo, mais o atraso da carga. */
+export const INICIO_DAS_ENTRADAS: Readonly<Record<IdDoCapitulo, number>> = Object.fromEntries(
+  Object.entries(INICIO_DOS_CAPITULOS).map(([id, t]) => [id, id === "abertura" ? t : t + ATRASO_DA_CARGA]),
+) as Record<IdDoCapitulo, number>;
+
+/**
  * Paradas da história (spec "Avançar e voltar a história"): uma por capítulo, logo antes do portal que leva ao
  * seguinte (os tempos dos portais estão em `PORTAIS`, em animacao-da-vitrine.ts); a última é o fim do convite.
  */
@@ -47,7 +57,7 @@ const SEGUNDOS_POR_PIXEL_DA_RODA = 0.005;
 /** Ritmo com que o tempo alcança a rodinha: rápido para parecer preso à mão, sem saltar quadros. */
 const VELOCIDADE_DA_RODINHA = 6;
 /** Depois disso, a partir do início do capítulo, as entradas já terminaram e nada anda até a parada. */
-const FIM_DAS_ENTRADAS = 3;
+const FIM_DAS_ENTRADAS = 3 + ATRASO_DA_CARGA;
 
 /** Trechos sem animação de cada capítulo (do fim das entradas até a parada): a rodinha passa direto por eles. */
 const TRECHOS_PARADOS: readonly (readonly [number, number])[] = CAPITULOS.slice(1).map(({ id }, i) => [

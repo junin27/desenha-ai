@@ -14,6 +14,7 @@ import {
   cenaLstm,
   type DadosDasCenas,
   pousarAbertura,
+  pousarContadores,
 } from "./cenas-da-historia";
 import {
   cenaConvite,
@@ -237,7 +238,10 @@ export class TelaVitrine {
    * o GSAP carrega, `pousar` é falso: senão a gota já começaria como mancha.
    */
   private mostrarSo(id: IdDoCapitulo, pousar = true): void {
-    if (pousar && this.cenas.abertura && !this.animacao) pousarAbertura(this.cenas.abertura);
+    if (pousar && !this.animacao) {
+      if (this.cenas.abertura) pousarAbertura(this.cenas.abertura);
+      pousarContadores(this.palco);
+    }
     for (const [nome, cena] of Object.entries(this.cenas)) {
       cena.style.visibility = nome === id ? "visible" : "hidden";
       cena.style.opacity = nome === id ? "1" : "0";

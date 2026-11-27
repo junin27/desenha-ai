@@ -5,6 +5,8 @@ import {
   ControleDaHistoria,
   DURACAO_DA_HISTORIA,
   INICIO_DOS_CAPITULOS,
+  ATRASO_DA_CARGA,
+  INICIO_DAS_ENTRADAS,
   ligarEntrada,
   PARADAS_DOS_CAPITULOS,
 } from "../../../src/presentation/vitrine/controle-da-historia";
@@ -131,7 +133,7 @@ describe("Requisito: Rodinha acompanha a transição (spec vitrine-da-abertura)"
   it("test_trecho_parado_e_atravessado", () => {
     const { controle, relogio } = naParada(1);
     girar(100);
-    expect(rodar(controle, relogio, 3000)).toBeCloseTo(INICIO_DOS_CAPITULOS.jogo + 3, 5);
+    expect(rodar(controle, relogio, 3000)).toBeCloseTo(INICIO_DOS_CAPITULOS.jogo + 3 + ATRASO_DA_CARGA, 5);
   });
 
   it("test_rodinha_para_baixo_na_abertura_nao_desfaz_o_titulo", () => {
@@ -144,5 +146,21 @@ describe("Requisito: Rodinha acompanha a transição (spec vitrine-da-abertura)"
     const { controle, relogio } = naParada(10);
     girar(-1000);
     expect(rodar(controle, relogio, 3000)).toBeCloseTo(DURACAO_DA_HISTORIA, 5);
+  });
+});
+
+describe("Requisito: Transição por portal — tela nova vazia antes dos elementos (spec vitrine-da-abertura)", () => {
+  it("test_elementos_nascem_1_segundo_depois_do_fim_do_portal", () => {
+    expect(ATRASO_DA_CARGA).toBe(1);
+    for (const { id } of CAPITULOS.slice(1)) {
+      expect(INICIO_DAS_ENTRADAS[id]).toBeCloseTo(INICIO_DOS_CAPITULOS[id] + 1, 5);
+    }
+    expect(INICIO_DAS_ENTRADAS.abertura).toBe(0);
+  });
+
+  it("test_entradas_terminam_antes_da_parada_do_capitulo", () => {
+    CAPITULOS.slice(1).forEach(({ id }, i) => {
+      expect(INICIO_DAS_ENTRADAS[id] + 3).toBeLessThan(PARADAS_DOS_CAPITULOS[i + 1] ?? -1);
+    });
   });
 });

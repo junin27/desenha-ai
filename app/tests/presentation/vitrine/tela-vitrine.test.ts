@@ -226,3 +226,32 @@ describe("Requisito: Degradação em notebook lento (spec vitrine-da-abertura)",
     expect(gota).toBe(abertura?.querySelector('[data-parte="forma-da-mancha"]')?.getAttribute("d"));
   });
 });
+
+describe("Requisito: Transição por portal — detalhes no fundo de cada capítulo (spec vitrine-da-abertura)", () => {
+  it("test_capitulos_depois_da_abertura_tem_rabiscos_desenhados_no_fundo", async () => {
+    const tela = await montada(conteudo());
+    for (const id of [
+      "jogo",
+      "desenho",
+      "cnn",
+      "lstm",
+      "ze",
+      "destilacao",
+      "qlora",
+      "quantizacao",
+      "engenharia",
+    ]) {
+      const detalhes = tela.raiz.querySelector(`[data-cena="${id}"] [data-parte="detalhes"]`);
+      expect(detalhes, id).not.toBeNull();
+      expect(detalhes?.querySelectorAll("path").length, id).toBeGreaterThanOrEqual(6);
+    }
+  });
+});
+
+describe("Requisito: Movimento reduzido — números no valor final (spec vitrine-da-abertura)", () => {
+  it("test_sem_animacao_o_contador_mostra_os_455_exemplos_e_nao_zero", async () => {
+    const tela = await montada(conteudo({ resumo: { exemplosDoZe: 455 } }), { movimentoReduzido: true });
+    tela.passo();
+    expect(tela.raiz.querySelector("[data-ate]")?.textContent).toBe("455");
+  });
+});

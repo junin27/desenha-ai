@@ -777,3 +777,70 @@
 .cena-engenharia {
   background: #5d442d; /* encolhe para dentro da janela da casa no convite */
 }
+
+/* Detalhes do fundo: linhas e rabiscos na mesma família de cor do fundo (nascem 1 s depois do portal). */
+.detalhes-do-fundo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.rabiscos-do-fundo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.rabiscos-do-fundo path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cena-cnn {
+  background: #fffdf6; /* a grade passa para a camada de detalhes: o corte chega no papel liso */
+}
+.detalhes-desenho {
+  color: #75583b;
+  background: repeating-linear-gradient(90deg, transparent 0 118px, #4f3925 118px 123px);
+}
+.detalhes-cnn {
+  color: #eadcbe;
+  background:
+    linear-gradient(#efe6d2 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(90deg, #efe6d2 1px, transparent 1px) 0 0 / 34px 34px;
+}
+.detalhes-lstm,
+.detalhes-ze {
+  color: #eadcbe;
+  background: radial-gradient(circle, #efe3c8 2px, transparent 3px) 0 0 / 40px 40px;
+}
+.detalhes-destilacao {
+  color: #e5ad7c;
+  background:
+    radial-gradient(circle at 12% 80%, #f7d3ae 0 60px, transparent 61px),
+    radial-gradient(circle at 88% 20%, #f7d3ae 0 90px, transparent 91px);
+}
+.detalhes-qlora {
+  color: #4a3420;
+  background:
+    linear-gradient(#3a2614 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, #3a2614 1px, transparent 1px) 0 0 / 40px 40px;
+}
+.detalhes-quantizacao {
+  color: #b6a889;
+  background: repeating-linear-gradient(135deg, transparent 0 26px, #c4b796 26px 30px);
+}
+.detalhes-engenharia {
+  color: #75583b;
+  background: repeating-linear-gradient(90deg, transparent 0 118px, #4f3925 118px 123px);
+}
+.detalhes-jogo {
+  display: none; /* a roça já é o vídeo */
+}
+
+/* Sem animação (corte direto), o jarro já aparece cheio; a animação o enche de 0 a 68%. */
+.jarro .nivel {
+  height: 68%;
+}

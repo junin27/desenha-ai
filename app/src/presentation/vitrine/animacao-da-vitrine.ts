@@ -9,8 +9,8 @@ import {
   suavizar,
   type ObjetoDoPortal,
 } from "../../domain/vitrine/portal";
-import { INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
-import { entradasDosCapitulos, type Cenas } from "./entradas-dos-capitulos";
+import { INICIO_DAS_ENTRADAS, INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
+import { entradasDosCapitulos, nascerDaTela, type Cenas } from "./entradas-dos-capitulos";
 import { CongeladorDeVideo } from "./congelador-de-video";
 import { aplicarQuadro, medirNaCena } from "./motor-do-portal";
 
@@ -125,10 +125,14 @@ export function montarAnimacao(cenas: Cenas): gsap.core.Timeline {
     "quantizacao",
     "engenharia",
   ] as const) {
-    cartao(tl, cenas[id], INICIO[id] + 0.1, inicioDaSaidaDoCartao(id));
+    cartao(tl, cenas[id], INICIO_DAS_ENTRADAS[id] + 0.1, inicioDaSaidaDoCartao(id));
   }
   entradasDosCapitulos(tl, cenas);
   for (const portal of PORTAIS) adicionarPortal(tl, cenas, portal);
+  for (const portal of PORTAIS) {
+    if (portal.sentido !== "sair")
+      nascerDaTela(tl, cenas[portal.dentro], portal.t, INICIO_DAS_ENTRADAS[portal.dentro]);
+  }
   tl.to({}, { duration: 1 }, INICIO.convite + 4.7);
   return tl;
 }

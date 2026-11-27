@@ -28,8 +28,37 @@ export interface DadosDasCenas {
   readonly nomesDasCategorias: readonly string[];
 }
 
+/**
+ * Rabiscos à mão no fundo de cada capítulo (espiral, zigue-zague, laço, estrela, onda, setas e "x"), na mesma
+ * família de cor do fundo: o corte do portal continua sem troca de cor e a tela não fica chapada.
+ */
+const RABISCOS = [
+  "M120 150 m-30 0 a30 30 0 1 1 60 0 a24 24 0 1 1 -48 0 a18 18 0 1 1 36 0",
+  "M1250 90 l30 -25 l30 25 l30 -25 l30 25 l30 -25",
+  "M80 780 c60 -60 120 40 180 -20 s120 40 180 -20",
+  "M1450 700 l12 30 l32 2 l-25 20 l9 31 l-28 -18 l-28 18 l9 -31 l-25 -20 l32 -2 z",
+  "M700 840 a40 25 0 1 0 1 0",
+  "M1480 380 q20 -30 40 0 t40 0 t40 0",
+  "M400 110 l20 20 m0 -20 l-20 20 M1100 830 l20 20 m0 -20 l-20 20",
+  "M260 470 q60 -80 140 -20 m-24 -26 l24 26 l-32 4",
+];
+
+function criarDetalhesDoFundo(id: IdDoCapitulo): HTMLElement {
+  const caminhos = RABISCOS.map((d) => `<path d="${d}"/>`).join("");
+  const desenho = svgDeTexto(
+    `<svg class="rabiscos-do-fundo" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${caminhos}</svg>`,
+  );
+  return criar("div", { classe: `detalhes-do-fundo detalhes-${id}`, dados: { parte: "detalhes" } }, [
+    desenho,
+  ]);
+}
+
 export function criarCena(id: IdDoCapitulo, filhos: readonly Node[]): HTMLElement {
-  const cena = criar("section", { classe: `cena-vitrine cena-${id}`, dados: { cena: id } }, filhos);
+  const detalhes = id === "abertura" ? [] : [criarDetalhesDoFundo(id)];
+  const cena = criar("section", { classe: `cena-vitrine cena-${id}`, dados: { cena: id } }, [
+    ...detalhes,
+    ...filhos,
+  ]);
   cena.setAttribute("aria-hidden", "true");
   return cena;
 }
@@ -85,6 +114,13 @@ export const ESCALA_DA_MANCHA = 1.75;
  * A abertura em repouso, sem animação (movimento reduzido ou abaixo de 30 fps): a gota já virou mancha e está no
  * tamanho final, para o título creme ter o fundo escuro por trás.
  */
+/** Contadores no número final (o "0 → 455" só existe na animação; sem ela, o número certo aparece direto). */
+export function pousarContadores(raiz: ParentNode): void {
+  for (const contador of raiz.querySelectorAll<HTMLElement>("[data-ate]")) {
+    contador.textContent = Number(contador.dataset.ate).toLocaleString("pt-BR");
+  }
+}
+
 export function pousarAbertura(cena: HTMLElement): void {
   const gota = cena.querySelector('[data-parte="gota"]');
   const forma = cena.querySelector('[data-parte="forma-da-mancha"]')?.getAttribute("d");
