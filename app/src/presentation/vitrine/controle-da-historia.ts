@@ -79,7 +79,9 @@ export class ControleDaHistoria {
 
   voltarCapitulo(): void {
     const anterior = [...PARADAS_DOS_CAPITULOS].reverse().find((parada) => parada < this.alvo - 1e-6);
-    this.alvo = anterior ?? 0;
+    // na abertura não há capítulo anterior: voltar ao segundo 0 desfazia o título e deixava a tela vazia
+    if (anterior === undefined) return;
+    this.alvo = anterior;
     this.velocidade = VELOCIDADE_PARA_TRAS;
   }
 
@@ -89,7 +91,9 @@ export class ControleDaHistoria {
     const novoGesto = agora - this.ultimaRodinha > MS_ENTRE_GESTOS_DA_RODA;
     this.ultimaRodinha = agora;
     if (!novoGesto || deltaY === 0) return;
-    if (deltaY > 0) this.avancarCapitulo();
+    // na abertura não há para onde voltar: girar para qualquer lado avança (mouse com rolagem invertida)
+    const naAbertura = this.alvo <= (PARADAS_DOS_CAPITULOS[0] ?? 0) + 1e-6;
+    if (deltaY > 0 || naAbertura) this.avancarCapitulo();
     else this.voltarCapitulo();
   }
 

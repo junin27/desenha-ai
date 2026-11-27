@@ -39,6 +39,10 @@ Cada gesto (um giro da roda do mouse, Seta para baixo, PageDown, Espaço ou arra
 - **WHEN** o visitante gira a roda várias vezes no mesmo gesto
 - **THEN** a história avança só um capítulo
 
+#### Scenario: Rodinha na abertura
+- **WHEN** a vitrine está parada no capítulo de abertura e o visitante gira a roda em qualquer sentido
+- **THEN** a história anda até a parada do capítulo do jogo, e o título da abertura nunca é desfeito
+
 #### Scenario: Voltar por um portal
 - **WHEN** a história está no capítulo do desenho e o visitante volta até o capítulo do jogo
 - **THEN** só a cena do jogo fica visível, sem transformação nem recorte aplicado a ela

@@ -44,6 +44,24 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
     expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
   });
 
+  it("test_voltar_na_abertura_nao_desfaz_o_titulo", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    ligarEntrada(window, controle, () => true);
+    rodar(controle, relogio, 6000);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "PageUp" }));
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[0] ?? -1, 5);
+  });
+
+  it("test_rodinha_para_cima_na_abertura_avanca_para_o_jogo", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    ligarEntrada(window, controle, () => true);
+    rodar(controle, relogio, 6000);
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: -100, cancelable: true }));
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
+  });
+
   it("test_varios_giros_da_roda_no_mesmo_gesto_avancam_um_capitulo", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
