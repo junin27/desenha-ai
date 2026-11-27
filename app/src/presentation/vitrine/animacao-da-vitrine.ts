@@ -12,6 +12,7 @@ import {
 import { INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
 import { entradasDosCapitulos, type Cenas } from "./entradas-dos-capitulos";
 import { CongeladorDeVideo } from "./congelador-de-video";
+import { corDoObjeto, VeuDoPortal } from "./veu-do-portal";
 import { aplicarQuadro, medirNaCena } from "./motor-do-portal";
 
 gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin, SplitText);
@@ -25,10 +26,13 @@ const FASE_DO_SUMIR = PREVIA_DO_AFASTAMENTO / TOTAL_DO_AFASTAMENTO;
  * A cena seguinte fica escondida no objeto (spec "Transição por portal"): parada, opacidade 0; no zoom ela
  * surge de dentro do objeto e já está inteira na metade dele.
  */
-const FIM_DO_SURGIMENTO = 0.5;
+const INICIO_DO_SURGIMENTO = 0.3;
+const FIM_DO_SURGIMENTO = 0.7;
 
-export function opacidadeDaCenaNova(progressoDoZoom: number): number {
-  return Math.min(1, Math.max(0, progressoDoZoom) / FIM_DO_SURGIMENTO);
+/** Véu na cor do objeto: opaco no começo do zoom, some entre 30% e 70% dele, com o objeto já grande (a cena nasce da cor do objeto). */
+export function opacidadeDoVeu(progressoDoZoom: number): number {
+  const fracao = (progressoDoZoom - INICIO_DO_SURGIMENTO) / (FIM_DO_SURGIMENTO - INICIO_DO_SURGIMENTO);
+  return 1 - Math.min(1, Math.max(0, fracao));
 }
 
 interface Portal {
@@ -145,8 +149,10 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
   const fora = cenas[portal.fora],
     dentro = cenas[portal.dentro];
   let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
+  let cor: string | undefined;
   const zoom = { r: 0 };
   const congelar = congeladorDoPortal(fora, dentro);
+  const veu = new VeuDoPortal(dentro);
   tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, portal.t).set(fora, { zIndex: 1 }, portal.t);
   tl.fromTo(
     zoom,
@@ -157,13 +163,14 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
       ease: "none",
       immediateRender: false,
       onUpdate: () => {
-        geometria ??= geometriaDoPortal(
-          objetoDoPortal(fora, portal),
-          telaAtual(),
-          focoDoPortal(dentro, portal),
-        );
+        if (geometria === undefined) {
+          const objeto = objetoDoPortal(fora, portal);
+          cor = corDoObjeto(fora, objeto);
+          geometria = geometriaDoPortal(objeto, telaAtual(), focoDoPortal(dentro, portal));
+        }
         congelar(zoom.r);
-        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)), opacidadeDaCenaNova(zoom.r));
+        aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)));
+        veu.mostrar(cor ?? "", zoom.r > 0 && zoom.r < 1 ? opacidadeDoVeu(zoom.r) : 0);
       },
     },
     portal.t,
