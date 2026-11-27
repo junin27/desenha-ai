@@ -108,7 +108,18 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - **Feito nesta sessão:** charada sem vazamento na tela; parâmetros corrigidos (1,72 bi, LoRA 1,01%, FP16 3,44 GB) no notebook e no banner; revisão offline do treino (`scripts/revisar_dataset.py`); jogo com temperatura 0,3 e sem penalidade; `docs/cadastro.md` com os campos do formulário e o padrão da planilha do professor (repetição = vermelho).
 - **Próximo passo:** change na demo-offline para usar o GGUF Q8_0 (hoje `preparar_demo.py` grava o Zé com o nome `…Q4_K_M.gguf`); `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf`; ensaio real; voltar o formato do Zé a ✗ no checklist; preencher os `[PENDENTE]` de banner e pitch; arquivar as 6 changes. Cadastro no formulário até 27/11 (com o usuário).
 
-## Estado em 27/11/2026 (madrugada) — LEIA PRIMEIRO (vitrine-viva, transições)
+## Estado em 27/11/2026 (tarde) — LEIA PRIMEIRO (vitrine-viva: transição APROVADA)
+
+O usuário **aprovou** a transição entre capítulos ("perfeito") vendo no navegador dele a 60 fps. Como ficou:
+
+- **Corte pela cor, com o fundo do capítulo seguinte na cor do objeto:** a câmera mergulha até o **miolo** do objeto cobrir a tela inteira (zoom final = cobrir nas duas direções × 2; `zoomFinal` em `domain/vitrine/portal.ts`) e o capítulo seguinte começa dessa mesma cor: janela da casa → "O desenho" no marrom `#5d442d` (medido nos pixels do vídeo); desenho/grade/resposta → papel `#fffdf6`; cabeça do Zé → destilação na pele `#f3c79b`; jarro → QLoRA na tinta; peso → quantização `#cfc3a6` (e o hexágono do llama.cpp na mesma cor); engenharia no marrom da janela do convite.
+- **Tela nova vazia por 1 s** (`ATRASO_DA_CARGA`, `INICIO_DAS_ENTRADAS` em `controle-da-historia.ts`); depois a camada de detalhes (linhas + rabiscos SVG, mesma família de cor) se desenha e os elementos **nascem da tela** (scale 0,6 → 1, um por vez; `nascerDaTela` em `entradas-dos-capitulos.ts`).
+- **Corte direto** (movimento reduzido ou < 30 fps): a animação é revertida (`revert()`, não `kill()`), a abertura pousa com a mancha pronta e o título visível, contadores e jarro já no valor final.
+- O navegador embutido do app roda a 15–30 fps e sempre cai no corte direto: **para ver os portais, abrir http://localhost:4173 no navegador do usuário** (launch "jogo-build").
+
+**Ainda em aberto:** portal do "ô" → roça (ainda troca do escuro para a roça clara; opções: entrar na letra creme ou a roça surgir do escuro — perguntar); voltar com PageUp a partir da LSTM não funcionou no painel embutido (conferir no navegador real); `animacao-da-vitrine.ts` tem 317 linhas (> 300, separar); tarefas 5.6, 7.1, 7.2, 8.1, 9.1, 9.2 de `vitrine-viva`; não commitar o `app/package-lock.json` se o npm remover linhas `libc`.
+
+## Estado em 27/11/2026 (madrugada) — histórico (vitrine-viva, transições)
 
 O usuário ainda **não aprovou** a transição entre capítulos; vai continuar no serviço.
 
