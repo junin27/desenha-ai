@@ -35,13 +35,6 @@
   height: 100%;
   object-fit: cover;
 }
-/* véu na cor do objeto do portal, por cima de tudo da cena seguinte */
-.veu-do-portal {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  pointer-events: none;
-}
 .objeto-do-portal {
   position: absolute;
   pointer-events: none;

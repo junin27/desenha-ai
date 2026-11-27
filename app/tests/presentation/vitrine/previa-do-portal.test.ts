@@ -2,22 +2,21 @@
 import { describe, expect, it } from "vitest";
 import {
   inicioDaSaidaDoCartao,
-  opacidadeDoVeu,
+  opacidadeDaCenaNova,
   saidaDoCapitulo,
 } from "../../../src/presentation/vitrine/animacao-da-vitrine";
 import { PARADAS_DOS_CAPITULOS } from "../../../src/presentation/vitrine/controle-da-historia";
 
 describe("Requisito: Transição por portal (spec vitrine-da-abertura)", () => {
-  it("test_comeca_na_cor_do_objeto_veu_opaco_no_inicio_do_zoom", () => {
-    expect(opacidadeDoVeu(0)).toBe(1);
-    expect(opacidadeDoVeu(0.3)).toBe(1);
+  it("test_comeca_na_cor_do_objeto_cena_nova_invisivel_ate_o_objeto_cobrir_a_tela", () => {
+    expect(opacidadeDaCenaNova(0)).toBe(0);
+    expect(opacidadeDaCenaNova(0.85)).toBe(0);
   });
 
-  it("test_surge_de_dentro_do_objeto_sem_veu_aos_70_por_cento_do_zoom", () => {
-    expect(opacidadeDoVeu(0.5)).toBeGreaterThan(0);
-    expect(opacidadeDoVeu(0.5)).toBeLessThan(1);
-    expect(opacidadeDoVeu(0.7)).toBe(0);
-    expect(opacidadeDoVeu(1)).toBe(0);
+  it("test_surge_so_com_o_objeto_cobrindo_a_tela_sem_veu_no_fim", () => {
+    expect(opacidadeDaCenaNova(0.93)).toBeGreaterThan(0);
+    expect(opacidadeDaCenaNova(0.93)).toBeLessThan(1);
+    expect(opacidadeDaCenaNova(1)).toBe(1);
   });
 });
 

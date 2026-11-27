@@ -12,7 +12,6 @@ import {
 import { INICIO_DOS_CAPITULOS as INICIO } from "./controle-da-historia";
 import { entradasDosCapitulos, type Cenas } from "./entradas-dos-capitulos";
 import { CongeladorDeVideo } from "./congelador-de-video";
-import { corDoObjeto, VeuDoPortal } from "./veu-do-portal";
 import { aplicarQuadro, medirNaCena } from "./motor-do-portal";
 
 gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin, SplitText);
@@ -26,13 +25,13 @@ const FASE_DO_SUMIR = PREVIA_DO_AFASTAMENTO / TOTAL_DO_AFASTAMENTO;
  * A cena seguinte fica escondida no objeto (spec "Transição por portal"): parada, opacidade 0; no zoom ela
  * surge de dentro do objeto e já está inteira na metade dele.
  */
-const INICIO_DO_SURGIMENTO = 0.3;
-const FIM_DO_SURGIMENTO = 0.7;
+const INICIO_DO_SURGIMENTO = 0.85;
+const FIM_DO_SURGIMENTO = 1;
 
-/** Véu na cor do objeto: opaco no começo do zoom, some entre 30% e 70% dele, com o objeto já grande (a cena nasce da cor do objeto). */
-export function opacidadeDoVeu(progressoDoZoom: number): number {
+/** Cena nova: invisível até o objeto cobrir a tela com a sua cor; aí surge em tela cheia (corte pela cor). */
+export function opacidadeDaCenaNova(progressoDoZoom: number): number {
   const fracao = (progressoDoZoom - INICIO_DO_SURGIMENTO) / (FIM_DO_SURGIMENTO - INICIO_DO_SURGIMENTO);
-  return 1 - Math.min(1, Math.max(0, fracao));
+  return Math.min(1, Math.max(0, fracao));
 }
 
 interface Portal {
@@ -64,8 +63,6 @@ const PORTAIS: readonly Portal[] = [
     objeto: "so",
     forma: "circulo",
     buraco: true,
-    // a câmera entra pelo buraco do "ô" e cai na estradinha de terra da roça
-    focoNaTela: { x: 0.127, y: 0.733, largura: 0.07, altura: 0.125 },
     t: 4.5,
   },
   { fora: "jogo", dentro: "desenho", objeto: "janela", canto: 2, foco: ".folha-vitrine", t: 11.3 },
@@ -149,10 +146,8 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
   const fora = cenas[portal.fora],
     dentro = cenas[portal.dentro];
   let geometria: ReturnType<typeof geometriaDoPortal> | undefined;
-  let cor: string | undefined;
   const zoom = { r: 0 };
   const congelar = congeladorDoPortal(fora, dentro);
-  const veu = new VeuDoPortal(dentro);
   tl.set(dentro, { autoAlpha: 1, zIndex: 2 }, portal.t).set(fora, { zIndex: 1 }, portal.t);
   tl.fromTo(
     zoom,
@@ -163,14 +158,20 @@ function adicionarEntrada(tl: gsap.core.Timeline, cenas: Cenas, portal: Portal):
       ease: "none",
       immediateRender: false,
       onUpdate: () => {
-        if (geometria === undefined) {
-          const objeto = objetoDoPortal(fora, portal);
-          cor = corDoObjeto(fora, objeto);
-          geometria = geometriaDoPortal(objeto, telaAtual(), focoDoPortal(dentro, portal));
-        }
+        geometria ??= geometriaDoPortal(
+          objetoDoPortal(fora, portal),
+          telaAtual(),
+          focoDoPortal(dentro, portal),
+        );
         congelar(zoom.r);
         aplicarQuadro(fora, dentro, quadroDoPortal(geometria, suavizar(zoom.r)));
-        veu.mostrar(cor ?? "", zoom.r > 0 && zoom.r < 1 ? opacidadeDoVeu(zoom.r) : 0);
+        // a cena nova não é recortada nem ampliada: o mergulho é na cena atual, e a nova surge da cor do objeto
+        if (zoom.r < 1)
+          Object.assign(dentro.style, {
+            transform: "",
+            clipPath: "",
+            opacity: String(opacidadeDaCenaNova(zoom.r)),
+          });
       },
     },
     portal.t,
@@ -244,7 +245,7 @@ function objetoDoPortal(cena: HTMLElement, portal: Portal): ObjetoDoPortal {
 
 /** A bolinha do "ô" (o SplitText separa as letras): a roça aparece dentro dela. */
 /** Raio do buraco (miolo) do "ô", em frações da largura da letra. */
-const RAIO_DO_BURACO_DO_O = 0.14;
+const RAIO_DO_BURACO_DO_O = 0.1; // ~0,14/raiz de 2: o quadrado cabe no buraco e a tela fica só escura
 
 function bolinhaDoO(
   alvo: Element,

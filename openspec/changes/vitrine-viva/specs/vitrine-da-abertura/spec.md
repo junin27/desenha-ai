@@ -62,7 +62,7 @@ A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fic
 - **THEN** a vitrine continua no capítulo de abertura
 
 ### Requirement: Transição por portal
-O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado, o objeto aparece como sempre e nada do capítulo seguinte é visível. No gesto, a câmera mergulha no objeto, que cresce ainda com a sua própria cor (lida do objeto na tela), e o capítulo seguinte surge de dentro dessa cor entre 30% e 70% do zoom, até ocupar a tela inteira.
+O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado, o objeto aparece como sempre e nada do capítulo seguinte é visível. No gesto, a câmera mergulha no próprio objeto até a cor dele cobrir a tela, sem recorte nem imagem nova por cima; só então, a partir de 85% do zoom, o capítulo seguinte surge em tela cheia a partir dessa cor, até ocupar a tela inteira.
 
 #### Scenario: Objetos dos portais
 - **WHEN** a história passa pelos portais de mergulho, em ordem
@@ -73,12 +73,12 @@ O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado
 - **THEN** o capítulo do desenho não está visível, e a janela da casa aparece como sempre
 
 #### Scenario: Surge de dentro do objeto
-- **WHEN** a câmera já percorreu 70% do zoom na janela da casa
-- **THEN** o capítulo do desenho está totalmente visível, sem a cor da janela por cima, recortado no formato da janela ampliada
+- **WHEN** a câmera termina o zoom na janela da casa
+- **THEN** o capítulo do desenho está totalmente visível, sem a cor da janela por cima
 
 #### Scenario: Começa na cor do objeto
-- **WHEN** a câmera percorreu até 30% do zoom na janela da casa
-- **THEN** o recorte da janela ampliada mostra só a cor da janela, e não o cenário do desenho
+- **WHEN** a câmera percorreu até 85% do zoom na janela da casa
+- **THEN** só a cena do jogo está visível, ampliada na janela, e nada do capítulo do desenho aparece
 
 #### Scenario: Fim do portal
 - **WHEN** termina a passagem para qualquer capítulo
