@@ -102,3 +102,41 @@ describe("Requisito: Transição por portal, com foco no elemento principal (spe
     expect(quadro.recorte).toBeNull();
   });
 });
+
+describe("Requisito: Transição por portal — zoom até o miolo do objeto (spec vitrine-da-abertura)", () => {
+  /** Miolo do objeto: tira a moldura (1/8 de cada lado), que na janela da casa é o contorno escuro. */
+  function miolo(o: ObjetoDoPortal): ObjetoDoPortal {
+    return {
+      ...o,
+      x: o.x + o.largura / 8,
+      y: o.y + o.altura / 8,
+      largura: (o.largura * 3) / 4,
+      altura: (o.altura * 3) / 4,
+    };
+  }
+
+  it.each([0.955, 1])("test_janela_estreita_o_miolo_cobre_a_tela_inteira_na_hora_do_corte_u_%s", (u) => {
+    const quadro = quadroDoPortal(geometriaDoPortal(JANELA, TELA), u);
+    const m = miolo(JANELA);
+    const [esq, topo] = aplicarMatriz(quadro.fora, m.x, m.y);
+    const [dir, baixo] = aplicarMatriz(quadro.fora, m.x + m.largura, m.y + m.altura);
+    expect(esq).toBeLessThanOrEqual(0);
+    expect(topo).toBeLessThanOrEqual(0);
+    expect(dir).toBeGreaterThanOrEqual(TELA.largura);
+    expect(baixo).toBeGreaterThanOrEqual(TELA.altura);
+  });
+
+  it("test_objeto_redondo_o_circulo_cobre_os_cantos_da_tela_no_fim", () => {
+    const quadro = quadroDoPortal(geometriaDoPortal(LETRA_O, TELA), 1);
+    const [cx, cy] = aplicarMatriz(
+      quadro.fora,
+      LETRA_O.x + LETRA_O.largura / 2,
+      LETRA_O.y + LETRA_O.altura / 2,
+    );
+    const [bordaX] = aplicarMatriz(quadro.fora, LETRA_O.x + LETRA_O.largura, 0);
+    const raioNaTela = bordaX - cx;
+    expect(raioNaTela * 0.75).toBeGreaterThanOrEqual(
+      Math.hypot(Math.max(cx, TELA.largura - cx), Math.max(cy, TELA.altura - cy)),
+    );
+  });
+});

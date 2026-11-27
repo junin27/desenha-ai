@@ -48,6 +48,12 @@ export interface GeometriaDoPortal {
   /** Foco da cena nova: sua escala sobre o objeto e seu centro, em coordenadas da cena nova. */
   readonly foco?: { readonly escala: number; readonly centro: { readonly x: number; readonly y: number } };
   readonly escalaInicial: number;
+  /**
+   * Zoom da câmera no fim do mergulho: o miolo do objeto (sem a moldura) cobre a tela nas DUAS direções. Antes
+   * era só `1/escalaInicial`, que cobre uma direção: na janela da casa (estreita e alta) sobravam a parede e a
+   * moldura escura dos lados na hora do corte.
+   */
+  readonly zoomFinal: number;
   readonly centroDoObjeto: { readonly x: number; readonly y: number };
   readonly deslocamentoInicial: { readonly x: number; readonly y: number };
   readonly recorteInicial: Recorte;
@@ -65,12 +71,23 @@ const INICIO_DA_ABERTURA = 0.3;
 const CANTO_PADRAO = 18;
 const IDENTIDADE: Matriz = [1, 0, 0, 1, 0, 0];
 
+/**
+ * Quanto além de "cobrir a tela" a câmera vai: o miolo do objeto (sem moldura, ~3/4 do tamanho) tem de cobrir a
+ * tela antes de o capítulo seguinte surgir (85% do mergulho, `u` suavizado ≈ 0,955).
+ */
+const MARGEM_ALEM_DA_MOLDURA = 2;
+
 export function geometriaDoPortal(
   objeto: ObjetoDoPortal,
   tela: TamanhoDaTela,
   foco?: Retangulo,
 ): GeometriaDoPortal {
   const escalaInicial = Math.max(objeto.largura / tela.largura, objeto.altura / tela.altura);
+  const cobrir =
+    objeto.forma === "circulo"
+      ? Math.hypot(tela.largura, tela.altura) / Math.min(objeto.largura, objeto.altura)
+      : Math.max(tela.largura / objeto.largura, tela.altura / objeto.altura);
+  const zoomFinal = cobrir * MARGEM_ALEM_DA_MOLDURA;
   const centroDoObjeto = { x: objeto.x + objeto.largura / 2, y: objeto.y + objeto.altura / 2 };
   const deslocamentoInicial = {
     x: centroDoObjeto.x - (escalaInicial * tela.largura) / 2,
@@ -99,6 +116,7 @@ export function geometriaDoPortal(
     objeto,
     ...(comFoco ? { foco: comFoco } : {}),
     escalaInicial,
+    zoomFinal,
     centroDoObjeto,
     deslocamentoInicial,
     recorteInicial,
@@ -137,9 +155,9 @@ export function suavizar(p: number): number {
 }
 
 function camera(geometria: GeometriaDoPortal, u: number): { zoom: number; alvoX: number; alvoY: number } {
-  const { escalaInicial, centroDoObjeto, tela } = geometria;
+  const { zoomFinal, centroDoObjeto, tela } = geometria;
   return {
-    zoom: escalaInicial ** -u,
+    zoom: zoomFinal ** u,
     alvoX: centroDoObjeto.x + (tela.largura / 2 - centroDoObjeto.x) * u,
     alvoY: centroDoObjeto.y + (tela.altura / 2 - centroDoObjeto.y) * u,
   };
