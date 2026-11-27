@@ -13,6 +13,7 @@ import {
   cenaJogo,
   cenaLstm,
   type DadosDasCenas,
+  pousarAbertura,
 } from "./cenas-da-historia";
 import {
   cenaConvite,
@@ -42,9 +43,19 @@ export interface OpcoesDaVitrine extends OpcoesDoPersonagem {
   readonly movimentoReduzido?: boolean;
   readonly agoraMs?: () => number;
   readonly pedirQuadro?: (passo: () => void) => void;
+  /** Monta a animação (padrão: GSAP carregado sob demanda); os testes injetam uma de mentira. */
+  readonly criarAnimacao?: (cenas: Record<IdDoCapitulo, HTMLElement>) => Promise<AnimacaoDaVitrine>;
 }
 
-type Animacao = { time(segundos: number): unknown; kill(): unknown };
+/** O que a vitrine usa da linha do tempo do GSAP. */
+export interface AnimacaoDaVitrine {
+  time(segundos: number): unknown;
+  kill(): unknown;
+  /** Desfaz todos os estilos que a animação aplicou (letras, cartões, cenas) e a desliga. */
+  revert(): unknown;
+}
+
+type Animacao = AnimacaoDaVitrine;
 
 /** A vitrine (spec `vitrine-da-abertura`): primeira tela do jogo, história em 11 capítulos, convite ao apelido. */
 export class TelaVitrine {
@@ -170,7 +181,7 @@ export class TelaVitrine {
   }
 
   private construir(dados: DadosDasCenas): void {
-    this.animacao?.kill();
+    this.animacao?.revert();
     const jogo = cenaJogo(dados, this.opcoes);
     const ze = cenaZe(dados, this.opcoes);
     const convite = cenaConvite(this.opcoes, (botao) => {
@@ -193,30 +204,57 @@ export class TelaVitrine {
     this.zes = [convite.ze, jogo.ze, ze.ze];
     this.palco.replaceChildren(...CAPITULOS.map(({ id }) => this.cenas[id]).filter((c) => c !== undefined));
     this.animacao = undefined;
-    this.mostrarSo(this.capitulo); // enquanto o GSAP carrega (ou sem animação), corte direto
+    // enquanto o GSAP carrega, só mostra o capítulo; sem animação nenhuma, corte direto com a abertura em repouso
+    if (this.animado) this.mostrarSo(this.capitulo, false);
+    else this.mostrarSo(this.capitulo);
     if (this.animado) void this.carregarAnimacao();
   }
 
   /** O GSAP só é carregado quando há animação (movimento reduzido e testes não o baixam). */
   private async carregarAnimacao(): Promise<void> {
     const cenas = this.cenas as Record<IdDoCapitulo, HTMLElement>;
-    const { montarAnimacao } = await import("./animacao-da-vitrine");
-    if (this.cenas === cenas && this.animado) this.animacao = montarAnimacao(cenas);
+    const criar = this.opcoes.criarAnimacao ?? animacaoComGsap;
+    const animacao = await criar(cenas);
+    if (this.cenas === cenas && this.animado) this.animacao = animacao;
+    else animacao.revert();
     this.medidor.aquecer((this.opcoes.agoraMs ?? (() => performance.now()))());
   }
 
+  /**
+   * Abaixo de 30 fps: larga a animação no meio. Só `kill()` deixaria cada elemento onde a animação parou (as
+   * letras do título invisíveis no meio da abertura); `revert()` devolve tudo ao estado final do CSS.
+   */
   private cairParaCorteDireto(): void {
-    this.animacao?.kill();
+    this.animacao?.revert();
     this.animacao = undefined;
     for (const cena of Object.values(this.cenas))
       Object.assign(cena.style, { transform: "", clipPath: "", opacity: "" });
     for (const video of this.videos) video.pause();
   }
 
-  private mostrarSo(id: IdDoCapitulo): void {
+  /**
+   * Corte direto: só o capítulo `id` aparece e a abertura fica em repouso (mancha pronta, título visível). Enquanto
+   * o GSAP carrega, `pousar` é falso: senão a gota já começaria como mancha.
+   */
+  private mostrarSo(id: IdDoCapitulo, pousar = true): void {
+    if (pousar && this.cenas.abertura && !this.animacao) pousarAbertura(this.cenas.abertura);
     for (const [nome, cena] of Object.entries(this.cenas)) {
       cena.style.visibility = nome === id ? "visible" : "hidden";
       cena.style.opacity = nome === id ? "1" : "0";
     }
   }
+}
+
+/**
+ * Carrega o GSAP sob demanda e embrulha a linha do tempo: ela tem um método `then` (espera a animação acabar), então
+ * devolvê-la direto de uma função `async` faria o `await` esperar a história inteira terminar.
+ */
+async function animacaoComGsap(cenas: Record<IdDoCapitulo, HTMLElement>): Promise<AnimacaoDaVitrine> {
+  const { montarAnimacao } = await import("./animacao-da-vitrine");
+  const linha = montarAnimacao(cenas);
+  return {
+    time: (segundos) => linha.time(segundos),
+    kill: () => linha.kill(),
+    revert: () => linha.revert(),
+  };
 }

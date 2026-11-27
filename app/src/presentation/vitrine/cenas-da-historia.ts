@@ -78,6 +78,22 @@ export function cenaAbertura(): HTMLElement {
   return criarCena("abertura", [tinta, titulo]);
 }
 
+/** Escala final da mancha de tinta na abertura (a mesma do fim da entrada animada). */
+export const ESCALA_DA_MANCHA = 1.75;
+
+/**
+ * A abertura em repouso, sem animação (movimento reduzido ou abaixo de 30 fps): a gota já virou mancha e está no
+ * tamanho final, para o título creme ter o fundo escuro por trás.
+ */
+export function pousarAbertura(cena: HTMLElement): void {
+  const gota = cena.querySelector('[data-parte="gota"]');
+  const forma = cena.querySelector('[data-parte="forma-da-mancha"]')?.getAttribute("d");
+  if (gota && forma) gota.setAttribute("d", forma);
+  cena
+    .querySelector('[data-parte="mancha"]')
+    ?.setAttribute("transform", `translate(800 450) scale(${ESCALA_DA_MANCHA})`);
+}
+
 export function cenaJogo(
   dados: DadosDasCenas,
   opcoesDoZe: OpcoesDoPersonagem,

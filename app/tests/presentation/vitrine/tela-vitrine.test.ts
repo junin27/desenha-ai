@@ -6,7 +6,11 @@ import type { PalpitesNaFracao } from "../../../src/application/palpites-da-vitr
 import { criarDesenho } from "../../../src/domain/desenho/desenho";
 import { ClassificadorOnnx } from "../../../src/infrastructure/onnx/classificador-onnx";
 import { entradaDaGrade } from "../../../src/presentation/vitrine/cenas-da-historia";
-import { TelaVitrine, type ConteudoDaVitrine } from "../../../src/presentation/vitrine/tela-vitrine";
+import {
+  TelaVitrine,
+  type AnimacaoDaVitrine,
+  type ConteudoDaVitrine,
+} from "../../../src/presentation/vitrine/tela-vitrine";
 
 const NOMES = Array.from({ length: 30 }, (_, i) => (i === 15 ? "sol" : i === 20 ? "flor" : `classe${i}`));
 const SOL = criarDesenho([
@@ -178,5 +182,47 @@ describe("Requisito: Grade 28×28 é a entrada da CNN (spec vitrine-da-abertura)
     grade.forEach((v, i) => {
       expect(Math.abs(v - (recebido[0]?.[i] ?? Number.NaN))).toBeLessThanOrEqual(1e-6);
     });
+  });
+});
+
+describe("Requisito: Degradação em notebook lento (spec vitrine-da-abertura)", () => {
+  it("test_taxa_baixa_no_meio_da_abertura_desfaz_a_animacao_e_o_titulo_fica_visivel", async () => {
+    let agora = 0;
+    let revertida = false;
+    // Animação de mentira que, como o GSAP no meio da abertura, deixa as letras do título invisíveis
+    // até ser revertida.
+    const criarAnimacao = (cenas: Record<string, HTMLElement>): Promise<AnimacaoDaVitrine> => {
+      const titulo = cenas.abertura?.querySelector<HTMLElement>(".titulo-vitrine");
+      if (titulo) titulo.style.opacity = "0";
+      return Promise.resolve({
+        time: () => undefined,
+        kill: () => undefined,
+        revert: () => {
+          revertida = true;
+          if (titulo) titulo.style.opacity = "";
+        },
+      });
+    };
+    const tela = await montada(conteudo(), { animar: true, agoraMs: () => agora, criarAnimacao });
+    await new Promise((resolver) => setTimeout(resolver, 0)); // a animação "carrega"
+    for (let i = 0; i < 200; i++) {
+      agora += 45; // 22 quadros por segundo, depois do aquecimento de 2 s
+      tela.passo();
+    }
+    expect(revertida).toBe(true);
+    const titulo = tela.raiz.querySelector<HTMLElement>(".titulo-vitrine");
+    expect(titulo?.style.opacity).toBe("");
+    expect(tela.capitulo).toBe("abertura");
+    // em repouso a abertura mostra a mancha de tinta pronta (o título creme precisa dela por trás)
+    const abertura = tela.raiz.querySelector('[data-cena="abertura"]');
+    const gota = abertura?.querySelector('[data-parte="gota"]')?.getAttribute("d");
+    expect(gota).toBe(abertura?.querySelector('[data-parte="forma-da-mancha"]')?.getAttribute("d"));
+  });
+
+  it("test_movimento_reduzido_abertura_ja_com_a_mancha_pronta", async () => {
+    const tela = await montada(conteudo(), { movimentoReduzido: true });
+    const abertura = tela.raiz.querySelector('[data-cena="abertura"]');
+    const gota = abertura?.querySelector('[data-parte="gota"]')?.getAttribute("d");
+    expect(gota).toBe(abertura?.querySelector('[data-parte="forma-da-mancha"]')?.getAttribute("d"));
   });
 });
