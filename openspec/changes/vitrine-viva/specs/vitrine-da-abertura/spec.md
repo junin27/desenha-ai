@@ -29,7 +29,7 @@ A vitrine SHALL caber em 1366×768 e em 1920×1080 sem barra de rolagem e sem co
 - **THEN** a posição de rolagem da página continua 0
 
 ### Requirement: Avançar e voltar a história
-Cada gesto (um giro da roda do mouse, Seta para baixo, PageDown, Espaço ou arrastar o dedo para cima) SHALL levar a história até a parada do capítulo seguinte, tocando a passagem inteira sem pular quadros; Seta para cima, PageUp e arrastar para baixo SHALL voltar à parada do capítulo anterior. Cada capítulo tem uma parada, logo antes do seu portal. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
+Cada gesto (um giro da roda do mouse para cima, Seta para baixo, PageDown, Espaço ou arrastar o dedo para cima) SHALL levar a história até a parada do capítulo seguinte, tocando a passagem inteira sem pular quadros; Girar a roda para baixo, Seta para cima, PageUp e arrastar para baixo SHALL voltar à parada do capítulo anterior. Cada capítulo tem uma parada, logo antes do seu portal. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
 
 #### Scenario: Avançar com a tecla
 - **WHEN** a vitrine está parada no capítulo de abertura e o visitante aperta Seta para baixo uma vez
@@ -40,8 +40,8 @@ Cada gesto (um giro da roda do mouse, Seta para baixo, PageDown, Espaço ou arra
 - **THEN** a história avança só um capítulo
 
 #### Scenario: Rodinha na abertura
-- **WHEN** a vitrine está parada no capítulo de abertura e o visitante gira a roda em qualquer sentido
-- **THEN** a história anda até a parada do capítulo do jogo, e o título da abertura nunca é desfeito
+- **WHEN** a vitrine está parada no capítulo de abertura e o visitante gira a roda para baixo
+- **THEN** a vitrine continua na abertura com o título inteiro, sem voltar ao quadro vazio do início
 
 #### Scenario: Voltar por um portal
 - **WHEN** a história está no capítulo do desenho e o visitante volta até o capítulo do jogo

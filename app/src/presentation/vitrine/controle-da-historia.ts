@@ -91,9 +91,8 @@ export class ControleDaHistoria {
     const novoGesto = agora - this.ultimaRodinha > MS_ENTRE_GESTOS_DA_RODA;
     this.ultimaRodinha = agora;
     if (!novoGesto || deltaY === 0) return;
-    // na abertura não há para onde voltar: girar para qualquer lado avança (mouse com rolagem invertida)
-    const naAbertura = this.alvo <= (PARADAS_DOS_CAPITULOS[0] ?? 0) + 1e-6;
-    if (deltaY > 0 || naAbertura) this.avancarCapitulo();
+    // pedido do usuário (27/11/2026): girar para cima (deltaY < 0) avança, para baixo volta
+    if (deltaY < 0) this.avancarCapitulo();
     else this.voltarCapitulo();
   }
 

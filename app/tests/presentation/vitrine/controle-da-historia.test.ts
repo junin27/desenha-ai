@@ -53,7 +53,16 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
     expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[0] ?? -1, 5);
   });
 
-  it("test_rodinha_para_cima_na_abertura_avanca_para_o_jogo", () => {
+  it("test_rodinha_para_baixo_volta_ao_capitulo_anterior", () => {
+    const relogio = new RelogioFalso();
+    const controle = new ControleDaHistoria(relogio.agora);
+    controle.irPara(PARADAS_DOS_CAPITULOS[2] ?? -1);
+    ligarEntrada(window, controle, () => true);
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: 100, cancelable: true }));
+    expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
+  });
+
+  it("test_rodinha_para_cima_avanca_para_o_jogo", () => {
     const relogio = new RelogioFalso();
     const controle = new ControleDaHistoria(relogio.agora);
     ligarEntrada(window, controle, () => true);
@@ -68,7 +77,7 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
     ligarEntrada(window, controle, () => true);
     rodar(controle, relogio, 6000);
     for (let i = 0; i < 12; i++) {
-      window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+      window.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, cancelable: true }));
       rodar(controle, relogio, 30);
     }
     expect(rodar(controle, relogio, 6000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[1] ?? -1, 5);
@@ -79,9 +88,9 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
     const controle = new ControleDaHistoria(relogio.agora);
     ligarEntrada(window, controle, () => true);
     rodar(controle, relogio, 6000);
-    window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, cancelable: true }));
     rodar(controle, relogio, 800);
-    window.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, cancelable: true }));
+    window.dispatchEvent(new WheelEvent("wheel", { deltaY: -120, cancelable: true }));
     expect(rodar(controle, relogio, 10_000)).toBeCloseTo(PARADAS_DOS_CAPITULOS[2] ?? -1, 5);
   });
 
@@ -104,7 +113,7 @@ describe("Requisito: Avançar e voltar a história (spec vitrine-da-abertura)", 
   it("test_rodinha_nao_rola_a_pagina", () => {
     const controle = new ControleDaHistoria(() => 0);
     ligarEntrada(window, controle, () => true);
-    const rodinha = new WheelEvent("wheel", { deltaY: 300, cancelable: true });
+    const rodinha = new WheelEvent("wheel", { deltaY: -300, cancelable: true });
     window.dispatchEvent(rodinha);
     expect(rodinha.defaultPrevented).toBe(true);
     expect(window.scrollY).toBe(0);
