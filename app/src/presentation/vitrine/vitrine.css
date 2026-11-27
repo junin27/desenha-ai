@@ -736,3 +736,44 @@
   padding: 2px 16px;
   cursor: pointer;
 }
+
+/*
+ * Fundo de cada capítulo = cor do objeto do portal que leva a ele. A câmera mergulha no objeto até a cor dele
+ * cobrir a tela; se o capítulo seguinte começar dessa mesma cor, ele parece já estar lá dentro (não há troca de
+ * cor no corte). Cores medidas no fim do zoom de cada objeto.
+ */
+.cena-desenho {
+  background: #5d442d; /* interior da janela da casa, medido nos pixels do vídeo da roça */
+}
+.cena-cnn {
+  background:
+    linear-gradient(#efe6d2 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(90deg, #efe6d2 1px, transparent 1px) 0 0 / 34px 34px,
+    #fffdf6; /* papel da folha onde o desenho foi feito */
+}
+.cena-lstm,
+.cena-ze {
+  background: #fffdf6; /* papel da grade 28×28 e da caixa da resposta da LSTM */
+}
+.cena-destilacao {
+  background: #f3c79b; /* pele do Zé: o professor ensina "dentro da cabeça" dele */
+}
+.cena-qlora {
+  background: var(--tinta); /* a tinta no fundo do jarro do aluno */
+}
+.cena-qlora .legenda-pesos,
+.cena-qlora .antes-depois {
+  color: #fff6df;
+}
+.cena-qlora .antes-depois b {
+  color: #a5d6a7;
+}
+.cena-quantizacao {
+  background: #cfc3a6; /* o peso em que a câmera entra */
+}
+.hex.ze span {
+  background: #cfc3a6; /* a quantização encolhe para dentro deste hexágono: mesma cor */
+}
+.cena-engenharia {
+  background: #5d442d; /* encolhe para dentro da janela da casa no convite */
+}
