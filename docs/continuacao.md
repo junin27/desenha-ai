@@ -108,6 +108,17 @@ bash scripts/verificar.sh             # tem de terminar com "OK: verificação c
 - **Feito nesta sessão:** charada sem vazamento na tela; parâmetros corrigidos (1,72 bi, LoRA 1,01%, FP16 3,44 GB) no notebook e no banner; revisão offline do treino (`scripts/revisar_dataset.py`); jogo com temperatura 0,3 e sem penalidade; `docs/cadastro.md` com os campos do formulário e o padrão da planilha do professor (repetição = vermelho).
 - **Próximo passo:** change na demo-offline para usar o GGUF Q8_0 (hoje `preparar_demo.py` grava o Zé com o nome `…Q4_K_M.gguf`); `preparar_demo.py --gguf-do-ze notebooks/resultados/rodada5/zedorabisco-1.7b-Q8_0.gguf`; ensaio real; voltar o formato do Zé a ✗ no checklist; preencher os `[PENDENTE]` de banner e pitch; arquivar as 6 changes. Cadastro no formulário até 27/11 (com o usuário).
 
+## Estado em 27/11/2026 (madrugada) — LEIA PRIMEIRO (vitrine-viva, transições)
+
+O usuário ainda **não aprovou** a transição entre capítulos; vai continuar no serviço.
+
+- **Feito:** rodinha para cima avança e para baixo volta, na medida do giro (0,5 s por 100 px), e parar de girar para no meio. O trecho parado antes de cada parada é pulado. Teclas vão de parada em parada. A vitrine cobre telas acima de 1600 px. O texto do capítulo fica visível na parada.
+- **Transição atual (corte pela cor):** a câmera mergulha só na cena atual até a cor do objeto cobrir a tela (o buraco do "ô", a janela marrom); o capítulo seguinte surge em tela cheia de 85% do zoom em diante (`opacidadeDaCenaNova` em `animacao-da-vitrine.ts`).
+- **O que o usuário rejeitou:** prévia ou miniatura visível no objeto, a cena nova recortada dentro do objeto (a roça no "ô", o desenho bege na janela) e o véu colorido sobre a cena recortada. Ele quer a sensação de que a próxima tela "já fazia parte do cenário".
+- **Problemas conhecidos:** no "ô" pode sobrar um pouco do anel laranja nos cantos quando a roça surge (`RAIO_DO_BURACO_DO_O = 0.1`; com 0.06 a tela fica escura antes, mas o zoom pesa demais). A fluidez não foi medida nesta máquina: o painel do navegador do app ficou preso em 30 fps e liga o modo lento.
+- **Ideia a discutir com ele:** desenhar o capítulo seguinte com fundo da mesma cor do objeto, para o corte não ter troca de cor.
+- `app/package-lock.json` local tem linhas `libc` removidas pelo npm: não faça commit.
+
 ## Estado em 26/11/2026 (tarde) — LEIA PRIMEIRO (change `vitrine-viva`)
 
 **Onde paramos:** implementando a change `openspec/changes/vitrine-viva` (aprovada pelo usuário em 26/11). 27 de 33 tarefas feitas e no GitHub; `bash scripts/verificar.sh` verde (485 testes Python, 701 TS, OpenSpec 13/13).
