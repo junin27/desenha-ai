@@ -42,8 +42,25 @@ const VELOCIDADE_PARA_A_FRENTE = 2;
 const VELOCIDADE_PARA_TRAS = 2.5;
 /** Quadro mais longo considerado: uma engasgada do navegador não faz a passagem pular um pedaço. */
 const MAIOR_QUADRO_EM_SEGUNDOS = 1 / 60;
-/** Eventos da roda mais próximos que isso são o mesmo gesto (trackpads mandam dezenas por giro). */
-export const MS_ENTRE_GESTOS_DA_RODA = 400;
+/** Rodinha (spec "Rodinha acompanha a transição"): segundos de história por pixel girado (0,5 s a cada 100 px). */
+const SEGUNDOS_POR_PIXEL_DA_RODA = 0.005;
+/** Ritmo com que o tempo alcança a rodinha: rápido para parecer preso à mão, sem saltar quadros. */
+const VELOCIDADE_DA_RODINHA = 6;
+/** Depois disso, a partir do início do capítulo, as entradas já terminaram e nada anda até a parada. */
+const FIM_DAS_ENTRADAS = 3;
+
+/** Trechos sem animação de cada capítulo (do fim das entradas até a parada): a rodinha passa direto por eles. */
+const TRECHOS_PARADOS: readonly (readonly [number, number])[] = CAPITULOS.slice(1).map(({ id }, i) => [
+  INICIO_DOS_CAPITULOS[id] + FIM_DAS_ENTRADAS,
+  PARADAS_DOS_CAPITULOS[i + 1] ?? DURACAO_DA_HISTORIA,
+]);
+
+/** Se o tempo cair num trecho parado, pula para a borda dele no sentido do giro. */
+export function atravessarTrechoParado(segundos: number, paraFrente: boolean): number {
+  const trecho = TRECHOS_PARADOS.find(([inicio, fim]) => segundos > inicio && segundos < fim);
+  if (trecho === undefined) return segundos;
+  return paraFrente ? trecho[1] : trecho[0];
+}
 const PIXELS_DO_GESTO_DE_TOQUE = 50;
 
 export function capituloEm(segundos: number): IdDoCapitulo {
@@ -62,7 +79,6 @@ export class ControleDaHistoria {
   private tempo = 0;
   private velocidade = VELOCIDADE_DA_ENTRADA;
   private ultimoPasso: number | undefined;
-  private ultimaRodinha = Number.NEGATIVE_INFINITY;
 
   constructor(private readonly agoraMs: () => number) {}
 
@@ -85,15 +101,16 @@ export class ControleDaHistoria {
     this.velocidade = VELOCIDADE_PARA_TRAS;
   }
 
-  /** Um giro da roda: só o primeiro evento de cada gesto conta. */
+  /** A rodinha move a história na medida do giro; parar de girar para a história onde ela está. */
   rodinha(deltaY: number): void {
-    const agora = this.agoraMs();
-    const novoGesto = agora - this.ultimaRodinha > MS_ENTRE_GESTOS_DA_RODA;
-    this.ultimaRodinha = agora;
-    if (!novoGesto || deltaY === 0) return;
-    // pedido do usuário (27/11/2026): girar para cima (deltaY < 0) avança, para baixo volta
-    if (deltaY < 0) this.avancarCapitulo();
-    else this.voltarCapitulo();
+    if (deltaY === 0) return;
+    // girar para cima (deltaY < 0) avança, para baixo volta (pedido do usuário, 27/11/2026)
+    const paraFrente = deltaY < 0;
+    const primeiraParada = PARADAS_DOS_CAPITULOS[0] ?? 0;
+    const desejado = this.alvo - deltaY * SEGUNDOS_POR_PIXEL_DA_RODA;
+    const limitado = Math.min(DURACAO_DA_HISTORIA, Math.max(primeiraParada, desejado));
+    this.alvo = atravessarTrechoParado(limitado, paraFrente);
+    this.velocidade = VELOCIDADE_DA_RODINHA;
   }
 
   irPara(segundos: number): void {

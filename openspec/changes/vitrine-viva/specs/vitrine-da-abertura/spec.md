@@ -29,23 +29,30 @@ A vitrine SHALL caber em 1366×768 e em 1920×1080 sem barra de rolagem e sem co
 - **THEN** a posição de rolagem da página continua 0
 
 ### Requirement: Avançar e voltar a história
-Cada gesto (um giro da roda do mouse para cima, Seta para baixo, PageDown, Espaço ou arrastar o dedo para cima) SHALL levar a história até a parada do capítulo seguinte, tocando a passagem inteira sem pular quadros; Girar a roda para baixo, Seta para cima, PageUp e arrastar para baixo SHALL voltar à parada do capítulo anterior. Cada capítulo tem uma parada, logo antes do seu portal. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
+Seta para baixo, PageDown, Espaço e arrastar o dedo para cima SHALL levar a história até a parada do capítulo seguinte, tocando a passagem inteira sem pular quadros; Seta para cima, PageUp e arrastar para baixo SHALL voltar à parada do capítulo anterior. Cada capítulo tem uma parada, logo antes do seu portal. Voltar SHALL restaurar o estado anterior das cenas, sem cena sobreposta nem deslocada.
 
 #### Scenario: Avançar com a tecla
 - **WHEN** a vitrine está parada no capítulo de abertura e o visitante aperta Seta para baixo uma vez
 - **THEN** a história anda até a parada do capítulo do jogo e para ali
 
-#### Scenario: Vários giros seguidos da roda
-- **WHEN** o visitante gira a roda várias vezes no mesmo gesto
-- **THEN** a história avança só um capítulo
+#### Scenario: Voltar por um portal
+- **WHEN** a história está no capítulo do desenho e o visitante volta até o capítulo do jogo
+- **THEN** só a cena do jogo fica visível, sem transformação nem recorte aplicado a ela
+
+### Requirement: Rodinha acompanha a transição
+A roda do mouse SHALL mover a história na medida do giro: girar para cima avança 0,5 s de história a cada 100 px de rolagem, girar para baixo volta na mesma medida, e parar de girar para a história onde ela está, mesmo no meio de um portal. O trecho de um capítulo sem animação, entre o fim das entradas (3 s depois do início do capítulo) e a parada dele, SHALL ser atravessado sem precisar girar por ele. A história SHALL NOT voltar antes da parada da abertura nem passar do fim.
+
+#### Scenario: Meio giro para no meio do portal
+- **WHEN** a vitrine está na parada da abertura e o visitante gira a roda 100 px para cima e para
+- **THEN** a história fica parada 0,5 s depois da parada da abertura, no meio do portal do "ô"
+
+#### Scenario: Trecho parado é atravessado
+- **WHEN** a vitrine está na parada do jogo e o visitante gira a roda 100 px para baixo
+- **THEN** a história volta até 3 s depois do início do capítulo do jogo
 
 #### Scenario: Rodinha na abertura
 - **WHEN** a vitrine está parada no capítulo de abertura e o visitante gira a roda para baixo
 - **THEN** a vitrine continua na abertura com o título inteiro, sem voltar ao quadro vazio do início
-
-#### Scenario: Voltar por um portal
-- **WHEN** a história está no capítulo do desenho e o visitante volta até o capítulo do jogo
-- **THEN** só a cena do jogo fica visível, sem transformação nem recorte aplicado a ela
 
 ### Requirement: História só anda com o visitante
 A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fica ali até o visitante fazer um gesto. As animações de entrada do capítulo atual tocam até a parada dele.
@@ -55,15 +62,23 @@ A vitrine SHALL NOT avançar de capítulo sozinha: parada num capítulo, ela fic
 - **THEN** a vitrine continua no capítulo de abertura
 
 ### Requirement: Transição por portal
-O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado, o objeto aparece como sempre e nada do capítulo seguinte é visível. No gesto, a câmera mergulha no objeto e o capítulo seguinte surge de dentro dele durante a primeira metade do zoom, até ocupar a tela inteira. Os objetos SHALL ser: o buraco do "ô", a janela da casa, a folha do desenho, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso.
+O capítulo seguinte SHALL estar escondido num objeto do capítulo atual: parado, o objeto aparece como sempre e nada do capítulo seguinte é visível. No gesto, a câmera mergulha no objeto, que cresce ainda com a sua própria cor (lida do objeto na tela), e o capítulo seguinte surge de dentro dessa cor entre 30% e 70% do zoom, até ocupar a tela inteira.
+
+#### Scenario: Objetos dos portais
+- **WHEN** a história passa pelos portais de mergulho, em ordem
+- **THEN** os objetos são o buraco do "ô", a janela da casa, a folha do desenho, a grade de pixels, a resposta da LSTM, a cabeça do Zé, o jarro e um peso
 
 #### Scenario: Escondido enquanto parado
 - **WHEN** a vitrine está parada no capítulo do jogo, antes de qualquer gesto
 - **THEN** o capítulo do desenho não está visível, e a janela da casa aparece como sempre
 
 #### Scenario: Surge de dentro do objeto
-- **WHEN** a câmera já percorreu metade do zoom na janela da casa
-- **THEN** o capítulo do desenho está totalmente visível, recortado no formato da janela ampliada
+- **WHEN** a câmera já percorreu 70% do zoom na janela da casa
+- **THEN** o capítulo do desenho está totalmente visível, sem a cor da janela por cima, recortado no formato da janela ampliada
+
+#### Scenario: Começa na cor do objeto
+- **WHEN** a câmera percorreu até 30% do zoom na janela da casa
+- **THEN** o recorte da janela ampliada mostra só a cor da janela, e não o cenário do desenho
 
 #### Scenario: Fim do portal
 - **WHEN** termina a passagem para qualquer capítulo
