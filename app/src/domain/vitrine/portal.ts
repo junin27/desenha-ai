@@ -6,6 +6,10 @@
  * s0) e C(u) = "amplia por s0^-u em volta do objeto e leva o centro do objeto ao centro da tela", em u = 1 vale
  * C∘P0 = identidade: a cena nova termina exatamente na tela, sem borda. O recorte começa no formato do objeto
  * (círculo = canto de meio lado) e se abre até a tela inteira, sempre dentro da cena nova.
+ *
+ * Com FOCO (o elemento principal da cena nova), no começo é ele que preenche o objeto, e não a cena inteira
+ * encolhida: P0 vira P(u), que vai de "foco sobre o objeto" (u = 0) a "tela sobre o objeto" (u = 1); como em
+ * u = 1 vale o P0 de antes, o fim continua sendo a identidade.
  */
 
 export interface Retangulo {
@@ -40,6 +44,9 @@ export interface Recorte {
 
 export interface GeometriaDoPortal {
   readonly tela: TamanhoDaTela;
+  readonly objeto: ObjetoDoPortal;
+  /** Foco da cena nova: sua escala sobre o objeto e seu centro, em coordenadas da cena nova. */
+  readonly foco?: { readonly escala: number; readonly centro: { readonly x: number; readonly y: number } };
   readonly escalaInicial: number;
   readonly centroDoObjeto: { readonly x: number; readonly y: number };
   readonly deslocamentoInicial: { readonly x: number; readonly y: number };
@@ -58,7 +65,11 @@ const INICIO_DA_ABERTURA = 0.3;
 const CANTO_PADRAO = 18;
 const IDENTIDADE: Matriz = [1, 0, 0, 1, 0, 0];
 
-export function geometriaDoPortal(objeto: ObjetoDoPortal, tela: TamanhoDaTela): GeometriaDoPortal {
+export function geometriaDoPortal(
+  objeto: ObjetoDoPortal,
+  tela: TamanhoDaTela,
+  foco?: Retangulo,
+): GeometriaDoPortal {
   const escalaInicial = Math.max(objeto.largura / tela.largura, objeto.altura / tela.altura);
   const centroDoObjeto = { x: objeto.x + objeto.largura / 2, y: objeto.y + objeto.altura / 2 };
   const deslocamentoInicial = {
@@ -76,7 +87,31 @@ export function geometriaDoPortal(objeto: ObjetoDoPortal, tela: TamanhoDaTela): 
     baixo: tela.altura - topo - objeto.altura / escalaInicial,
     canto: canto / escalaInicial,
   };
-  return { tela, escalaInicial, centroDoObjeto, deslocamentoInicial, recorteInicial };
+  const comFoco =
+    foco === undefined || foco.largura <= 0 || foco.altura <= 0
+      ? undefined
+      : {
+          escala: Math.max(objeto.largura / foco.largura, objeto.altura / foco.altura),
+          centro: { x: foco.x + foco.largura / 2, y: foco.y + foco.altura / 2 },
+        };
+  return {
+    tela,
+    objeto,
+    ...(comFoco ? { foco: comFoco } : {}),
+    escalaInicial,
+    centroDoObjeto,
+    deslocamentoInicial,
+    recorteInicial,
+  };
+}
+
+/** P(u): escala e deslocamento que põem a cena nova sobre o objeto (antes da câmera). */
+function posicionamento(geometria: GeometriaDoPortal, u: number): { escala: number; x: number; y: number } {
+  const { escalaInicial, centroDoObjeto: c, tela, foco } = geometria;
+  const escala = foco ? foco.escala ** (1 - u) * escalaInicial ** u : escalaInicial;
+  const qx = foco ? foco.centro.x + (tela.largura / 2 - foco.centro.x) * u : tela.largura / 2;
+  const qy = foco ? foco.centro.y + (tela.altura / 2 - foco.centro.y) * u : tela.altura / 2;
+  return { escala, x: c.x - escala * qx, y: c.y - escala * qy };
 }
 
 /** Posição das duas cenas e o recorte da de dentro para o progresso `u` (limitado a [0, 1]). */
@@ -119,19 +154,37 @@ function matrizDeFora(geometria: GeometriaDoPortal, u: number): Matriz {
 
 function matrizDeDentro(geometria: GeometriaDoPortal, u: number): Matriz {
   const { zoom, alvoX, alvoY } = camera(geometria, u);
-  const { centroDoObjeto: c, deslocamentoInicial: o, escalaInicial } = geometria;
-  const escala = zoom * escalaInicial;
-  return [escala, 0, 0, escala, zoom * (o.x - c.x) + alvoX, zoom * (o.y - c.y) + alvoY];
+  const c = geometria.centroDoObjeto;
+  const p = posicionamento(geometria, u);
+  const escala = zoom * p.escala;
+  return [escala, 0, 0, escala, zoom * (p.x - c.x) + alvoX, zoom * (p.y - c.y) + alvoY];
 }
 
 function recorteEm(geometria: GeometriaDoPortal, u: number): Recorte {
   const fechado = 1 - suavizar((u - INICIO_DA_ABERTURA) / (1 - INICIO_DA_ABERTURA));
-  const r = geometria.recorteInicial;
+  const r = recorteDoObjeto(geometria, u);
   return {
     topo: r.topo * fechado,
     direita: r.direita * fechado,
     baixo: r.baixo * fechado,
     esquerda: r.esquerda * fechado,
     canto: r.canto * fechado,
+  };
+}
+
+/** O objeto em coordenadas da cena nova (por P(u)): é por ele que a cena nova é vista antes de abrir. */
+function recorteDoObjeto(geometria: GeometriaDoPortal, u: number): Recorte {
+  const { objeto, tela } = geometria;
+  const p = posicionamento(geometria, u);
+  const esquerda = (objeto.x - p.x) / p.escala;
+  const topo = (objeto.y - p.y) / p.escala;
+  const canto =
+    objeto.forma === "circulo" ? Math.min(objeto.largura, objeto.altura) / 2 : (objeto.canto ?? CANTO_PADRAO);
+  return {
+    topo,
+    esquerda,
+    direita: tela.largura - esquerda - objeto.largura / p.escala,
+    baixo: tela.altura - topo - objeto.altura / p.escala,
+    canto: canto / p.escala,
   };
 }

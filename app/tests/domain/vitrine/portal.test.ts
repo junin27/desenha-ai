@@ -65,3 +65,40 @@ describe("Requisito: Transição por portal (spec vitrine-da-abertura)", () => {
     expect(quadroDoPortal(geometria, 2)).toEqual(quadroDoPortal(geometria, 1));
   });
 });
+
+describe("Requisito: Transição por portal, com foco no elemento principal (spec vitrine-da-abertura)", () => {
+  const FOLHA = { x: 400, y: 150, largura: 560, altura: 480 };
+
+  it("test_previa_com_foco_o_elemento_principal_preenche_o_objeto", () => {
+    const quadro = quadroDoPortal(geometriaDoPortal(JANELA, TELA, FOLHA), 0);
+    const [x0, y0] = aplicarMatriz(quadro.dentro, FOLHA.x, FOLHA.y);
+    const [x1, y1] = aplicarMatriz(quadro.dentro, FOLHA.x + FOLHA.largura, FOLHA.y + FOLHA.altura);
+    // centro da folha no centro da janela, e a folha cobre a janela (escala pelo lado que mais pede)
+    expect((x0 + x1) / 2).toBeCloseTo(JANELA.x + JANELA.largura / 2, 6);
+    expect((y0 + y1) / 2).toBeCloseTo(JANELA.y + JANELA.altura / 2, 6);
+    expect(x1 - x0).toBeGreaterThanOrEqual(JANELA.largura - 1e-6);
+    expect(y1 - y0).toBeGreaterThanOrEqual(JANELA.altura - 1e-6);
+    expect(Math.min(x1 - x0 - JANELA.largura, y1 - y0 - JANELA.altura)).toBeCloseTo(0, 6);
+  });
+
+  it("test_previa_com_foco_o_recorte_mostra_so_a_janela", () => {
+    const quadro = quadroDoPortal(geometriaDoPortal(JANELA, TELA, FOLHA), 0);
+    const r = quadro.recorte;
+    expect(r).not.toBeNull();
+    if (!r) return;
+    const [x0, y0] = aplicarMatriz(quadro.dentro, r.esquerda, r.topo);
+    const [x1, y1] = aplicarMatriz(quadro.dentro, TELA.largura - r.direita, TELA.altura - r.baixo);
+    expect([x0, y0, x1, y1].map((v) => Math.round(v * 1000) / 1000)).toEqual([
+      JANELA.x,
+      JANELA.y,
+      JANELA.x + JANELA.largura,
+      JANELA.y + JANELA.altura,
+    ]);
+  });
+
+  it("test_fim_do_portal_com_foco_a_cena_nova_fica_identidade_e_sem_recorte", () => {
+    const quadro = quadroDoPortal(geometriaDoPortal(JANELA, TELA, FOLHA), 1);
+    expect(quadro.dentro).toEqual([1, 0, 0, 1, 0, 0]);
+    expect(quadro.recorte).toBeNull();
+  });
+});
